@@ -36,22 +36,22 @@ library(janitor)
 # as NA values. Further details can be obtained via the following link:
 # https://pharmaverse.github.io/admiral/articles/admiral.html#handling-of-missing-values
 
-path <- ("original-sdtmdata/")
+path <- list(
+sdtm = "original-sdtmdata/", 
+adam = "original-adamdata/")    
 
 
-dm <- convert_blanks_to_na(read_xpt(file.path(path, "dm.xpt")))
-ds <- convert_blanks_to_na(read_xpt(file.path(path, "ds.xpt")))
-ex <- convert_blanks_to_na(read_xpt(file.path(path, "ex.xpt")))
-qs <- convert_blanks_to_na(read_xpt(file.path(path, "qs.xpt")))
-sv <- convert_blanks_to_na(read_xpt(file.path(path, "sv.xpt")))
-vs <- convert_blanks_to_na(read_xpt(file.path(path, "vs.xpt")))
-sc <- convert_blanks_to_na(read_xpt(file.path(path, "sc.xpt")))
-mh <-convert_blanks_to_na(read_xpt(file.path(path, "mh.xpt")))
+dm <- convert_blanks_to_na(read_xpt(file.path(path$sdtm, "dm.xpt")))
+ds <- convert_blanks_to_na(read_xpt(file.path(path$sdtm, "ds.xpt")))
+ex <- convert_blanks_to_na(read_xpt(file.path(path$sdtm, "ex.xpt")))
+qs <- convert_blanks_to_na(read_xpt(file.path(path$sdtm, "qs.xpt")))
+sv <- convert_blanks_to_na(read_xpt(file.path(path$sdtm, "sv.xpt")))
+vs <- convert_blanks_to_na(read_xpt(file.path(path$sdtm, "vs.xpt")))
+sc <- convert_blanks_to_na(read_xpt(file.path(path$sdtm, "sc.xpt")))
+mh <-convert_blanks_to_na(read_xpt(file.path(path$sdtm, "mh.xpt")))
 
 ## placeholder for origin=predecessor, use metatool::build_from_derived()
-xlpath <- "pilot5-submission/pilot5-documents"
-
-metacore <- spec_to_metacore(file.path(xlpath, "adam-pilot-5.xlsx"), where_sep_sheet = FALSE)
+metacore <- spec_to_metacore(file.path(path$adam, "adam-pilot-5.xlsx"), where_sep_sheet = FALSE)
 # Get the specifications for the dataset we are currently building
 adsl_spec <- metacore %>%
   select_dataset("ADSL")
@@ -217,27 +217,23 @@ adsl03 <- adsl02 %>%
 
 # Disposition -------------------------------------------------------------
 
-?derive_vars_merged()
 
 
 adsl04 <- adsl03 %>%
   left_join(ds00, by = c("STUDYID", "USUBJID")) %>%
   select(-DSDECOD) %>%
-  derive_var_merged(
-    dataset_add = ds00,
-    by_vars = exprs(STUDYID, USUBJID),
-    new_var = EOSSTT,
-    source_var = DSDECOD,
-    cat_fun = format_eosstt,
-    filter_add = !is.na(USUBJID),
-  ) %>%
   derive_vars_merged(
     dataset_add = ds00,
     by_vars = exprs(STUDYID, USUBJID),
-    new_var = DCSREAS,
-    source_var = DSDECOD,
-    cat_fun = format_dcsreas, # could not include dsterm in formatting logic
-    filter_add = !is.na(USUBJID),
+    new_vars = exprs(EOSSTT = DSDECOD),
+    filter_add = !is.na(USUBJID)
+  ) %>%
+  mutate(EOSSTT = (EOSSTT)) %>%
+  derive_vars_merged(
+    dataset_add = ds00,
+    by_vars = exprs(STUDYID, USUBJID),
+    new_vars = exprs(DCSREAS = DSDECOD),
+    filter_add = !is.na(USUBJID)
   ) %>%
   mutate(DCSREAS = ifelse(DSTERM == "PROTOCOL ENTRY CRITERIA NOT MET", "I/E Not Met", DCSREAS))
 
@@ -338,5 +334,5 @@ adsl07 %>%
   xportr_format(adsl_spec$var_spec %>%
     mutate_at(c("format"), ~ replace_na(., "")), "ADSL") %>%
   xportr_write(file.path(path$adam, "adsl.xpt"),
-    label = "Subject-Level Analysis Dataset"
+    metadata = "Subject-Level Analysis Dataset"
   )
