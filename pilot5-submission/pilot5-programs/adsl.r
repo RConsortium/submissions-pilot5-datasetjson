@@ -25,9 +25,16 @@ library(dplyr)
 library(tidyr)
 library(metacore)
 library(metatools)
-library(pilot3utils)
+library(pilot5utils)
 library(xportr)
 library(janitor)
+
+
+ path <- list(
+ sdtm = "original-sdtmdata/", # Modify path to the sdtm location
+ adam = "original-adamdata/"     # Modify path to the adam location
+ )
+
 
 # read source -------------------------------------------------------------
 # When SAS datasets are imported into R using read_sas(), missing
@@ -45,7 +52,7 @@ sc <- convert_blanks_to_na(read_xpt(file.path(path$sdtm, "sc.xpt")))
 mh <- convert_blanks_to_na(read_xpt(file.path(path$sdtm, "mh.xpt")))
 
 ## placeholder for origin=predecessor, use metatool::build_from_derived()
-metacore <- spec_to_metacore(file.path(path$adam, "adam-pilot-3.xlsx"), where_sep_sheet = FALSE)
+metacore <- spec_to_metacore(file.path(path$adam, "adam-pilot-5.xlsx"), where_sep_sheet = FALSE)
 # Get the specifications for the dataset we are currently building
 adsl_spec <- metacore %>%
   select_dataset("ADSL")
@@ -148,7 +155,7 @@ adsl01 <- adsl00 %>%
   create_cat_var(adsl_spec, AGE, AGEGR1, AGEGR1N) %>%
   create_var_from_codelist(adsl_spec, RACE, RACEN) %>%
   mutate(
-    SITEGR1 = format_sitegr1(SITEID)
+    SITEGR1 = (SITEID)
   )
 
 # Population flag ---------------------------------------------------------
@@ -211,21 +218,18 @@ adsl03 <- adsl02 %>%
 adsl04 <- adsl03 %>%
   left_join(ds00, by = c("STUDYID", "USUBJID")) %>%
   select(-DSDECOD) %>%
-  derive_var_merged_cat(
+  derive_vars_merged(
     dataset_add = ds00,
     by_vars = exprs(STUDYID, USUBJID),
-    new_var = EOSSTT,
-    source_var = DSDECOD,
-    cat_fun = format_eosstt,
-    filter_add = !is.na(USUBJID),
+    new_vars = exprs(EOSSTT = DSDECOD),
+    filter_add = !is.na(USUBJID)
   ) %>%
-  derive_var_merged_cat(
+  mutate(EOSSTT = (EOSSTT)) %>%
+  derive_vars_merged(
     dataset_add = ds00,
     by_vars = exprs(STUDYID, USUBJID),
-    new_var = DCSREAS,
-    source_var = DSDECOD,
-    cat_fun = format_dcsreas, # could not include dsterm in formatting logic
-    filter_add = !is.na(USUBJID),
+    new_vars = exprs(DCSREAS = DSDECOD),
+    filter_add = !is.na(USUBJID)
   ) %>%
   mutate(DCSREAS = ifelse(DSTERM == "PROTOCOL ENTRY CRITERIA NOT MET", "I/E Not Met", DCSREAS))
 
@@ -324,6 +328,6 @@ adsl07 %>%
   xportr_df_label(adsl_spec) %>% # Assigns dataset label from metacore specifications
   xportr_format(adsl_spec$var_spec %>%
     mutate_at(c("format"), ~ replace_na(., "")), "ADSL") %>%
-  xportr_write(file.path(path$adam, "adsl.xpt"),
-    label = "Subject-Level Analysis Dataset"
+  xportr_write(file.path(path$adam, "adsl.json"),
+    metadata = "Subject-Level Analysis Dataset"
   )
