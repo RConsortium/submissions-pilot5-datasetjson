@@ -25,9 +25,10 @@ library(dplyr)
 library(tidyr)
 library(metacore)
 library(metatools)
-library(pilot3utils)
+library(pilot5utils)
 library(xportr)
 library(janitor)
+library(datasetjson)
 
 # read source -------------------------------------------------------------
 # When SAS datasets are imported into R using read_sas(), missing

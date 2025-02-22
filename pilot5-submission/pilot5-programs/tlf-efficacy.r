@@ -28,7 +28,7 @@ library(dplyr)
 library(haven)
 library(r2rtf)
 library(emmeans)
-library(pilot3utils)
+library(pilot5utils)
 
 
 ## ------------------------------------------------------------------------------------------------------------------------------
@@ -81,12 +81,12 @@ apr0ancova1 <- merge(t10, t11) %>%
   mutate(
     Trt = c("Xanomeline High Dose", "Placebo"),
     N1 = N,
-    Mean1 = pilot3utils::fmt_est(mean_bl, sd_bl),
+    Mean1 = pilot5utils::fmt_est(mean_bl, sd_bl),
     N2 = N_20,
-    Mean2 = pilot3utils::fmt_est(mean, sd),
+    Mean2 = pilot5utils::fmt_est(mean, sd),
     N3 = N_20,
-    Mean3 = pilot3utils::fmt_est(mean_chg, sd_chg),
-    CI = pilot3utils::fmt_ci(emmean, lower.CL, upper.CL)
+    Mean3 = pilot5utils::fmt_est(mean_chg, sd_chg),
+    CI = pilot5utils::fmt_ci(emmean, lower.CL, upper.CL)
   ) %>%
   select(Trt:CI)
 
@@ -104,8 +104,8 @@ apr0ancova2 <- t2 %>%
   ) %>%
   mutate(
     comp = "Xanomeline High Dose vs. Placebo",
-    mean = pilot3utils::fmt_ci(estimate, lower, upper),
-    p = pilot3utils::fmt_pval(p.value)
+    mean = pilot5utils::fmt_ci(estimate, lower, upper),
+    p = pilot5utils::fmt_pval(p.value)
   ) %>%
   select(comp:p)
 
@@ -148,7 +148,7 @@ tbl_1 <- apr0ancova1 %>%
     )
   ) %>%
   rtf_source(
-    source = c(paste("Table generated on:", Sys.time()), "Source: [pilot3: adam-adsl; adlbc]"),
+    source = c(paste("Table generated on:", Sys.time()), "Source: [pilot5: adam-adsl; adlbc]"),
     text_justification = "c"
   )
 
@@ -179,4 +179,4 @@ tbl_3 <- apr0ancova3 %>%
 tbl <- list(tbl_1, tbl_2, tbl_3)
 tbl %>%
   rtf_encode() %>%
-  write_rtf(file.path(path$output, "tlf-efficacy-pilot3.rtf"))
+  write_rtf(file.path(path$output, "tlf-efficacy-pilot5.rtf"))
