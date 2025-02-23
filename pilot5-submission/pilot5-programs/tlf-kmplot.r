@@ -28,8 +28,8 @@ library(haven)
 library(dplyr)
 library(ggplot2)
 library(cowplot)
-library(visR)
-library(pilot3utils)
+library(ggsurvfit)
+library(pilot5utils)
 
 
 ## ------------------------------------------------------------------------------------------------------------------------------
@@ -57,16 +57,16 @@ anl <- adsl %>%
 
 ## ------------------------------------------------------------------------------------------------------------------------------
 # estimate survival
-surv_mod <- visR::estimate_KM(data = anl, strata = "TRT01A")
+surv_mod <- ggsurvfit::estimate_KM(data = anl, strata = "TRT01A")
 
 # save plot
 ggplot2::theme_set(theme_bw())
 
 pdf.options(reset = TRUE, onefile = FALSE)
 
-pdf(file.path(path$output, "tlf-kmplot-pilot3.pdf"))
+pdf(file.path(path$output, "tlf-kmplot-pilot5.pdf"))
 
-km <- visR::visr(surv_mod,
+km <- ggsurvfit::visr(surv_mod,
   y_label = "Probability of event\n",
   x_label = "Time to First Dermatologic Event (Days)",
   y_ticks = seq(0, 1, 0.10)
@@ -78,7 +78,7 @@ km <- km +
   ggplot2::geom_hline(yintercept = 0.5, linetype = "dashed")
 
 km <- km %>%
-  visR::add_risktable(group = "statlist", rowgutter = 0.25)
+  ggsurvfit::add_risktable(group = "statlist", rowgutter = 0.25)
 
 title <- cowplot::ggdraw() +
   cowplot::draw_label(
