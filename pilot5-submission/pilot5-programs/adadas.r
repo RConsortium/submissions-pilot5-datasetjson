@@ -26,6 +26,7 @@ library(metatools)
 library(stringr)
 library(xportr)
 library(pilot5utils)
+library(datasetjson)
 
 dm <- haven::read_xpt(file.path(path$sdtm, "dm.xpt"))
 qs <- haven::read_xpt(file.path(path$sdtm, "qs.xpt"))
@@ -129,7 +130,7 @@ adas_locf2 <- adas4 %>%
   restrict_derivation(
     derivation = derive_locf_records,
     args = params(
-      dataset_expected_obs = actot_expected_obsv,
+      dataset_ref  = actot_expected_obsv,
       by_vars = exprs(
         STUDYID, SITEID, SITEGR1, USUBJID, TRTSDT, TRTEDT,
         TRTP, TRTPN, AGE, AGEGR1, AGEGR1N, RACE, RACEN, SEX,
@@ -175,12 +176,12 @@ adas5 <- adas_locf2 %>%
 
 
 ## out to XPT
-adas5 %>%
-  drop_unspec_vars(adadas_spec) %>% # only keep vars from define
-  order_cols(adadas_spec) %>% # order columns based on define
-  set_variable_labels(adadas_spec) %>% # apply variable labels based on define
-  xportr_format(adadas_spec$var_spec %>%
-    mutate_at(c("format"), ~ replace_na(., "")), "ADADAS") %>%
-  xportr_write(file.path(path$adam, "adadas.xpt"),
-    label = "ADAS-COG Analysis Dataset"
-  )
+# adas5 %>%
+#   drop_unspec_vars(adadas_spec) %>% # only keep vars from define
+#   order_cols(adadas_spec) %>% # order columns based on define
+#   set_variable_labels(adadas_spec) %>% # apply variable labels based on define
+#   xportr_format(adadas_spec$var_spec %>%
+#     mutate_at(c("format"), ~ replace_na(., "")), "ADADAS") %>%
+#   xportr_write(file.path(path$adam, "adadas.xpt"),
+#     label = "ADAS-COG Analysis Dataset"
+#   )
