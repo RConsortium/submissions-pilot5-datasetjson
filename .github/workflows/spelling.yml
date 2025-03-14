@@ -7,7 +7,7 @@ on:
     inputs:
       r-version:
         description: 'The version of R to use'
-        default: '4.2'
+        default: '4.4'
         required: false
         type: string
   push:
@@ -57,7 +57,7 @@ jobs:
           R_VERSION="${{ inputs.r-version }}"
           if [ "$R_VERSION" == "" ]
           then {
-            R_VERSION="4.2"
+            R_VERSION="4.4"
           }
           fi
           echo "::set-output name=R_VERSION::$R_VERSION"
