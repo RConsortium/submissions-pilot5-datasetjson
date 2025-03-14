@@ -54,7 +54,7 @@ jobs:
       - name: Normalize inputs
         id: normalizer
         run: |
-          R_VERSION="${{ inputs.r-version }}"
+          R_VERSION="${{ github.event.inputs.r-version }}"
           if [ "$R_VERSION" == "" ]
           then {
             R_VERSION="4.4"
