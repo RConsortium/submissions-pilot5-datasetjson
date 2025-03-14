@@ -83,9 +83,7 @@ jobs:
           
       - name: Install Dependencies
         run: |
-          if (!requireNamespace("spelling", quietly = TRUE)) {
-            install.packages("spelling")
-          }
+          renv::install("spelling")
         shell: Rscript {0}
 
       - name: Run Spellcheck
