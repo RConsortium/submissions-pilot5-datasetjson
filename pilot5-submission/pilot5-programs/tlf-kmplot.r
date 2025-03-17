@@ -57,28 +57,32 @@ anl <- adsl %>%
 
 ## ------------------------------------------------------------------------------------------------------------------------------
 # estimate survival
-surv_mod <- ggsurvfit::estimate_KM(data = anl, strata = "TRT01A")
+surv_mod <- ggsurvfit::survfit2(Surv(AVAL, 1-CNSR) ~ TRT01A, data = anl)
 
 # save plot
 ggplot2::theme_set(theme_bw())
 
-pdf.options(reset = TRUE, onefile = FALSE)
+km <- surv_mod |>
+  ggsurvfit(linewidth = 1) +
+  add_censor_mark() +
+  add_confidence_interval() +
+  add_risktable(risktable_stats = c("n.risk")) +
+  scale_ggsurvfit(x_scales = list(name = "Time to First Dermatologic Event (Days)",
+                                  breaks = seq(0, 200, by = 20),
+                                  limits = c(0, 200)
+                                  ),
+                  y_scales = list(name = "Probability of event",
+                                  expand = c(0.025, 0),
+                                  limits = c(0, 1),
+                                  breaks = seq(0, 1, by = 0.10),
+                                  label = NULL
+                                  )
+  ) +
+  ggsurvfit::add_legend_title(title = "TRT01A") + 
+  ggplot2::theme(legend.position = "right") + 
+  ggplot2::geom_hline(yintercept = 0.5, linetype = "dashed") %>%
+  ggsurvfit_build()
 
-pdf(file.path(path$output, "tlf-kmplot-pilot5.pdf"))
-
-km <- ggsurvfit::visr(surv_mod,
-  y_label = "Probability of event\n",
-  x_label = "Time to First Dermatologic Event (Days)",
-  y_ticks = seq(0, 1, 0.10)
-) %>%
-  add_CNSR() %>%
-  add_CI()
-
-km <- km +
-  ggplot2::geom_hline(yintercept = 0.5, linetype = "dashed")
-
-km <- km %>%
-  ggsurvfit::add_risktable(group = "statlist", rowgutter = 0.25)
 
 title <- cowplot::ggdraw() +
   cowplot::draw_label(
@@ -95,11 +99,12 @@ caption <- cowplot::ggdraw() +
     size = 10
   )
 
-km <- cowplot::plot_grid(
+file <- cowplot::plot_grid(
   title, km, caption,
   ncol = 1,
-  rel_heights = c(0.1, 0.8, 0.1)
+  rel_heights = c(0.1, 0.75, 0.1)
 )
 
-print(km)
-dev.off()
+ggsave(file, filename = file.path(path$output, "tlf-kmplot-pilot5.pdf"))
+
+while (!is.null(dev.list()))  dev.off()
