@@ -26,6 +26,10 @@ library(tidyr)
 library(metacore)
 library(metatools)
 library(pilot5utils)
+<<<<<<< HEAD
+=======
+library(remotes)
+>>>>>>> 7500270bcd98313e360cdeac98077eb9ae7a0ba5
 library(xportr)
 library(janitor)
 library(datasetjson)
@@ -43,6 +47,11 @@ library(datasetjson)
 # as NA values. Further details can be obtained via the following link:
 # https://pharmaverse.github.io/admiral/articles/admiral.html#handling-of-missing-values
 
+path <- list(
+sdtm = "original-sdtmdata/", 
+adam = "original-adamdata/")    
+
+
 dm <- convert_blanks_to_na(read_xpt(file.path(path$sdtm, "dm.xpt")))
 ds <- convert_blanks_to_na(read_xpt(file.path(path$sdtm, "ds.xpt")))
 ex <- convert_blanks_to_na(read_xpt(file.path(path$sdtm, "ex.xpt")))
@@ -50,7 +59,7 @@ qs <- convert_blanks_to_na(read_xpt(file.path(path$sdtm, "qs.xpt")))
 sv <- convert_blanks_to_na(read_xpt(file.path(path$sdtm, "sv.xpt")))
 vs <- convert_blanks_to_na(read_xpt(file.path(path$sdtm, "vs.xpt")))
 sc <- convert_blanks_to_na(read_xpt(file.path(path$sdtm, "sc.xpt")))
-mh <- convert_blanks_to_na(read_xpt(file.path(path$sdtm, "mh.xpt")))
+mh <-convert_blanks_to_na(read_xpt(file.path(path$sdtm, "mh.xpt")))
 
 ## placeholder for origin=predecessor, use metatool::build_from_derived()
 metacore <- spec_to_metacore(file.path(path$adam, "adam-pilot-5.xlsx"), where_sep_sheet = FALSE)
@@ -159,6 +168,9 @@ adsl01 <- adsl00 %>%
     SITEGR1 = (SITEID)
   )
 
+
+
+
 # Population flag ---------------------------------------------------------
 # SAFFL - Y if ITTFL='Y' and TRTSDT ne missing. N otherwise
 # ITTFL - Y if ARMCD ne ' '. N otherwise
@@ -216,6 +228,8 @@ adsl03 <- adsl02 %>%
 
 # Disposition -------------------------------------------------------------
 
+
+
 adsl04 <- adsl03 %>%
   left_join(ds00, by = c("STUDYID", "USUBJID")) %>%
   select(-DSDECOD) %>%
@@ -233,6 +247,7 @@ adsl04 <- adsl03 %>%
     filter_add = !is.na(USUBJID)
   ) %>%
   mutate(DCSREAS = ifelse(DSTERM == "PROTOCOL ENTRY CRITERIA NOT MET", "I/E Not Met", DCSREAS))
+
 
 # Baseline variables ------------------------------------------------------
 # selection definition from define
@@ -328,7 +343,7 @@ adsl07 %>%
   xportr_label(adsl_spec) %>% # Assigns variable label from metacore specifications
   xportr_df_label(adsl_spec) %>% # Assigns dataset label from metacore specifications
   xportr_format(adsl_spec$var_spec %>%
-    mutate_at(c("format"), ~ replace_na(., "")), "ADSL") %>%
-  xportr_write(file.path(path$adam, "adsl.json"),
-    metadata = "Subject-Level Analysis Dataset"
+                  mutate_at(c("format"), ~ replace_na(., "")), "ADSL") %>%
+  xportr_write(file.path(path$adam, "adsl.xpt"),
+               label = "Subject-Level Analysis Dataset"
   )
