@@ -30,10 +30,10 @@ library(xportr)
 library(janitor)
 library(datasetjson)
 
- path <- list(
- sdtm = "original-sdtmdata/", # Modify path to the sdtm location
- adam = "original-adamdata/"     # Modify path to the adam location
- )
+path <- list(
+  sdtm = "pilot5-submission/pilot5-input/sdtmdata/",  # Modify path to the sdtm location
+  adam = "pilot5-submission/pilot5-input/adamdata/", # Modify path to the adam location
+  dapm3 = "pilot5-submission/")    
 
 
 # read source -------------------------------------------------------------
@@ -41,11 +41,6 @@ library(datasetjson)
 # character values from SAS appear as "" characters in R, instead of appearing
 # as NA values. Further details can be obtained via the following link:
 # https://pharmaverse.github.io/admiral/articles/admiral.html#handling-of-missing-values
-
-path <- list(
-sdtm = "pilot5-submission/pilot5-input/sdtmdata/", 
-adam = "pilot5-submission/pilot5-input/sdtmdata/",
-dapm3 = "")    
 
  
 dm <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "dm.rds")))
@@ -60,7 +55,7 @@ mh <-convert_blanks_to_na(readRDS(file.path(path$sdtm, "mh.rds")))
 
 
 ## placeholder for origin=predecessor, use metatool::build_from_derived()
-metacore <- spec_to_metacore(file.path(path$adam, "adam-pilot-5.xlsx"), where_sep_sheet = FALSE)
+metacore <- spec_to_metacore(file.path(path$dapm3, "adam-pilot-5.xlsx"), where_sep_sheet = FALSE)
 # Get the specifications for the dataset we are currently building
 adsl_spec <- metacore %>%
   select_dataset("ADSL")
@@ -332,15 +327,12 @@ mmsetot <- qs %>%
 adsl07 <- adsl06 %>%
   left_join(mmsetot, by = c("STUDYID", "USUBJID"))
 
-adsl07 <- adsl07 %>%
-  mutate(DCSREAS = str_to_title(DCSREAS))
 
-unique(adsl07$DCSREAS)
 
 # Export to xpt -----------------------------------------------------
 adsl07 %>%
   drop_unspec_vars(adsl_spec) %>% # Check all variables specified are present and no more
-  #check_ct_data(adsl_spec, na_acceptable = TRUE) # Checks all variables with CT only contain values within the CT
+  #check_ct_data(adsl_spec, na_acceptable = TRUE) %>% # Checks all variables with CT only contain values within the CT
   order_cols(adsl_spec) %>%  # Orders the columns according to the spec
   sort_by_key(adsl_spec) %>% # Sorts the rows by the sort keys
   xportr_length(adsl_spec) %>% # Assigns SAS length from a variable level metadata
@@ -356,7 +348,6 @@ adsl07 %>%
   
 
 #saving the dataset as rds format
-
 saveRDS(adsl07, file.path(path$adam, "adsl.rds"))
 
 
