@@ -62,7 +62,7 @@ surv_mod <- ggsurvfit::survfit2(Surv(AVAL, 1-CNSR) ~ TRT01A, data = anl)
 # save plot
 ggplot2::theme_set(theme_bw())
 
-km <- surv_mod |>
+km <- (surv_mod %>%
   ggsurvfit(linewidth = 1) +
   add_censor_mark() +
   add_confidence_interval() +
@@ -80,7 +80,7 @@ km <- surv_mod |>
   ) +
   ggsurvfit::add_legend_title(title = "TRT01A") + 
   ggplot2::theme(legend.position = "right") + 
-  ggplot2::geom_hline(yintercept = 0.5, linetype = "dashed") %>%
+  ggplot2::geom_hline(yintercept = 0.5, linetype = "dashed")) %>%
   ggsurvfit_build()
 
 
@@ -97,7 +97,7 @@ caption <- cowplot::ggdraw() +
     paste0("\nProgram: tlf-kmplot.r [", Sys.time(), "]"),
     fontfamily = "sans",
     size = 10
-  )
+  ) 
 
 file <- cowplot::plot_grid(
   title, km, caption,
