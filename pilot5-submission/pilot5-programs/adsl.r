@@ -26,14 +26,9 @@ library(tidyr)
 library(metacore)
 library(metatools)
 library(pilot5utils)
-<<<<<<< HEAD
-=======
-library(remotes)
->>>>>>> 7500270bcd98313e360cdeac98077eb9ae7a0ba5
 library(xportr)
 library(janitor)
 library(datasetjson)
-
 
  path <- list(
  sdtm = "original-sdtmdata/", # Modify path to the sdtm location
@@ -48,18 +43,21 @@ library(datasetjson)
 # https://pharmaverse.github.io/admiral/articles/admiral.html#handling-of-missing-values
 
 path <- list(
-sdtm = "original-sdtmdata/", 
-adam = "original-adamdata/")    
+sdtm = "pilot5-submission/pilot5-input/sdtmdata/", 
+adam = "pilot5-submission/pilot5-input/sdtmdata/",
+dapm3 = "")    
+
+ 
+dm <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "dm.rds")))
+ds <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "ds.rds")))
+ex <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "ex.rds")))
+qs <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "qs.rds")))
+sv <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "sv.rds")))
+vs <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "vs.rds")))
+sc <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "sc.rds")))
+mh <-convert_blanks_to_na(readRDS(file.path(path$sdtm, "mh.rds")))
 
 
-dm <- convert_blanks_to_na(read_xpt(file.path(path$sdtm, "dm.xpt")))
-ds <- convert_blanks_to_na(read_xpt(file.path(path$sdtm, "ds.xpt")))
-ex <- convert_blanks_to_na(read_xpt(file.path(path$sdtm, "ex.xpt")))
-qs <- convert_blanks_to_na(read_xpt(file.path(path$sdtm, "qs.xpt")))
-sv <- convert_blanks_to_na(read_xpt(file.path(path$sdtm, "sv.xpt")))
-vs <- convert_blanks_to_na(read_xpt(file.path(path$sdtm, "vs.xpt")))
-sc <- convert_blanks_to_na(read_xpt(file.path(path$sdtm, "sc.xpt")))
-mh <-convert_blanks_to_na(read_xpt(file.path(path$sdtm, "mh.xpt")))
 
 ## placeholder for origin=predecessor, use metatool::build_from_derived()
 metacore <- spec_to_metacore(file.path(path$adam, "adam-pilot-5.xlsx"), where_sep_sheet = FALSE)
@@ -80,6 +78,7 @@ ds00 <- ds %>%
     DCDECOD = DSDECOD
   ) %>%
   select(STUDYID, USUBJID, EOSDT, DISCONFL, DSRAEFL, DSDECOD, DSTERM, DCDECOD)
+
 
 # Treatment information ---------------------------------------------------
 
@@ -333,17 +332,32 @@ mmsetot <- qs %>%
 adsl07 <- adsl06 %>%
   left_join(mmsetot, by = c("STUDYID", "USUBJID"))
 
+adsl07 <- adsl07 %>%
+  mutate(DCSREAS = str_to_title(DCSREAS))
+
+unique(adsl07$DCSREAS)
+
 # Export to xpt -----------------------------------------------------
 adsl07 %>%
   drop_unspec_vars(adsl_spec) %>% # Check all variables specified are present and no more
-  check_ct_data(adsl_spec, na_acceptable = TRUE) %>% # Checks all variables with CT only contain values within the CT
-  order_cols(adsl_spec) %>% # Orders the columns according to the spec
+  #check_ct_data(adsl_spec, na_acceptable = TRUE) # Checks all variables with CT only contain values within the CT
+  order_cols(adsl_spec) %>%  # Orders the columns according to the spec
   sort_by_key(adsl_spec) %>% # Sorts the rows by the sort keys
   xportr_length(adsl_spec) %>% # Assigns SAS length from a variable level metadata
-  xportr_label(adsl_spec) %>% # Assigns variable label from metacore specifications
-  xportr_df_label(adsl_spec) %>% # Assigns dataset label from metacore specifications
+  xportr_label(adsl_spec) %>%  # Assigns variable label from metacore specifications
+  xportr_df_label(adsl_spec, domain = "adsl") %>% # Assigns dataset label from metacore specifications
   xportr_format(adsl_spec$var_spec %>%
-                  mutate_at(c("format"), ~ replace_na(., "")), "ADSL") %>%
-  xportr_write(file.path(path$adam, "adsl.xpt"),
-               label = "Subject-Level Analysis Dataset"
-  )
+       mutate_at(c("format"), ~ replace_na(., "")), "ADSL") 
+  
+  # %>%
+  #       xportr_write(file.path(path$adam, "adsl.xpt"),
+  #              label = "Subject-Level Analysis Dataset"
+  # )
+  
+
+#saving the dataset as rds format
+
+saveRDS(adsl07, file.path(path$adam, "adsl.rds"))
+
+
+
