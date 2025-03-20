@@ -17,7 +17,7 @@ library(tidyr)
 library(dplyr)
 library(Tplyr)
 library(pharmaRTF)
-library(pilot3utils)
+library(pilot5utils)
 
 ## ------------------------------------------------------------------------------------------------------------------------------
 options(huxtable.add_colnames = FALSE)
@@ -150,4 +150,4 @@ doc <- rtf_doc(ht) %>%
   )
 
 # Write out the RTF
-write_rtf(doc, file = file.path(path$output, "tlf-primary-pilot3.rtf"))
+write_rtf(doc, file = file.path(path$output, "tlf-primary-pilot5.rtf"))

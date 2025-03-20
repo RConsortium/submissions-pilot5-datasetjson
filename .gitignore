@@ -5,6 +5,6 @@
 docs
 
 inst/doc
-pilot3.Rcheck/
-pilot3*.tar.gz
-pilot3*.tgz
+pilot5.Rcheck/
+pilot5*.tar.gz
+pilot5*.tgz
