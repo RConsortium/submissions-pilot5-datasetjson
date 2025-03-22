@@ -10,13 +10,6 @@
 # )
 # nolint end
 
-###########################################################################
-#' developers : Kangjie Zhang
-#' date: 29NOV2022
-#' modification History:
-#' program ADADAS
-###########################################################################
-
 ## setup
 library(dplyr)
 library(tidyr)
