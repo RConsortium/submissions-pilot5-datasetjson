@@ -32,7 +32,7 @@ adsl <- convert_blanks_to_na(adsl)
 
 
 ## origin=predecessor, use metatool::build_from_derived()
-metacore <- spec_to_metacore(file.path(path$adam, "adam-pilot-5.xlsx"), where_sep_sheet = FALSE)
+metacore <- spec_to_metacore(file.path(path$adamspecs, "adam-pilot-5.xlsx"), where_sep_sheet = FALSE)
 # Get the specifications for the dataset we are currently building
 adadas_spec <- metacore %>%
   select_dataset("ADADAS")
@@ -167,108 +167,11 @@ adas5 <- adas_locf2 %>%
     filter = is.na(ABLFL)
   )
 
-# Export dataset to JSON ---------------------------------------------------
-
-adadas <- adas5 %>%
+## Final data 
+adas <- adas5 %>%
   drop_unspec_vars(adadas_spec) %>% # only keep vars from define
-  order_cols(adadas_spec)
+  order_cols(adadas_spec) %>% # order columns based on define
+  set_variable_labels(adadas_spec) 
 
-# Metadata from specs
-
-sysinfo <- unname(Sys.info()) 
-
-var_spec <- adadas_spec[["var_spec"]]
-
-var_spec_JSON <- var_spec %>% 
-  mutate(
-    dataType = case_when(
-      tolower(type) == "text" ~ "string",
-      !is.na(format) & str_ends(variable, "DT") ~ "date",
-      !is.na(format) & str_ends(variable, "TM") ~ "time",
-      !is.na(format) & str_ends(variable, "DTM") ~ "datetime",
-      .default = tolower(type)
-    ),
-    displayFormat = tolower(format),
-    targetDataType = if_else(!is.na(format), "integer" , NA ),
-    name = variable,
-    itemOID = variable
-  ) %>% 
-  select(itemOID, name, label, dataType, targetDataType, length, displayFormat)
-
-
-adadas_json <- dataset_json(
-  adadas,
-  file_oid = path$output_datasetjson,
-  last_modified = strftime(as.POSIXlt(Sys.time(), "UTC"), "%Y-%m-%dT%H:%M"),
-  originator = "Celine Piraux",
-  sys = sysinfo[1],
-  sys_version = sysinfo[3],
-  study = "CDSICPILOT01",
-  item_oid = "ADADAS",
-  name = "ADADAS",
-  dataset_label = "ADAS-Cog Analysis",
-  columns = var_spec_JSON
-)
-
-write_dataset_json(adadas_json, file=file.path(path$output_datasetjson, "adadas.json"), pretty = TRUE)
-
-# Metadata from dataframe
-
-data_classes <- sapply(adadas, class)
-
-datatype_JSON <- tibble(variable = names(data_classes), class = data_classes)
-
-data_info <- adadas %>%
-  map_df(~ tibble(class = class(.)[1], type = typeof(.)), .id = "variable") %>% 
-  mutate(
-    dataType = case_when(
-      class == "character" ~ "string",
-      class == "numeric" ~ "double",
-      class == "Date" ~ "date",
-      .default = "ERROR"
-    ),
-    targetDataType = case_when(
-      class == "Date" ~ "integer"
-    )
-  )
-
-## Add labels
-
-adadas_label <- var_spec %>% 
-  select(variable, label)
-
-adadas_metadata <- data_info %>% 
-  left_join(adadas_label, by="variable") %>% 
-  mutate(
-    name = variable,
-    itemOID = variable 
-    ) %>% 
-  select(itemOID, name, label, dataType, targetDataType)
-
-adadas_json <- dataset_json(
-  adadas,
-  file_oid = path$output_datasetjson,
-  last_modified = strftime(as.POSIXlt(Sys.time(), "UTC"), "%Y-%m-%dT%H:%M"),
-  originator = "Celine Piraux",
-  sys = sysinfo[1],
-  sys_version = sysinfo[3],
-  study = "CDSICPILOT01",
-  item_oid = "ADADAS",
-  name = "ADADAS",
-  dataset_label = "ADAS-Cog Analysis",
-  columns = adadas_metadata
-)
-
-write_dataset_json(adadas_json, file=file.path(path$output_datasetjson, "adadas_2.json"), pretty = TRUE)
-
-
-## out to XPT
-# adas5 %>%
-#   drop_unspec_vars(adadas_spec) %>% # only keep vars from define
-#   order_cols(adadas_spec) %>% # order columns based on define
-#   set_variable_labels(adadas_spec) %>% # apply variable labels based on define
-#   xportr_format(adadas_spec$var_spec %>%
-#     mutate_at(c("format"), ~ replace_na(., "")), "ADADAS") %>%
-#   xportr_write(file.path(path$adam, "adadas.xpt"),
-#     label = "ADAS-COG Analysis Dataset"
-#   )
+#saving the dataset as rds format
+saveRDS(adas, file.path(path$adam, "adas.rds"))
