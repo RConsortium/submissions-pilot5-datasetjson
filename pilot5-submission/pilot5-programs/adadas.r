@@ -29,9 +29,9 @@ library(pilot5utils)
 library(datasetjson)
 library(purrr)
 
-dm <- haven::read_xpt(file.path(path$sdtm, "dm.xpt"))
-qs <- haven::read_xpt(file.path(path$sdtm, "qs.xpt"))
-adsl <- haven::read_xpt(file.path(path$adam, "adsl.xpt"))
+dm <- readRDS(file.path(path$sdtm, "dm.rds"))
+qs <- readRDS(file.path(path$sdtm, "qs.rds"))
+adsl <- readRDS(file.path(path$adam, "adsl.rds"))
 
 dm <- convert_blanks_to_na(dm)
 qs <- convert_blanks_to_na(qs)
