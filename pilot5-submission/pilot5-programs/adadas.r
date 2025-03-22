@@ -205,7 +205,7 @@ var_spec_JSON <- var_spec %>%
 
 adadas_json <- dataset_json(
   adadas,
-  file_oid = path$adam,
+  file_oid = path$output_datasetjson,
   last_modified = strftime(as.POSIXlt(Sys.time(), "UTC"), "%Y-%m-%dT%H:%M"),
   originator = "Celine Piraux",
   sys = sysinfo[1],
@@ -217,7 +217,7 @@ adadas_json <- dataset_json(
   columns = var_spec_JSON
 )
 
-write_dataset_json(adadas_json, file=file.path(path$adam, "adadas.json"), pretty = TRUE)
+write_dataset_json(adadas_json, file=file.path(path$output_datasetjson, "adadas.json"), pretty = TRUE)
 
 # Metadata from dataframe
 
@@ -254,7 +254,7 @@ adadas_metadata <- data_info %>%
 
 adadas_json <- dataset_json(
   adadas,
-  file_oid = path$adam,
+  file_oid = path$output_datasetjson,
   last_modified = strftime(as.POSIXlt(Sys.time(), "UTC"), "%Y-%m-%dT%H:%M"),
   originator = "Celine Piraux",
   sys = sysinfo[1],
@@ -266,7 +266,7 @@ adadas_json <- dataset_json(
   columns = adadas_metadata
 )
 
-write_dataset_json(adadas_json, file=file.path(path$adam, "adadas_2.json"), pretty = TRUE)
+write_dataset_json(adadas_json, file=file.path(path$output_datasetjson, "adadas_2.json"), pretty = TRUE)
 
 
 ## out to XPT
