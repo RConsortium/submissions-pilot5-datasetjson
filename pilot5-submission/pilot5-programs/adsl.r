@@ -233,14 +233,18 @@ adsl04 <- adsl03 %>%
     new_vars = exprs(EOSSTT = DSDECOD),
     filter_add = !is.na(USUBJID)
   ) %>%
-  mutate(EOSSTT = (EOSSTT)) %>%
+  mutate(EOSSTT = if_else(DCDECOD == "COMPLETED", "COMPLETED", "DISCONTINUED")) %>%
   derive_vars_merged(
     dataset_add = ds00,
     by_vars = exprs(STUDYID, USUBJID),
     new_vars = exprs(DCSREAS = DSDECOD),
     filter_add = !is.na(USUBJID)
   ) %>%
-  mutate(DCSREAS = ifelse(DSTERM == "PROTOCOL ENTRY CRITERIA NOT MET", "I/E Not Met", DCSREAS))
+  mutate(DCSREAS = case_when(
+    DCDECOD != "COMPLETED" & DSTERM == "PROTOCOL ENTRY CRITERIA NOT MET" ~ "I/E Not Met",
+    DCDECOD != "COMPLETED" ~ DCSREAS,
+    TRUE ~ ""
+  ))
 
 
 # Baseline variables ------------------------------------------------------
