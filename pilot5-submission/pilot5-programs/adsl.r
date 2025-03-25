@@ -336,7 +336,7 @@ adsl07 <- adsl06 %>%
 # Export to xpt -----------------------------------------------------
 adsl07 %>%
   drop_unspec_vars(adsl_spec) %>% # Check all variables specified are present and no more
-  #check_ct_data(adsl_spec, na_acceptable = TRUE) %>% # Checks all variables with CT only contain values within the CT
+  check_ct_data(adsl_spec, na_acceptable = TRUE) %>% # Checks all variables with CT only contain values within the CT
   order_cols(adsl_spec) %>%  # Orders the columns according to the spec
   sort_by_key(adsl_spec) %>% # Sorts the rows by the sort keys
   xportr_length(adsl_spec) %>% # Assigns SAS length from a variable level metadata
