@@ -157,11 +157,7 @@ adsl00 <- dm %>%
 # Demographic grouping ----------------------------------------------------
 adsl01 <- adsl00 %>%
   create_cat_var(adsl_spec, AGE, AGEGR1, AGEGR1N) %>%
-  create_var_from_codelist(adsl_spec, RACE, RACEN) %>%
-  mutate(
-    SITEGR1 = (SITEID)
-  )
-
+  create_var_from_codelist(adsl_spec, RACE, RACEN)
 
 
 
@@ -330,6 +326,22 @@ mmsetot <- qs %>%
 
 adsl07 <- adsl06 %>%
   left_join(mmsetot, by = c("STUDYID", "USUBJID"))
+
+
+#generating the SITEGR1 variable 
+#Grouping by SITEID, TRT01A to get the count fewer than 3 patients in any one treatment group.
+
+adsl07_ <- adsl07 %>%
+  group_by(SITEID, TRT01A) %>%
+  count(SITEID) %>%
+  ungroup(SITEID, TRT01A)
+
+
+
+adsl07 <- left_join(adsl07, adsl07_, by = c("SITEID", "TRT01A")) %>%
+  mutate(SITEGR1= if_else(n <=3, "900", SITEID)) %>%
+  select(-n)
+
 
 
 
