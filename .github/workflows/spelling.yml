@@ -10,14 +10,14 @@ on:
         default: '4.4'
         required: false
         type: string
-  push:
-    branches:
-      - main
-      - devel
-  pull_request:
-    branches:
-      - main
-      - devel
+#  push:
+#    branches:
+#      - main
+#      - devel
+#  pull_request:
+#    branches:
+#      - main
+#      - devel
 
 
 concurrency:
