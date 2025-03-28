@@ -1,6 +1,5 @@
 on:
   workflow_dispatch:
-  workflow_call:
     inputs:
       r-version:
         description: 'The version of R to use'
@@ -18,11 +17,11 @@ on:
         required: false
         type: string
 
-  push:
-    branches:
-      - main
-      - devel
-      - pre-release
+#  push:
+#    branches:
+#      - main
+#      - devel
+#      - pre-release
 
 name: Documentation
 
