@@ -43,27 +43,27 @@ itt <- adsl[adsl[["ITTFL"]] == "Y", c("STUDYID", "USUBJID")]
 adlb1 <- adlb %>%
   dplyr::right_join(itt, by = c("STUDYID", "USUBJID")) %>%
   subset(TRTPN %in% c(0, 81) & PARAMCD == "GLUC" & !is.na(AVISITN)) %>%
-  mutate(TRTPN = ifelse(TRTPN == 0, 99, TRTPN)) # change treatment order for pairwise comparison
+  dplyr::mutate(TRTPN = ifelse(TRTPN == 0, 99, TRTPN)) # change treatment order for pairwise comparison
 
 ## Fit data for linear model
 gluc_lmfit <- adlb1 %>%
-  filter(AVISITN == 20) %>%
-  lm(CHG ~ BASE + TRTPN, data = .)
+  dplyr::filter(AVISITN == 20) %>%
+  stats::lm(CHG ~ BASE + TRTPN, data = .)
 
 ## Raw summary statistics
 t10 <- adlb1 %>%
-  filter(AVISITN == 0) %>%
-  group_by(TRTPN, TRTP) %>%
-  summarise(
+  dplyr::filter(AVISITN == 0) %>%
+  dplyr::group_by(TRTPN, TRTP) %>%
+  dplyr::summarise(
     N = n(),
     mean_bl = mean(BASE),
     sd_bl = sd(BASE)
   )
 
 t11 <- adlb1 %>%
-  filter(AVISITN == 20, !is.na(CHG), !is.na(BASE)) %>%
-  group_by(TRTPN, TRTP) %>%
-  summarise(
+  dplyr::filter(AVISITN == 20, !is.na(CHG), !is.na(BASE)) %>%
+  dplyr::group_by(TRTPN, TRTP) %>%
+  dplyr::summarise(
     N_20 = n(),
     mean_chg = mean(CHG),
     sd_chg = sd(CHG),
@@ -72,13 +72,13 @@ t11 <- adlb1 %>%
   )
 
 ## Calculate LS mean
-t12 <- emmeans(gluc_lmfit, "TRTPN")
+t12 <- emmeans::emmeans(gluc_lmfit, "TRTPN")
 
 ## Merge and format data for reporting
 apr0ancova1 <- merge(t10, t11) %>%
   merge(t12) %>%
-  mutate(emmean_sd = SE * sqrt(df)) %>%
-  mutate(
+  dplyr::mutate(emmean_sd = SE * sqrt(df)) %>%
+  dplyr::mutate(
     Trt = c("Xanomeline High Dose", "Placebo"),
     N1 = N,
     Mean1 = pilot5utils::fmt_est(mean_bl, sd_bl),
@@ -88,7 +88,7 @@ apr0ancova1 <- merge(t10, t11) %>%
     Mean3 = pilot5utils::fmt_est(mean_chg, sd_chg),
     CI = pilot5utils::fmt_ci(emmean, lower.CL, upper.CL)
   ) %>%
-  select(Trt:CI)
+  dplyr::select(Trt:CI)
 
 apr0ancova1
 
@@ -98,16 +98,16 @@ t2 <- data.frame(pairs(t12))
 
 ## Treatment Comparison
 apr0ancova2 <- t2 %>%
-  mutate(
+  dplyr::mutate(
     lower = estimate - 1.96 * SE,
     upper = estimate + 1.96 * SE
   ) %>%
-  mutate(
+  dplyr::mutate(
     comp = "Xanomeline High Dose vs. Placebo",
     mean = pilot5utils::fmt_ci(estimate, lower, upper),
     p = pilot5utils::fmt_pval(p.value)
   ) %>%
-  select(comp:p)
+  dplyr::select(comp:p)
 
 apr0ancova2
 
@@ -124,30 +124,30 @@ apr0ancova3
 
 ## ------------------------------------------------------------------------------------------------------------------------------
 tbl_1 <- apr0ancova1 %>%
-  rtf_title(
+  r2rtf::rtf_title(
     title = "ANCOVA of Change from Baseline at Week 20"
   ) %>%
-  rtf_colheader(
+  r2rtf::rtf_colheader(
     colheader = " | Baseline{^a} | Week 20 | Change from Baseline",
     col_rel_width = c(4, 3.5, 3.5, 7.5)
   ) %>%
-  rtf_colheader(
+  r2rtf::rtf_colheader(
     colheader = "Treatment | N | Mean (SD) | N | Mean (SD) | N | Mean (SD) | LS Mean (95% CI){^b}",
     col_rel_width = c(4, 1, 2.5, 1, 2.5, 1, 2.5, 4)
   ) %>%
-  rtf_body(
+  r2rtf::rtf_body(
     col_rel_width = c(4, 1, 2.5, 1, 2.5, 1, 2.5, 4),
     text_justification = c("l", rep("c", 7)),
     last_row = FALSE
   ) %>%
-  rtf_footnote(
+  r2rtf::rtf_footnote(
     footnote = c(
       "{^a} Table is based on participants who have observable data at Baseline and Week 20.",
       "{^b} Based on an Analysis of covariance (ANCOVA) model with treatment and baseline value as covariates",
       "CI = Confidence Interval, LS = Least Squares, SD = Standard Deviation"
     )
   ) %>%
-  rtf_source(
+  r2rtf::rtf_source(
     source = c(paste("Table generated on:", Sys.time()), "Source: [pilot5: adam-adsl; adlbc]"),
     text_justification = "c"
   )
@@ -155,12 +155,12 @@ tbl_1 <- apr0ancova1 %>%
 
 ## ------------------------------------------------------------------------------------------------------------------------------
 tbl_2 <- apr0ancova2 %>%
-  rtf_colheader(
+  r2rtf::rtf_colheader(
     colheader = "Pairwise Comparison | Difference in LS Mean (95% CI){^b} | p-Value",
     text_justification = c("l", "c", "c"),
     col_rel_width = c(7.5, 7, 4)
   ) %>%
-  rtf_body(
+  r2rtf::rtf_body(
     col_rel_width = c(7.5, 7, 4),
     text_justification = c("l", "c", "c"),
     last_row = FALSE
@@ -169,7 +169,7 @@ tbl_2 <- apr0ancova2 %>%
 
 ## ------------------------------------------------------------------------------------------------------------------------------
 tbl_3 <- apr0ancova3 %>%
-  rtf_body(
+  r2rtf::rtf_body(
     as_colheader = FALSE,
     text_justification = "l"
   )
@@ -178,5 +178,5 @@ tbl_3 <- apr0ancova3 %>%
 ## ------------------------------------------------------------------------------------------------------------------------------
 tbl <- list(tbl_1, tbl_2, tbl_3)
 tbl %>%
-  rtf_encode() %>%
-  write_rtf(file.path(path$output, "tlf-efficacy-pilot5.rtf"))
+  r2rtf::rtf_encode() %>%
+  r2rtf::write_rtf(file.path(path$output, "tlf-efficacy-pilot5.rtf"))
