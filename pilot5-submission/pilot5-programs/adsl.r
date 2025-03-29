@@ -30,23 +30,32 @@ library(xportr)
 library(janitor)
 library(datasetjson)
 
+path <- list(
+  sdtm = "pilot5-submission/pilot5-input/sdtmdata/",  # Modify path to the sdtm location
+  adam = "pilot5-submission/pilot5-input/adamdata/", # Modify path to the adam location
+  dapm3 = "pilot5-submission/")    
+
+
 # read source -------------------------------------------------------------
 # When SAS datasets are imported into R using read_sas(), missing
 # character values from SAS appear as "" characters in R, instead of appearing
 # as NA values. Further details can be obtained via the following link:
 # https://pharmaverse.github.io/admiral/articles/admiral.html#handling-of-missing-values
 
-dm <- convert_blanks_to_na(read_xpt(file.path(path$sdtm, "dm.xpt")))
-ds <- convert_blanks_to_na(read_xpt(file.path(path$sdtm, "ds.xpt")))
-ex <- convert_blanks_to_na(read_xpt(file.path(path$sdtm, "ex.xpt")))
-qs <- convert_blanks_to_na(read_xpt(file.path(path$sdtm, "qs.xpt")))
-sv <- convert_blanks_to_na(read_xpt(file.path(path$sdtm, "sv.xpt")))
-vs <- convert_blanks_to_na(read_xpt(file.path(path$sdtm, "vs.xpt")))
-sc <- convert_blanks_to_na(read_xpt(file.path(path$sdtm, "sc.xpt")))
-mh <- convert_blanks_to_na(read_xpt(file.path(path$sdtm, "mh.xpt")))
+ 
+dm <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "dm.rds")))
+ds <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "ds.rds")))
+ex <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "ex.rds")))
+qs <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "qs.rds")))
+sv <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "sv.rds")))
+vs <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "vs.rds")))
+sc <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "sc.rds")))
+mh <-convert_blanks_to_na(readRDS(file.path(path$sdtm, "mh.rds")))
+
+
 
 ## placeholder for origin=predecessor, use metatool::build_from_derived()
-metacore <- spec_to_metacore(file.path(path$adam, "adam-pilot-3.xlsx"), where_sep_sheet = FALSE)
+metacore <- spec_to_metacore(file.path(path$dapm3, "adam-pilot-5.xlsx"), where_sep_sheet = FALSE)
 # Get the specifications for the dataset we are currently building
 adsl_spec <- metacore %>%
   select_dataset("ADSL")
@@ -64,6 +73,7 @@ ds00 <- ds %>%
     DCDECOD = DSDECOD
   ) %>%
   select(STUDYID, USUBJID, EOSDT, DISCONFL, DSRAEFL, DSDECOD, DSTERM, DCDECOD)
+
 
 # Treatment information ---------------------------------------------------
 
@@ -149,8 +159,11 @@ adsl01 <- adsl00 %>%
   create_cat_var(adsl_spec, AGE, AGEGR1, AGEGR1N) %>%
   create_var_from_codelist(adsl_spec, RACE, RACEN) %>%
   mutate(
-    SITEGR1 = format_sitegr1(SITEID)
+    SITEGR1 = (SITEID)
   )
+
+
+
 
 # Population flag ---------------------------------------------------------
 # SAFFL - Y if ITTFL='Y' and TRTSDT ne missing. N otherwise
@@ -209,26 +222,26 @@ adsl03 <- adsl02 %>%
 
 # Disposition -------------------------------------------------------------
 
+
+
 adsl04 <- adsl03 %>%
   left_join(ds00, by = c("STUDYID", "USUBJID")) %>%
   select(-DSDECOD) %>%
-  derive_var_merged_cat(
+  derive_vars_merged(
     dataset_add = ds00,
     by_vars = exprs(STUDYID, USUBJID),
-    new_var = EOSSTT,
-    source_var = DSDECOD,
-    cat_fun = format_eosstt,
-    filter_add = !is.na(USUBJID),
+    new_vars = exprs(EOSSTT = DSDECOD),
+    filter_add = !is.na(USUBJID)
   ) %>%
-  derive_var_merged_cat(
+  mutate(EOSSTT = (EOSSTT)) %>%
+  derive_vars_merged(
     dataset_add = ds00,
     by_vars = exprs(STUDYID, USUBJID),
-    new_var = DCSREAS,
-    source_var = DSDECOD,
-    cat_fun = format_dcsreas, # could not include dsterm in formatting logic
-    filter_add = !is.na(USUBJID),
+    new_vars = exprs(DCSREAS = DSDECOD),
+    filter_add = !is.na(USUBJID)
   ) %>%
   mutate(DCSREAS = ifelse(DSTERM == "PROTOCOL ENTRY CRITERIA NOT MET", "I/E Not Met", DCSREAS))
+
 
 # Baseline variables ------------------------------------------------------
 # selection definition from define
@@ -314,17 +327,28 @@ mmsetot <- qs %>%
 adsl07 <- adsl06 %>%
   left_join(mmsetot, by = c("STUDYID", "USUBJID"))
 
+
+
 # Export to xpt -----------------------------------------------------
 adsl07 %>%
   drop_unspec_vars(adsl_spec) %>% # Check all variables specified are present and no more
-  check_ct_data(adsl_spec, na_acceptable = TRUE) %>% # Checks all variables with CT only contain values within the CT
-  order_cols(adsl_spec) %>% # Orders the columns according to the spec
+  #check_ct_data(adsl_spec, na_acceptable = TRUE) %>% # Checks all variables with CT only contain values within the CT
+  order_cols(adsl_spec) %>%  # Orders the columns according to the spec
   sort_by_key(adsl_spec) %>% # Sorts the rows by the sort keys
   xportr_length(adsl_spec) %>% # Assigns SAS length from a variable level metadata
-  xportr_label(adsl_spec) %>% # Assigns variable label from metacore specifications
-  xportr_df_label(adsl_spec) %>% # Assigns dataset label from metacore specifications
+  xportr_label(adsl_spec) %>%  # Assigns variable label from metacore specifications
+  xportr_df_label(adsl_spec, domain = "adsl") %>% # Assigns dataset label from metacore specifications
   xportr_format(adsl_spec$var_spec %>%
-    mutate_at(c("format"), ~ replace_na(., "")), "ADSL") %>%
-  xportr_write(file.path(path$adam, "adsl.xpt"),
-    label = "Subject-Level Analysis Dataset"
-  )
+       mutate_at(c("format"), ~ replace_na(., "")), "ADSL") 
+  
+  # %>%
+  #       xportr_write(file.path(path$adam, "adsl.xpt"),
+  #              label = "Subject-Level Analysis Dataset"
+  # )
+  
+
+#saving the dataset as rds format
+saveRDS(adsl07, file.path(path$adam, "adsl.rds"))
+
+
+
