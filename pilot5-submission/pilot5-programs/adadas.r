@@ -169,9 +169,13 @@ adas5 <- adas_locf2 %>%
 
 ## Final data 
 adas <- adas5 %>%
-  drop_unspec_vars(adadas_spec) %>% # only keep vars from define
-  order_cols(adadas_spec) %>% # order columns based on define
-  set_variable_labels(adadas_spec) 
+  drop_unspec_vars(adadas_spec) %>% 
+  order_cols(adadas_spec) %>% 
+  set_variable_labels(adadas_spec) %>% 
+  xportr_format(adadas_spec$var_spec %>%
+                  mutate_at(c("format"), ~ replace_na(., "")), "ADADAS") %>%
+  xportr_df_label(adadas_spec, domain = "adadas")
+
 
 #saving the dataset as rds format
 saveRDS(adas, file.path(path$adam, "adadas.rds"))
