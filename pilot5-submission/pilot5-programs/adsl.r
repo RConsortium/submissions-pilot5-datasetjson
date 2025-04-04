@@ -1,20 +1,9 @@
-# Note to Reviewer
-# To rerun the code below, please refer ADRG appendix.
-# After required package are installed.
-# The path variable needs to be defined by using example code below
-#
-# nolint start
-# path <- list(
-# sdtm = "path/to/esub/tabulations/sdtm", # Modify path to the sdtm location
-# adam = "path/to/esub/analysis/adam"     # Modify path to the adam location
-# )
-# nolint end
 
 ###########################################################################
 #' developers : Steven Haesendonckx/Declan Hodges/Thomas Neitmann
 #' date: 09DEC2022
-#' modification History:
-#'
+#' modification History:Sai janardhan
+#' date:31MAR2025
 ###########################################################################
 
 # Set up ------------------------------------------------------------------
@@ -347,21 +336,16 @@ adsl07 <- left_join(adsl07, adsl07_, by = c("SITEID", "TRT01A")) %>%
 
 # Export to xpt -----------------------------------------------------
 adsl07 %>%
-  drop_unspec_vars(adsl_spec) %>% # Check all variables specified are present and no more
-  check_ct_data(adsl_spec, na_acceptable = TRUE) %>% # Checks all variables with CT only contain values within the CT
-  order_cols(adsl_spec) %>%  # Orders the columns according to the spec
-  sort_by_key(adsl_spec) %>% # Sorts the rows by the sort keys
-  xportr_length(adsl_spec) %>% # Assigns SAS length from a variable level metadata
-  xportr_label(adsl_spec) %>%  # Assigns variable label from metacore specifications
-  xportr_df_label(adsl_spec, domain = "adsl") %>% # Assigns dataset label from metacore specifications
+  drop_unspec_vars(adsl_spec) %>% 
+  check_ct_data(adsl_spec, na_acceptable = TRUE) %>%
+  order_cols(adsl_spec) %>% 
+  sort_by_key(adsl_spec) %>%
+  xportr_length(adsl_spec) %>% 
+  xportr_label(adsl_spec) %>%  
+  xportr_df_label(adsl_spec, domain = "adsl") %>% 
   xportr_format(adsl_spec$var_spec %>%
        mutate_at(c("format"), ~ replace_na(., "")), "ADSL") 
-  
-  # %>%
-  #       xportr_write(file.path(path$adam, "adsl.xpt"),
-  #              label = "Subject-Level Analysis Dataset"
-  # )
-  
+
 
 #saving the dataset as rds format
 saveRDS(adsl07, file.path(path$adam, "adsl.rds"))
