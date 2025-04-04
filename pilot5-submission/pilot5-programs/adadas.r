@@ -10,13 +10,6 @@
 # )
 # nolint end
 
-###########################################################################
-#' developers : Kangjie Zhang
-#' date: 29NOV2022
-#' modification History:
-#' program ADADAS
-###########################################################################
-
 ## setup
 library(dplyr)
 library(tidyr)
@@ -26,10 +19,12 @@ library(metatools)
 library(stringr)
 library(xportr)
 library(pilot5utils)
+library(datasetjson)
+library(purrr)
 
-dm <- haven::read_xpt(file.path(path$sdtm, "dm.xpt"))
-qs <- haven::read_xpt(file.path(path$sdtm, "qs.xpt"))
-adsl <- haven::read_xpt(file.path(path$adam, "adsl.xpt"))
+dm <- readRDS(file.path(path$sdtm, "dm.rds"))
+qs <- readRDS(file.path(path$sdtm, "qs.rds"))
+adsl <- readRDS(file.path(path$adam, "adsl.rds"))
 
 dm <- convert_blanks_to_na(dm)
 qs <- convert_blanks_to_na(qs)
@@ -37,7 +32,7 @@ adsl <- convert_blanks_to_na(adsl)
 
 
 ## origin=predecessor, use metatool::build_from_derived()
-metacore <- spec_to_metacore(file.path(path$adam, "adam-pilot-3.xlsx"), where_sep_sheet = FALSE)
+metacore <- spec_to_metacore(file.path(path$adamspecs, "adam-pilot-5.xlsx"), where_sep_sheet = FALSE)
 # Get the specifications for the dataset we are currently building
 adadas_spec <- metacore %>%
   select_dataset("ADADAS")
@@ -129,7 +124,7 @@ adas_locf2 <- adas4 %>%
   restrict_derivation(
     derivation = derive_locf_records,
     args = params(
-      dataset_expected_obs = actot_expected_obsv,
+      dataset_ref  = actot_expected_obsv,
       by_vars = exprs(
         STUDYID, SITEID, SITEGR1, USUBJID, TRTSDT, TRTEDT,
         TRTP, TRTPN, AGE, AGEGR1, AGEGR1N, RACE, RACEN, SEX,
@@ -172,15 +167,15 @@ adas5 <- adas_locf2 %>%
     filter = is.na(ABLFL)
   )
 
-
-
-## out to XPT
-adas5 %>%
-  drop_unspec_vars(adadas_spec) %>% # only keep vars from define
-  order_cols(adadas_spec) %>% # order columns based on define
-  set_variable_labels(adadas_spec) %>% # apply variable labels based on define
+## Final data 
+adas <- adas5 %>%
+  drop_unspec_vars(adadas_spec) %>% 
+  order_cols(adadas_spec) %>% 
+  set_variable_labels(adadas_spec) %>% 
   xportr_format(adadas_spec$var_spec %>%
-    mutate_at(c("format"), ~ replace_na(., "")), "ADADAS") %>%
-  xportr_write(file.path(path$adam, "adadas.xpt"),
-    label = "ADAS-COG Analysis Dataset"
-  )
+                  mutate_at(c("format"), ~ replace_na(., "")), "ADADAS") %>%
+  xportr_df_label(adadas_spec, domain = "adadas")
+
+
+#saving the dataset as rds format
+saveRDS(adas, file.path(path$adam, "adadas.rds"))
