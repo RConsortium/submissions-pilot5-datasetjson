@@ -7,7 +7,7 @@
 ###########################################################################
 # !/usr/bin/env Rscript
 path <- list(
-  sdtm = "./submission/sdtm", # Modify path to the sdtm location
-  adam = "./submission/adam", # Modify path to the adam location
+  sdtm = "./pilot5-submission/pilot5-input/sdtmdata", # Modify path to the sdtm location
+  adam = "./pilot5-submission/pilot5-input/adamdata", # Modify path to the adam location
   output = "./submission/output" # Modify path to the output location
 )
