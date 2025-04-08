@@ -4,6 +4,7 @@ library(tidyr)
 library(admiral)
 library(metacore)
 library(metatools)
+library(stringr)
 library(pilot5utils)
 
 # read source -------------------------------------------------------------
@@ -235,4 +236,4 @@ adlbc <- adlb09 %>%
   set_variable_labels(adlbc_spec) 
 
 #saving the dataset as RDS format
-saveRDS(adlbc, file.path(path$output_datasetjson, "adlbc.rds"))
+saveRDS(adlbc, file.path(path$adam, "adlbc.rds"))
