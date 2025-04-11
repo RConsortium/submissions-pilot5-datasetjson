@@ -4,10 +4,10 @@
 # The path variable needs to be defined by using example code below
 #
 # nolint start
-path <- list(
-  sdtm = "pilot5-submission/pilot5-input/sdtmdata/",  # Modify path to the sdtm location
-  adam = "pilot5-submission/pilot5-input/adamdata/" # Modify path to the adam location
-)
+# path <- list(
+# sdtm = "path/to/esub/tabulations/sdtm", # Modify path to the sdtm location
+# adam = "path/to/esub/analysis/adam"     # Modify path to the adam location
+# )
 # nolint end
 
 ###########################################################################
