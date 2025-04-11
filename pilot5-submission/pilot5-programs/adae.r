@@ -204,7 +204,3 @@ adae <- adae0 %>%
 
 # Saving the dataset as rds format -------
 saveRDS(adae, file.path(path$adam, "adae.rds"))
-
-adae_p3 <- read_xpt("~/Downloads/adae.xpt")
-adae_p3 <- convert_blanks_to_na(adae_p3)
-diffdf::diffdf(adae, adae_p3)
