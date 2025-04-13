@@ -52,7 +52,7 @@ for (rds_file in rds_files) {
                columns = OIDcols,
                file_oid = file.path(path$adam, df_name),
                last_modified = strftime(as.POSIXlt(Sys.time(), "UTC"), "%Y-%m-%dT%H:%M"),
-               originator = "CDISC",
+               originator = "R Submission Pilot 5",
                sys = sysinfo[1],
                sys_version = sysinfo[3],
                metadata_version = "MDV.TDF_ADaM.ADaM-IG.1.1", # from define
