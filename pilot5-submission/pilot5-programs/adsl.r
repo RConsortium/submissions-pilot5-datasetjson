@@ -66,6 +66,19 @@ ds00 <- ds %>%
 
 # Treatment information ---------------------------------------------------
 
+mh <-convert_blanks_to_na(readRDS(file.path(path$sdtm, "mh.rds")))
+
+mh <- derive_vars_dt(
+  mh,
+  dtc = MHDTC,
+  new_vars_prefix = "AST",
+  highest_imputation = "M",
+) 
+
+colnames(mh)
+mh[,c("MHDTC", "ASTDT")]
+
+
 ex_dt <- ex %>%
   derive_vars_dt(
     dtc = EXSTDTC,
