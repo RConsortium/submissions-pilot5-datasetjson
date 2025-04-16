@@ -4,10 +4,10 @@
 # The path variable needs to be defined by using example code below
 #
 # nolint start
-# path <- list(
-# sdtm = "path/to/esub/tabulations/sdtm", # Modify path to the sdtm location
-# adam = "path/to/esub/analysis/adam"     # Modify path to the adam location
-# )
+path <- list(
+  sdtm = "pilot5-submission/pilot5-input/sdtmdata/",  # Modify path to the sdtm location
+  adam = "pilot5-submission/pilot5-input/adamdata/", # Modify path to the adam location
+)
 # nolint end
 
 ###########################################################################
@@ -192,15 +192,36 @@ adae0 <- ae %>%
 
 # ADAE derivation end
 
-# Check variables against define & assign dataset labels, var labels and formats -------
+# Create final ADAE --------
+# Check variables against define to ensure all variables specified (and no more) exist in the dataset,
+# and that all variables with CT only contain values within the CT
+# Assign dataset labels and var labels
 adae <- adae0 %>%
-  drop_unspec_vars(adae_spec) %>% # Check all variables specified are present and no more
-  check_ct_data(adae_spec, na_acceptable = TRUE) %>% # Checks all variables with CT only contain values within the CT
-  order_cols(adae_spec) %>% # Orders the columns according to the spec
+  drop_unspec_vars(adae_spec) %>%
+  check_ct_data(adae_spec, na_acceptable = TRUE) %>%
+  order_cols(adae_spec) %>%
   sort_by_key(adae_spec) %>%
-  xportr_df_label(adae_spec, domain = "ADAE") %>% # dataset label
-  xportr_label(adae_spec) %>% # variable labels
-  convert_blanks_to_na() # blanks to NA
+  xportr_df_label(adae_spec, domain = "ADAE") %>%
+  xportr_label(adae_spec) %>%
+  convert_blanks_to_na() %>%
+  xportr_format(adae_spec$var_spec, "ADAE")
+
+# NOTE : When reading in original ADAE dataset to check against, it
+# seems the sas.format attributes set to DATE9. are changed to DATE9,
+# i.e. without the dot[.] at the end. Additionally, missing formats are
+# set to NULL (instead of an empty character vector). So when calling
+# diffdf() the workaround is to also remove the dot[.] and change the empty
+# character vector in the sas.format in the dataset generated here.
+# This will make the sas.format comparisons equal in diffdf().
+# See code below for work around.
+#----------------------------------------------------------------------------------------
+for (col in colnames(adae)) {
+  if (attr(adae[[col]], "format.sas") == "") {
+    attr(adae[[col]], "format.sas") <- NULL
+  } else if (attr(adae[[col]], "format.sas") == "DATE9.") {
+    attr(adae[[col]], "format.sas") <- "DATE9"
+  }
+}
 
 # Saving the dataset as rds format -------
 saveRDS(adae, file.path(path$adam, "adae.rds"))
