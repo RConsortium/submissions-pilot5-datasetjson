@@ -1,15 +1,6 @@
 # Note to Reviewer
 # To rerun the code below, please refer ADRG appendix.
 # After required package are installed.
-# The path variable needs to be defined by using example code below
-#
-# nolint start
-# path <- list(
-#  sdtm = "path/to/esub/tabulations/sdtm",   # Modify path to the sdtm location
-#  adam = "path/to/esub/analysis/adam",    # Modify path to the adam location
-#  output = "path/to/esub/.../output"    # Modify path to the output location
-# )
-# nolint end
 
 ## ----setup, message=FALSE------------------------------------------------------------------------------------------------------
 # CRAN package, please using install.packages() to install
@@ -23,8 +14,8 @@ library(pilot5utils)
 options(huxtable.add_colnames = FALSE)
 
 ## ------------------------------------------------------------------------------------------------------------------------------
-adas <- haven::read_xpt(file.path(path$adam, "adadas.xpt"))
-adsl <- haven::read_xpt(file.path(path$adam, "adsl.xpt"))
+adas <- readRDS(file.path(path$adam, "adadas.rds"))
+adsl <- readRDS(file.path(path$adam, "adsl.rds"))
 
 
 ## ------------------------------------------------------------------------------------------------------------------------------

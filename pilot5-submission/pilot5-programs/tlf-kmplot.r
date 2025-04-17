@@ -2,13 +2,6 @@
 # To rerun the code below, please refer ADRG appendix.
 # After required package are installed.
 # The path variable needs to be defined by using example code below
-#
-# nolint start
-# path <- list(
-#   adam = "path/to/esub/analysis/adam",      # Modify path to the adam location
-#   output = "path/to/esub/analysis/output"   # Modify path to the output location
-# )
-# nolint end
 
 ## ------------------------------------------------------------------------------------------------------------------------------
 # Working directory requires write permission
@@ -33,8 +26,8 @@ library(pilot5utils)
 
 
 ## ------------------------------------------------------------------------------------------------------------------------------
-adsl <- read_xpt(file.path(path$adam, "adsl.xpt"))
-adtte <- read_xpt(file.path(path$adam, "adtte.xpt"))
+adsl <- readRDS(file.path(path$adam, "adsl.rds"))
+adtte <- readRDS(file.path(path$adam, "adtte.rds"))
 
 
 ## ------------------------------------------------------------------------------------------------------------------------------
