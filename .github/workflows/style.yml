@@ -3,21 +3,20 @@ name: Check Code Style
 
 on:
   workflow_dispatch:
-  workflow_call:
     inputs:
       r-version:
         description: 'The version of R to use'
         default: '4.2'
         required: false
         type: string
-  push:
-    branches:
-      - main
-      - devel
-  pull_request:
-    branches:
-      - main
-      - devel
+#  push:
+#    branches:
+#      - main
+#      - devel
+#  pull_request:
+#    branches:
+#      - main
+#      - devel
 
 
 concurrency:

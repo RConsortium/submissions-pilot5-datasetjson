@@ -7,17 +7,17 @@ on:
     inputs:
       r-version:
         description: 'The version of R to use'
-        default: '4.2'
+        default: '4.4'
         required: false
         type: string
-  push:
-    branches:
-      - main
-      - devel
-  pull_request:
-    branches:
-      - main
-      - devel
+#  push:
+#    branches:
+#      - main
+#      - devel
+#  pull_request:
+#    branches:
+#      - main
+#      - devel
 
 
 concurrency:
@@ -54,10 +54,10 @@ jobs:
       - name: Normalize inputs
         id: normalizer
         run: |
-          R_VERSION="${{ inputs.r-version }}"
+          R_VERSION="${{ github.event.inputs.r-version }}"
           if [ "$R_VERSION" == "" ]
           then {
-            R_VERSION="4.2"
+            R_VERSION="4.4"
           }
           fi
           echo "::set-output name=R_VERSION::$R_VERSION"
@@ -67,6 +67,10 @@ jobs:
         uses: r-lib/actions/setup-r@v2
         with:
           r-version: ${{ steps.normalizer.outputs.R_VERSION }}
+          use-public-rspm: true
+
+      - name: setup renv
+        uses: r-lib/actions/setup-renv@v2
           
       - name: Restore cache
         uses: actions/cache@v3
@@ -79,14 +83,14 @@ jobs:
           
       - name: Install Dependencies
         run: |
-          if (!requireNamespace("spelling", quietly = TRUE)) {
-            install.packages("spelling")
-          }
+          renv::install("spelling")
         shell: Rscript {0}
 
+      ########## Run spellcheck on directory of R scripts ##########
       - name: Run Spellcheck
         run: |
-          (spell_errors <- spelling::spell_check_package())
+          input_files <- list.files("pilot5-submission/pilot5-programs", pattern = "\\.(r|Rmd)$", full.names = TRUE)
+          (spell_errors <- spelling::spell_check_files(input_files))
           if (nrow(spell_errors) > 0L) {
             quit(save = "no", status = 1, runLast = FALSE)
           }

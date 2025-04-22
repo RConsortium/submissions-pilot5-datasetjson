@@ -1,53 +1,25 @@
-# Note to Reviewer
-# To rerun the code below, please refer ADRG appendix.
-# After required package are installed.
-# The path variable needs to be defined by using example code below
-#
-# nolint start
-# path <- list(
-# sdtm = "path/to/esub/tabulations/sdtm", # Modify path to the sdtm location
-# adam = "path/to/esub/analysis/adam"     # Modify path to the adam location
-# )
-# nolint end
-
-###########################################################################
-#' developers : Steven Haesendonckx/Dadong Zhang/Nicole Jones
-#' date: 28NOV2022
-#' modification History:
-#' Dadong Zhang, 17DEC2022
-#' Nicole Jones, 12Jan2023
-#' Nicole Jones, 13Apr2023
-###########################################################################
-
 # Set up ------------------------------------------------------------------
-library(haven)
-library(admiral)
 library(dplyr)
 library(tidyr)
+library(admiral)
 library(metacore)
 library(metatools)
-library(xportr)
 library(stringr)
+library(pilot5utils)
 
 # read source -------------------------------------------------------------
-# When SAS datasets are imported into R using  read_sas(), missing
-# character values from SAS appear as "" characters in R, instead of appearing
-# as NA values. Further details can be obtained via the following link:
-# https://pharmaverse.github.io/admiral/articles/admiral.html#handling-of-missing-values
-
-# Read and convert NA for SDTM DATASET
 ## Laboratory Tests Results (LB)
-lb <- convert_blanks_to_na(read_xpt(file.path(path$sdtm, "lb.xpt")))
-## Supplemental Qualifiers for LB (SUPPLB)
-supplb <- convert_blanks_to_na(read_xpt(file.path(path$sdtm, "supplb.xpt")))
+lb <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "lb.rds")))
 
+## Supplemental Qualifiers for LB (SUPPLB)
+supplb <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "supplb.rds")))
 
 # Read and convert NA for ADaM DATASET
 ## Subject-Level Analysis
-adsl <- convert_blanks_to_na(read_xpt(file.path(path$adam, "adsl.xpt")))
+adsl <- convert_blanks_to_na(readRDS(file.path(path$adam, "adsl.rds")))
 
 # create labels
-metacore <- spec_to_metacore(file.path(path$adam, "adam-pilot-3.xlsx"), where_sep_sheet = FALSE, quiet = TRUE)
+metacore <- spec_to_metacore(file.path(path$adam, "adam-pilot-5.xlsx"), where_sep_sheet = FALSE, quiet = TRUE)
 
 adlbc_spec <- metacore %>%
   select_dataset("ADLBC")
@@ -163,8 +135,8 @@ eot <- adlb05 %>%
 
 adlb06 <- adlb05 %>%
   filter(grepl("WEEK", VISIT, fixed = TRUE) |
-    grepl("UNSCHEDULED", VISIT, fixed = TRUE) |
-    grepl("SCREENING", VISIT, fixed = TRUE)) %>% # added conditions to include screening and unscheduled visits
+           grepl("UNSCHEDULED", VISIT, fixed = TRUE) |
+           grepl("SCREENING", VISIT, fixed = TRUE)) %>% # added conditions to include screening and unscheduled visits
   mutate(
     AVISIT = case_when(
       ABLFL == "Y" ~ "Baseline",
@@ -251,7 +223,7 @@ adlb09 <- adlb08 %>%
   full_join(adlb08, by = c("USUBJID", "PARAMCD", "LBSEQ"), multiple = "all")
 
 # Treatment Vars ------------------------------------------------------------
-
+## ADLBC Production data
 adlbc <- adlb09 %>%
   mutate(
     TRTP = TRT01P,
@@ -261,9 +233,7 @@ adlbc <- adlb09 %>%
   ) %>%
   drop_unspec_vars(adlbc_spec) %>%
   order_cols(adlbc_spec) %>%
-  set_variable_labels(adlbc_spec) %>%
-  xportr_format(adlbc_spec$var_spec %>%
-    mutate_at(c("format"), ~ replace_na(., "")), "ADLBC") %>%
-  xportr_write(file.path(path$adam, "adlbc.xpt"),
-    label = "Analysis Dataset Lab Blood Chemistry"
-  )
+  set_variable_labels(adlbc_spec) 
+
+#saving the dataset as RDS format
+saveRDS(adlbc, file.path(path$adam, "adlbc.rds"))
