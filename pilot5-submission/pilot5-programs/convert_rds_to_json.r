@@ -48,9 +48,11 @@ for (rds_file in rds_files) {
                       displayFormat == "DATE9." ~ "integer",
                       displayFormat == "DATETIME20." ~ "integer",
                       .default = NA
-                    )
-                  
-                  ) %>%
+                    ),
+                  length = dplyr::case_when(
+                    dataType == "string" ~ length,
+                    .default = NA
+                  )) %>%
     data.frame()
   
   dataset_json(df, 
