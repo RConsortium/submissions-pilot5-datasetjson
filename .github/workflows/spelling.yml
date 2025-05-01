@@ -80,7 +80,7 @@ jobs:
           
       - name: Install Dependencies
         run: |
-          renv::install("spelling")
+          renv::install("spelling", repos = "cran.rstudio.com")
         shell: Rscript {0}
 
       ########## Run spellcheck on directory of R scripts ##########

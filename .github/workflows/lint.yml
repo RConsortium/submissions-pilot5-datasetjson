@@ -92,14 +92,6 @@ jobs:
             ~/.staged.dependencies
           key: staged-deps
 
-      - name: Run Staged dependencies
-        uses: insightsengineering/staged-dependencies-action@v1
-        with:
-          run-system-dependencies: false
-          renv-restore: false
-          enable-check: false
-        env:
-          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       ##################### END boilerplate steps #####################
 
       - name: Changed files
@@ -111,7 +103,7 @@ jobs:
 
       - name: Lint
         run: |
-          install.packages("lintr")
+          install.packages("lintr", repos = "cran.rstudio.com")
           exclusions_list <- NULL
           if (!identical("${{ inputs.lint-all-files }}", "true")) {
             changed_files <- jsonlite::fromJSON('${{ steps.files.outputs.added_modified }}')

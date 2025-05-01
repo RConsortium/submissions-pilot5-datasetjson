@@ -30,7 +30,7 @@ jobs:
           Rscript -e 'install.packages(c("dplyr", "jsonlite", "quarto", "diffdf", "rmarkdown"), repos = "cran.rstudio.com")'
           
       - name: Run QC script
-        run: R -e 'quarto::render("qcReport.qmd")'
+        run: R -e 'quarto::quarto_render("qcReport.qmd")'
     
       - name: Upload report artifact
         uses: actions/upload-artifact@v4
