@@ -49,8 +49,10 @@ adas1 <- adadas_pred %>%
     by_vars = exprs(STUDYID, USUBJID, QSSEQ)
   ) %>%
   # subset to interested PARAMCD(QSTESTCD)
-  filter(PARAMCD %in%
-    c(str_c("ACITM", str_pad(1:14, 2, pad = "0")), "ACTOT")) %>%
+  filter(
+    PARAMCD %in%
+      c(str_c("ACITM", str_pad(1:14, 2, pad = "0")), "ACTOT")
+  ) %>%
   # ADT
   derive_vars_dt(
     new_vars_prefix = "A",
@@ -172,8 +174,11 @@ adas <- adas5 %>%
   drop_unspec_vars(adadas_spec) %>%
   order_cols(adadas_spec) %>%
   set_variable_labels(adadas_spec) %>%
-  xportr_format(adadas_spec$var_spec %>%
-    mutate_at(c("format"), ~ replace_na(., "")), "ADADAS") %>%
+  xportr_format(
+    adadas_spec$var_spec %>%
+      mutate_at(c("format"), ~ replace_na(., "")),
+    "ADADAS"
+  ) %>%
   xportr_df_label(adadas_spec, domain = "adadas")
 
 

@@ -7,14 +7,14 @@ library(tidyr)
 
 # Metadata ----------------------------------------------------------------
 
-spec_path <- list.files(path = path$adam, pattern = "adam-pilot-5.xlsx", full.names = T)
+spec_path <- list.files(path = path$adam, pattern = "adam-pilot-5.xlsx", full.names = TRUE)
 
 specs <- spec_path %>%
   metacore::spec_to_metacore(where_sep_sheet = FALSE)
 
 # Input Files -------------------------------------------------------------
 
-rds_files <- list.files(path = path$adam, patter = "*.rds", full.names = F)
+rds_files <- list.files(path = path$adam, patter = "*.rds", full.names = FALSE)
 
 # Pull all required information -------------------------------------------
 
@@ -26,7 +26,7 @@ for (rds_file in rds_files) {
   df_spec <- specs %>%
     select_dataset(toupper(df_name))
 
-  OIDcols <- df_spec$ds_vars %>%
+  OIDcols <- df_spec$ds_vars %>% #nolint
     dplyr::select(dataset, variable, key_seq) %>%
     dplyr::left_join(df_spec$var_spec, by = c("variable")) %>%
     dplyr::rename(name = variable, dataType = type, keySequence = key_seq, displayFormat = format) %>%

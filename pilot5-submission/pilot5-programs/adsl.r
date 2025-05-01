@@ -129,8 +129,8 @@ adsl00 <- dm %>%
   derive_vars_merged(
     dataset_add = ex_dt,
     filter_add = (EXDOSE > 0 |
-      (EXDOSE == 0 &
-        grepl("PLACEBO", EXTRT, fixed = TRUE))) &
+                    (EXDOSE == 0 &
+                       grepl("PLACEBO", EXTRT, fixed = TRUE))) &
       !is.na(EXSTDT),
     new_vars = exprs(TRTSDT = EXSTDT),
     order = exprs(EXSTDT, EXSEQ),
@@ -140,9 +140,11 @@ adsl00 <- dm %>%
   # treatment end
   derive_vars_merged(
     dataset_add = ex_dt,
-    filter_add = (EXDOSE > 0 |
-      (EXDOSE == 0 &
-        grepl("PLACEBO", EXTRT, fixed = TRUE))) &
+    filter_add = (
+      EXDOSE > 0 |
+        (EXDOSE == 0 &
+           grepl("PLACEBO", EXTRT, fixed = TRUE))
+    ) &
       !is.na(EXENDT),
     new_vars = exprs(TRTEDT = EXENDT),
     order = exprs(EXENDT, EXSEQ),
@@ -356,8 +358,11 @@ adsl07 %>%
   xportr_length(adsl_spec) %>%
   xportr_label(adsl_spec) %>%
   xportr_df_label(adsl_spec, domain = "adsl") %>%
-  xportr_format(adsl_spec$var_spec %>%
-    mutate_at(c("format"), ~ replace_na(., "")), "ADSL")
+  xportr_format(
+    adsl_spec$var_spec %>%
+      mutate_at(c("format"), ~ replace_na(., "")),
+    "ADSL"
+  )
 
 
 # saving the dataset as rds format

@@ -170,15 +170,16 @@ adae0 <- ae %>%
     ), filter = TRTEMFL == "Y" & AESER == "Y"
   ) %>%
   # CQ01NAM - Customized Query 01 Name
-  mutate(CQ01NAM = ifelse(str_detect(AEDECOD, "APPLICATION") |
-    str_detect(AEDECOD, "DERMATITIS") |
-    str_detect(AEDECOD, "ERYTHEMA") |
-    str_detect(AEDECOD, "BLISTER") |
-    str_detect(AEBODSYS, "SKIN AND SUBCUTANEOUS TISSUE DISORDERS") &
-      !str_detect(AEDECOD, "COLD SWEAT|HYPERHIDROSIS|ALOPECIA"),
-  "DERMATOLOGIC EVENTS",
-  NA_character_
-  )) %>%
+  mutate(
+         CQ01NAM = ifelse(str_detect(AEDECOD, "APPLICATION") |
+             str_detect(AEDECOD, "DERMATITIS") |
+             str_detect(AEDECOD, "ERYTHEMA") |
+             str_detect(AEDECOD, "BLISTER") |
+             str_detect(AEBODSYS, "SKIN AND SUBCUTANEOUS TISSUE DISORDERS") &
+               !str_detect(AEDECOD, "COLD SWEAT|HYPERHIDROSIS|ALOPECIA"),
+           "DERMATOLOGIC EVENTS",
+           NA_character_
+         )) %>%
   # AOCC01FL - 1st Occurrence 01 Flag for CQ01
   restrict_derivation(
     derivation = derive_var_extreme_flag,
