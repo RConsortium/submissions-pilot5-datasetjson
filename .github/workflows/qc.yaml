@@ -10,7 +10,7 @@ on:
 
 jobs:
   qc-check:
-  runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
 
 steps:
   - name: Check out this repository
