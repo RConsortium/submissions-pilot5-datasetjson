@@ -128,9 +128,10 @@ adsl00 <- dm %>%
   # treatment start
   derive_vars_merged(
     dataset_add = ex_dt,
-    filter_add = (EXDOSE > 0 |
-      (EXDOSE == 0 &
-        grepl("PLACEBO", EXTRT, fixed = TRUE))) &
+    filter_add = (
+      EXDOSE > 0 |
+        (EXDOSE == 0 & grepl("PLACEBO", EXTRT, fixed = TRUE))
+    ) &
       !is.na(EXSTDT),
     new_vars = exprs(TRTSDT = EXSTDT),
     order = exprs(EXSTDT, EXSEQ),
@@ -141,9 +142,7 @@ adsl00 <- dm %>%
   derive_vars_merged(
     dataset_add = ex_dt,
     filter_add = (
-      EXDOSE > 0 |
-        (EXDOSE == 0 &
-          grepl("PLACEBO", EXTRT, fixed = TRUE))
+      EXDOSE > 0 | (EXDOSE == 0 & grepl("PLACEBO", EXTRT, fixed = TRUE))
     ) &
       !is.na(EXENDT),
     new_vars = exprs(TRTEDT = EXENDT),

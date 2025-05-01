@@ -171,14 +171,15 @@ adae0 <- ae %>%
   ) %>%
   # CQ01NAM - Customized Query 01 Name
   mutate(
-    CQ01NAM = ifelse(str_detect(AEDECOD, "APPLICATION") |
-      str_detect(AEDECOD, "DERMATITIS") |
-      str_detect(AEDECOD, "ERYTHEMA") |
-      str_detect(AEDECOD, "BLISTER") |
-      str_detect(AEBODSYS, "SKIN AND SUBCUTANEOUS TISSUE DISORDERS") &
-        !str_detect(AEDECOD, "COLD SWEAT|HYPERHIDROSIS|ALOPECIA"),
-    "DERMATOLOGIC EVENTS",
-    NA_character_
+    CQ01NAM = ifelse(
+      str_detect(AEDECOD, "APPLICATION") |
+        str_detect(AEDECOD, "DERMATITIS") |
+        str_detect(AEDECOD, "ERYTHEMA") |
+        str_detect(AEDECOD, "BLISTER") |
+        str_detect(AEBODSYS, "SKIN AND SUBCUTANEOUS TISSUE DISORDERS") &
+          !str_detect(AEDECOD, "COLD SWEAT|HYPERHIDROSIS|ALOPECIA"),
+      "DERMATOLOGIC EVENTS",
+      NA_character_
     )
   ) %>%
   # AOCC01FL - 1st Occurrence 01 Flag for CQ01

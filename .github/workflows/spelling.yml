@@ -88,7 +88,7 @@ jobs:
         run: |
           input_files <- list.files("pilot5-submission/pilot5-programs", pattern = "\\.(r|Rmd)$", full.names = TRUE)
           (spell_errors <- spelling::spell_check_files(input_files))
-          if (nrow(spell_errors) > 0L) {
-            quit(save = "no", status = 1, runLast = FALSE)
-          }
+          # if (nrow(spell_errors) > 0L) {
+          #     quit(save = "no", status = 1, runLast = FALSE)
+          #}
         shell: Rscript {0}

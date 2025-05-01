@@ -104,6 +104,7 @@ jobs:
       - name: Lint
         run: |
           install.packages("lintr", repos = "cran.rstudio.com")
+          library(lintr)
           exclusions_list <- NULL
           if (!identical("${{ inputs.lint-all-files }}", "true")) {
             changed_files <- jsonlite::fromJSON('${{ steps.files.outputs.added_modified }}')
@@ -114,9 +115,9 @@ jobs:
               NULL
             }
           }
-          lints <- lintr::lint_dir(
+          lints <- lint_dir(
             "pilot5-submission/pilot5-programs", 
-            lintr::linters_with_defaults(line_length_linter = line_length_linter(120L)),
+            linters_with_defaults(line_length_linter = line_length_linter(120L)),
             exclusions = exclusions_list
             )
           saveRDS(lints, file = "lints.rds")
