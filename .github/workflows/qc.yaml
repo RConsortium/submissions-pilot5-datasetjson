@@ -20,7 +20,7 @@ jobs:
         with:
           repository: atorus-research/CDISC_pilot_replication
           sparse-checkout: 'output'
-        path: CDISC_pilot_replication
+          path: CDISC_pilot_replication
     
       - name: Set up R
         uses: r-lib/actions/setup-r@v2
