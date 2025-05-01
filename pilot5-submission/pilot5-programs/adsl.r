@@ -1,4 +1,3 @@
-
 ###########################################################################
 #' developers : Steven Haesendonckx/Declan Hodges/Thomas Neitmann
 #' date: 09DEC2022
@@ -20,9 +19,10 @@ library(janitor)
 library(datasetjson)
 
 path <- list(
-  sdtm = "pilot5-submission/pilot5-input/sdtmdata/",  # Modify path to the sdtm location
+  sdtm = "pilot5-submission/pilot5-input/sdtmdata/", # Modify path to the sdtm location
   adam = "pilot5-submission/pilot5-input/adamdata/", # Modify path to the adam location
-  dapm3 = "pilot5-submission/")    
+  dapm3 = "pilot5-submission/"
+)
 
 
 # read source -------------------------------------------------------------
@@ -31,7 +31,7 @@ path <- list(
 # as NA values. Further details can be obtained via the following link:
 # https://pharmaverse.github.io/admiral/articles/admiral.html#handling-of-missing-values
 
- 
+
 dm <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "dm.rds")))
 ds <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "ds.rds")))
 ex <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "ex.rds")))
@@ -39,7 +39,7 @@ qs <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "qs.rds")))
 sv <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "sv.rds")))
 vs <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "vs.rds")))
 sc <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "sc.rds")))
-mh <-convert_blanks_to_na(readRDS(file.path(path$sdtm, "mh.rds")))
+mh <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "mh.rds")))
 
 
 
@@ -66,17 +66,17 @@ ds00 <- ds %>%
 
 # Treatment information ---------------------------------------------------
 
-mh <-convert_blanks_to_na(readRDS(file.path(path$sdtm, "mh.rds")))
+mh <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "mh.rds")))
 
 mh <- derive_vars_dt(
   mh,
   dtc = MHDTC,
   new_vars_prefix = "AST",
   highest_imputation = "M",
-) 
+)
 
 colnames(mh)
-mh[,c("MHDTC", "ASTDT")]
+mh[, c("MHDTC", "ASTDT")]
 
 
 ex_dt <- ex %>%
@@ -330,8 +330,8 @@ adsl07 <- adsl06 %>%
   left_join(mmsetot, by = c("STUDYID", "USUBJID"))
 
 
-#generating the SITEGR1 variable 
-#Grouping by SITEID, TRT01A to get the count fewer than 3 patients in any one treatment group.
+# generating the SITEGR1 variable
+# Grouping by SITEID, TRT01A to get the count fewer than 3 patients in any one treatment group.
 
 adsl07_ <- adsl07 %>%
   group_by(SITEID, TRT01A) %>%
@@ -341,7 +341,7 @@ adsl07_ <- adsl07 %>%
 
 
 adsl07 <- left_join(adsl07, adsl07_, by = c("SITEID", "TRT01A")) %>%
-  mutate(SITEGR1= if_else(n <=3, "900", SITEID)) %>%
+  mutate(SITEGR1 = if_else(n <= 3, "900", SITEID)) %>%
   select(-n)
 
 
@@ -349,19 +349,16 @@ adsl07 <- left_join(adsl07, adsl07_, by = c("SITEID", "TRT01A")) %>%
 
 # Export to xpt -----------------------------------------------------
 adsl07 %>%
-  drop_unspec_vars(adsl_spec) %>% 
+  drop_unspec_vars(adsl_spec) %>%
   check_ct_data(adsl_spec, na_acceptable = TRUE) %>%
-  order_cols(adsl_spec) %>% 
+  order_cols(adsl_spec) %>%
   sort_by_key(adsl_spec) %>%
-  xportr_length(adsl_spec) %>% 
-  xportr_label(adsl_spec) %>%  
-  xportr_df_label(adsl_spec, domain = "adsl") %>% 
+  xportr_length(adsl_spec) %>%
+  xportr_label(adsl_spec) %>%
+  xportr_df_label(adsl_spec, domain = "adsl") %>%
   xportr_format(adsl_spec$var_spec %>%
-       mutate_at(c("format"), ~ replace_na(., "")), "ADSL") 
+    mutate_at(c("format"), ~ replace_na(., "")), "ADSL")
 
 
-#saving the dataset as rds format
+# saving the dataset as rds format
 saveRDS(adsl07, file.path(path$adam, "adsl.rds"))
-
-
-

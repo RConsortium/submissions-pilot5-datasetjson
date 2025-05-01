@@ -66,17 +66,17 @@ jobs:
           r-version: ${{ steps.normalizer.outputs.R_VERSION }}
           use-public-rspm: true
 
-      - name: setup renv
-        uses: r-lib/actions/setup-renv@v2
-          
-      - name: Restore cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.local/share/renv
-            ~/.staged.dependencies
-          key: ${{ runner.os }}-renv-${{ hashFiles('**/renv.lock') }}
-          restore-keys: ${{ runner.os }}-renv-
+      # - name: setup renv
+      #   uses: r-lib/actions/setup-renv@v2
+      #     
+      # - name: Restore cache
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: |
+      #       ~/.local/share/renv
+      #       ~/.staged.dependencies
+      #     key: ${{ runner.os }}-renv-${{ hashFiles('**/renv.lock') }}
+      #     restore-keys: ${{ runner.os }}-renv-
           
       - name: Install Dependencies
         run: |

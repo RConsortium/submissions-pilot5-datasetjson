@@ -7,9 +7,9 @@ library(metatools)
 library(pilot5utils)
 
 # read source -------------------------------------------------------------
-ds <-  convert_blanks_to_na(readRDS(file.path(path$sdtm, "ds.rds")))
-adsl <-  convert_blanks_to_na(readRDS(file.path(path$adam, "adsl.rds")))
-adae <-  convert_blanks_to_na(readRDS(file.path(path$adam, "adae.rds")))
+ds <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "ds.rds")))
+adsl <- convert_blanks_to_na(readRDS(file.path(path$adam, "adsl.rds")))
+adae <- convert_blanks_to_na(readRDS(file.path(path$adam, "adae.rds")))
 
 ## placeholder for origin=predecessor, use metatool::build_from_derived()
 metacore <- spec_to_metacore(file.path(path$adam, "adam-pilot-5.xlsx"), where_sep_sheet = FALSE)
@@ -92,7 +92,7 @@ adtte_pre <- derive_param_tte(
     TRTP = TRT01P
   )
 
-adtte_rds<- adtte_pre %>%
+adtte_rds <- adtte_pre %>%
   drop_unspec_vars(adtte_spec) %>% # only keep vars from define
   order_cols(adtte_spec) %>% # order columns based on define
   set_variable_labels(adtte_spec) # apply variable labels based on define
@@ -103,5 +103,5 @@ adtte <- adtte_rds %>%
   order_cols(adtte_spec) %>% # order columns based on define
   set_variable_labels(adtte_spec)
 
-#saving the dataset as RDS format
+# saving the dataset as RDS format
 saveRDS(adtte, file.path(path$output_datasetjson, "adtte.rds"))

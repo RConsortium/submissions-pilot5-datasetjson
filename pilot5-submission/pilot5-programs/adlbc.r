@@ -135,8 +135,8 @@ eot <- adlb05 %>%
 
 adlb06 <- adlb05 %>%
   filter(grepl("WEEK", VISIT, fixed = TRUE) |
-           grepl("UNSCHEDULED", VISIT, fixed = TRUE) |
-           grepl("SCREENING", VISIT, fixed = TRUE)) %>% # added conditions to include screening and unscheduled visits
+    grepl("UNSCHEDULED", VISIT, fixed = TRUE) |
+    grepl("SCREENING", VISIT, fixed = TRUE)) %>% # added conditions to include screening and unscheduled visits
   mutate(
     AVISIT = case_when(
       ABLFL == "Y" ~ "Baseline",
@@ -233,7 +233,7 @@ adlbc <- adlb09 %>%
   ) %>%
   drop_unspec_vars(adlbc_spec) %>%
   order_cols(adlbc_spec) %>%
-  set_variable_labels(adlbc_spec) 
+  set_variable_labels(adlbc_spec)
 
-#saving the dataset as RDS format
+# saving the dataset as RDS format
 saveRDS(adlbc, file.path(path$adam, "adlbc.rds"))

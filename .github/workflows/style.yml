@@ -82,7 +82,7 @@ jobs:
       
       - name: Run styler 🖼️
         run: |
-          detect <- styler::style_dir("pilot5-input", dry = "on")
+          detect <- styler::style_dir("pilot5-submission/pilot5-programs", dry = "on")
           if (TRUE %in% detect$changed) {
           problems <- subset(detect$file, detect$changed == T)
           cat(paste("Styling errors found in", length(problems), "files\n"))
