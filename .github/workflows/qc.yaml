@@ -33,7 +33,7 @@ jobs:
         run: R -e 'quarto::render("qcReport.qmd")'
     
       - name: Upload report artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: qcReport.html
           path: report/
