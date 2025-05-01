@@ -32,7 +32,7 @@ jobs:
       ##################### BEGIN boilerplate steps #####################
       - name: Get branch names
         id: branch-name
-        uses: tj-actions/branch-names@v5.4
+        uses: tj-actions/branch-names@v8.2.1
 
       - name: Checkout repo (PR) 🛎
         uses: actions/checkout@v3
@@ -82,7 +82,7 @@ jobs:
       
       - name: Run styler 🖼️
         run: |
-          detect <- styler::style_pkg(dry = "on")
+          detect <- styler::style_dir("pilot5-input", dry = "on")
           if (TRUE %in% detect$changed) {
           problems <- subset(detect$file, detect$changed == T)
           cat(paste("Styling errors found in", length(problems), "files\n"))
