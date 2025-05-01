@@ -76,7 +76,7 @@ jobs:
       - name: Install Dependencies
         run: |
           if (!requireNamespace("styler", quietly = TRUE)) {
-            install.packages("styler", repos = "cran.rstudio.com")
+            install.packages(c("styler", "knitr"), repos = "cran.rstudio.com")
           }
         shell: Rscript {0}
       

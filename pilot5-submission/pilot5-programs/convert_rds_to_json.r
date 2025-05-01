@@ -26,7 +26,7 @@ for (rds_file in rds_files) {
   df_spec <- specs %>%
     select_dataset(toupper(df_name))
 
-  OIDcols <- df_spec$ds_vars %>% #nolint
+  OIDcols <- df_spec$ds_vars %>% # nolint
     dplyr::select(dataset, variable, key_seq) %>%
     dplyr::left_join(df_spec$var_spec, by = c("variable")) %>%
     dplyr::rename(name = variable, dataType = type, keySequence = key_seq, displayFormat = format) %>%
