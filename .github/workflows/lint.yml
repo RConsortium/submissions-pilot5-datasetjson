@@ -11,12 +11,12 @@ on:
         default: 'false'
         required: false
         type: string
-#  push:
-#    branches:
-#      - main
-#  pull_request:
-#    branches:
-#      - main
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 name: Check Lint
 

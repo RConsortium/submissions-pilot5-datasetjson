@@ -9,14 +9,11 @@ on:
         default: '4.2'
         required: false
         type: string
-#  push:
-#    branches:
-#      - main
-#      - devel
-#  pull_request:
-#    branches:
-#      - main
-#      - devel
+
+  pull_request:
+    branches:
+      - main
+      - devel
 
 
 concurrency:
@@ -26,7 +23,7 @@ concurrency:
 jobs:
   roxygen:
     name: Style
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     if: >
