@@ -13,10 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out this repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
     
       - name: Check out CDISC_pilot_replication repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: atorus-research/CDISC_pilot_replication
           sparse-checkout: 'output'
