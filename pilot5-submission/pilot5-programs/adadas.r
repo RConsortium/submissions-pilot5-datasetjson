@@ -1,3 +1,11 @@
+#************************************************************************
+# Purpose:     Generate ADADAS dataset
+# Input:       DM, QS, and ADSL datasets
+# Output:      adadas.rds
+# Description: This R script generates the ADADAS dataset. Dataset specs
+#              can be found here: pilot5-submission/adam-pilot-5.xslx
+#************************************************************************
+
 # Note to Reviewer
 # To rerun the code below, please refer ADRG appendix.
 # After required package are installed.
@@ -7,10 +15,12 @@
 # path <- list(
 # sdtm = "path/to/esub/tabulations/sdtm", # Modify path to the sdtm location
 # adam = "path/to/esub/analysis/adam"     # Modify path to the adam location
+# adamspecs = "path/to/esub/analysis/adam"     # Modify path to the spec location
 # )
 # nolint end
 
-## setup
+# Setup -----------------
+## Load libraries -------
 library(dplyr)
 library(tidyr)
 library(admiral)
@@ -22,33 +32,35 @@ library(pilot5utils)
 library(datasetjson)
 library(purrr)
 
-dm <- readRDS(file.path(path$sdtm, "dm.rds"))
-qs <- readRDS(file.path(path$sdtm, "qs.rds"))
-adsl <- readRDS(file.path(path$adam, "adsl.rds"))
+## Load datasets ------------
+dm <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "dm.rds")))
+qs <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "qs.rds")))
+adsl <- convert_blanks_to_na(readRDS(file.path(path$adam, "adsl.rds")))
 
-dm <- convert_blanks_to_na(dm)
-qs <- convert_blanks_to_na(qs)
-adsl <- convert_blanks_to_na(adsl)
+## Load dataset specs -----------
+metacore <- spec_to_metacore(
+  file.path(path$adamspecs, "adam-pilot-5.xlsx"),
+  where_sep_sheet = FALSE
+)
 
-
-## origin=predecessor, use metatool::build_from_derived()
-metacore <- spec_to_metacore(file.path(path$adamspecs, "adam-pilot-5.xlsx"), where_sep_sheet = FALSE)
-# Get the specifications for the dataset we are currently building
+### Get the specifications for the dataset we are currently building
 adadas_spec <- metacore %>%
   select_dataset("ADADAS")
-# Pull together all the predecessor variables
-adadas_pred <- build_from_derived(adadas_spec,
+
+### Pull together all the predecessor variables
+adadas_pred <- build_from_derived(
+  adadas_spec,
   ds_list = list("ADSL" = adsl, "QS" = qs, "DM" = dm)
 )
 
-# ADT and ADY
+# Create ADADAS dataset -----------------
+## Derive ADY and ADT -------------------
 adas1 <- adadas_pred %>%
   derive_vars_merged(
     dataset_add = qs,
-    new_vars = exprs(QSDTC, QSSTRESN, QSTEST), # Get QS vars required for derivations
+    new_vars = exprs(QSDTC, QSSTRESN, QSTEST),
     by_vars = exprs(STUDYID, USUBJID, QSSEQ)
   ) %>%
-  # subset to interested PARAMCD(QSTESTCD)
   filter(
     PARAMCD %in%
       c(str_c("ACITM", str_pad(1:14, 2, pad = "0")), "ACTOT")
@@ -61,7 +73,7 @@ adas1 <- adadas_pred %>%
   # ADY
   derive_vars_dy(reference_date = TRTSDT, source_vars = exprs(ADT))
 
-## mutate AVISIT/AVAL/PARAM, assign AVISITN/PARAMN based on codelist from define
+## Derive AVISIT, AVAL, PARAM, AVISITN, PARAMN ----------
 adas2 <- adas1 %>%
   mutate(
     AVISIT = case_when(
@@ -74,11 +86,10 @@ adas2 <- adas1 %>%
     AVAL = QSSTRESN,
     PARAM = QSTEST %>% str_to_title()
   ) %>%
-  create_var_from_codelist(adadas_spec, AVISIT, AVISITN) %>% # derive AVISITN from codelist
-  create_var_from_codelist(adadas_spec, PARAM, PARAMN) # derive PARAMN from codelist
+  create_var_from_codelist(adadas_spec, AVISIT, AVISITN) %>%
+  create_var_from_codelist(adadas_spec, PARAM, PARAMN)
 
-
-## derive AWRANGE/AWTARGET/AWTDIFF/AWLO/AWHI/AWU
+## Derive AWRANGE, AWTARGET, AWTDIFF, AWLO, AWHI, AWU -----------
 aw_lookup <- tribble(
   ~AVISIT, ~AWRANGE, ~AWTARGET, ~AWLO, ~AWHI,
   "Baseline", "<=1", 1, NA_integer_, 1,
@@ -97,8 +108,7 @@ adas3 <- derive_vars_merged(
     AWU = "DAYS"
   )
 
-
-## ANL01FL
+## Derive ANL01FL -----------
 adas4 <- adas3 %>%
   mutate(diff = AWTARGET - ADY) %>%
   restrict_derivation(
@@ -112,7 +122,7 @@ adas4 <- adas3 %>%
     filter = !is.na(AVISIT)
   )
 
-# derive PARAMCD=ACTOT, DTYPE=LOCF
+## Derive PARAMCD=ACTOT, DTYPE=LOCF -------------
 # A dataset with combinations of PARAMCD, AVISIT which are expected.
 actot_expected_obsv <- tibble::tribble(
   ~PARAMCD, ~AVISITN, ~AVISIT,
@@ -137,9 +147,9 @@ adas_locf2 <- adas4 %>%
     ),
     filter = !is.na(ANL01FL)
   ) %>%
-  ################# assign ANL01FL for new records
+  # assign ANL01FL for new records
   mutate(ANL01FL = if_else(is.na(DTYPE), ANL01FL, "Y")) %>%
-  ################# re-derive AWRANGE/AWTARGET/AWTDIFF/AWLO/AWHI/AWU
+  # re-derive AWRANGE/AWTARGET/AWTDIFF/AWLO/AWHI/AWU
   select(-c("AWRANGE", "AWTARGET", "AWLO", "AWHI")) %>%
   derive_vars_merged(
     dataset_add = aw_lookup,
@@ -150,7 +160,7 @@ adas_locf2 <- adas4 %>%
     AWU = "DAYS"
   )
 
-## baseline information BASE/CHG/PCHG
+## Derive BASE, CHG, PCHG -----------
 adas5 <- adas_locf2 %>%
   # Calculate BASE
   derive_var_base(
@@ -169,18 +179,28 @@ adas5 <- adas_locf2 %>%
     filter = is.na(ABLFL)
   )
 
-## Final data
+# Export to xpt ---------------
 adas <- adas5 %>%
   drop_unspec_vars(adadas_spec) %>%
-  order_cols(adadas_spec) %>%
+  check_ct_data(adadas_spec, na_acceptable = TRUE) %>%
+  order_cols(adadas_spec) %>% 
+  sort_by_key(adadas_spec) %>%
   set_variable_labels(adadas_spec) %>%
-  xportr_format(
-    adadas_spec$var_spec %>%
-      mutate_at(c("format"), ~ replace_na(., "")),
-    "ADADAS"
-  ) %>%
-  xportr_df_label(adadas_spec, domain = "adadas")
+  #xportr_length(adadas_spec) %>%
+  xportr_df_label(adadas_spec, domain = "adadas") %>%
+  xportr_format(adadas_spec$var_spec %>%
+                  mutate_at(c("format"), ~ replace_na(., "")), "ADADAS")
 
+# FIX: attribute issues where sas.format attributes set to DATE9. are changed to DATE9,
+# and missing formats are set to NULL (instead of an empty character vector)
+# when reading original xpt file
+for (col in colnames(adas)) {
+  if (attr(adas[[col]], "format.sas") == "") {
+    attr(adas[[col]], "format.sas") <- NULL
+  } else if (attr(adas[[col]], "format.sas") == "DATE9.") {
+    attr(adas[[col]], "format.sas") <- "DATE9"
+  }
+}
 
-# saving the dataset as rds format
+# Saving the dataset as rds format --------------
 saveRDS(adas, file.path(path$adam, "adadas.rds"))
