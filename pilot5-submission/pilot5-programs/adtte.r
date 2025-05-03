@@ -46,7 +46,6 @@ adsl <- adsl %>%
   derive_vars_merged(
     dataset_add = ds00,
     by_vars = exprs(STUDYID, USUBJID),
-    new_vars = exprs(EOSDT = DSSTDT),
     filter_add = DSCAT == "DISPOSITION EVENT" & DSDECOD != "SCREEN FAILURE" & DSDECOD != "FINAL LAB VISIT"
   ) %>%
   mutate(EOS2DT = case_when(
@@ -104,4 +103,4 @@ adtte <- adtte_rds %>%
   set_variable_labels(adtte_spec)
 
 #saving the dataset as RDS format
-saveRDS(adtte, file.path(path$output_datasetjson, "adtte.rds"))
+saveRDS(adtte, file.path(path$adam, "adtte.rds"))
