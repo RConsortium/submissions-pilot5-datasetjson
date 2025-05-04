@@ -2,22 +2,12 @@
 # Purpose:     Generate ADSL dataset
 # Input:       DM, DS, EX, QS, SV, VS, SC, MH datasets
 # Output:      adsl.rds
-# Description: This R script generates the ADSL dataset. Dataset specs
-#              can be found here: pilot5-submission/adam-pilot-5.xslx
 #************************************************************************
 
 # Note to Reviewer
 # To rerun the code below, please refer ADRG appendix.
-# After required package are installed.
-# The path variable needs to be defined by using example code below
-#
-# nolint start
-# path <- list(
-# sdtm = "path/to/esub/tabulations/sdtm", # Modify path to the sdtm location
-# adam = "path/to/esub/analysis/adam"     # Modify path to the adam location
-# adamspecs = "path/to/esub/analysis/adam"     # Modify path to the spec location
-# )
-# nolint end
+# After required package are installed, the path variable needs to be defined
+# in the .Rprofile file
 
 # Setup -----------------
 ## Load libraries -------
@@ -31,21 +21,28 @@ library(pilot5utils)
 library(xportr)
 library(janitor)
 library(datasetjson)
-library(assertr)
 
 ## Load datasets ----------------------
 # Note - When SAS datasets are imported into R using read_sas(), missing
 # character values from SAS appear as "" characters in R, instead of appearing
 # as NA values. Further details can be obtained via the following link:
 # https://pharmaverse.github.io/admiral/articles/admiral.html#handling-of-missing-values
-dm <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "dm.rds")))
-ds <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "ds.rds")))
-ex <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "ex.rds")))
-qs <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "qs.rds")))
-sv <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "sv.rds")))
-vs <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "vs.rds")))
-sc <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "sc.rds")))
-mh <-convert_blanks_to_na(readRDS(file.path(path$sdtm, "mh.rds")))
+dat_to_load <- list(dm = file.path(path$sdtm, "dm.rds"),
+                    ds = file.path(path$sdtm, "ds.rds"),
+                    qs = file.path(path$sdtm, "qs.rds"),
+                    ex = file.path(path$sdtm, "ex.rds"),
+                    qs = file.path(path$sdtm, "qs.rds"),
+                    sv = file.path(path$sdtm, "sv.rds"),
+                    vs = file.path(path$sdtm, "vs.rds"),
+                    sc = file.path(path$sdtm, "sc.rds"),
+                    mh = file.path(path$sdtm, "mh.rds"))
+
+datasets <- map(
+  dat_to_load,
+  ~convert_blanks_to_na(readRDS(.x))
+)
+
+list2env(datasets, envir = .GlobalEnv)
 
 ## Load dataset specs -------------
 metacore <- spec_to_metacore(
@@ -107,12 +104,13 @@ ex_dt <- ex %>%
 ex_dose <- ex_dt %>%
   group_by(STUDYID, USUBJID, EXTRT) %>%
   summarise(cnt = n_distinct(EXTRT), CUMDOSE = sum(DOSE)) %>%
-  ungroup() %>%
-  verify(all(cnt == 1))
+  ungroup()
 
-# note - i added a verify statement (from assertr package) to check this in the pipe
-# above. i can delete one of the 2
-ex_dose[which(ex_dose[["cnt"]] > 1), "USUBJID"] # are there subjects with mixed treatments?
+# are there subjects with mixed treatments?
+n_mixed_trt <- ex_dose[which(ex_dose[["cnt"]] > 1), "USUBJID"]
+if(nrow(n_mixed_trt) > 0) {
+  print(glue("Note - there are {nrow(n_mixed_treat)} subjects with mixed treatments"))
+}
 
 adsl00 <- dm %>%
   select(-DOMAIN) %>%
@@ -178,6 +176,7 @@ eff <- qs %>%
 
 adsl02 <- adsl01 %>%
   left_join(eff, by = c("STUDYID", "USUBJID")) %>%
+  derive_var_merged_exist_flag()
   mutate(
     SAFFL = case_when(
       ARMCD != "Scrnfail" & ARMCD != "" & !is.na(TRTSDT) ~ "Y",
@@ -341,7 +340,7 @@ adsl <- adsl07 %>%
   xportr_label(adsl_spec) %>%  
   xportr_df_label(adsl_spec, domain = "adsl") %>% 
   xportr_format(adsl_spec$var_spec %>%
-       mutate_at(c("format"), ~ replace_na(., "")), "ADSL") 
+       mutate_at(c("format"), ~ replace_na(., "")), "ADSL")
 
 # Saving the dataset as rds format --------------
-saveRDS(adsl07, file.path(path$adam, "adsl.rds"))
+saveRDS(adsl, file.path(path$adam, "adsl_new.rds"))
