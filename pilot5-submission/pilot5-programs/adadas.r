@@ -2,22 +2,12 @@
 # Purpose:     Generate ADADAS dataset
 # Input:       DM, QS, and ADSL datasets
 # Output:      adadas.rds
-# Description: This R script generates the ADADAS dataset. Dataset specs
-#              can be found here: pilot5-submission/adam-pilot-5.xslx
 #************************************************************************
 
 # Note to Reviewer
 # To rerun the code below, please refer ADRG appendix.
-# After required package are installed.
-# The path variable needs to be defined by using example code below
-#
-# nolint start
-# path <- list(
-# sdtm = "path/to/esub/tabulations/sdtm", # Modify path to the sdtm location
-# adam = "path/to/esub/analysis/adam"     # Modify path to the adam location
-# adamspecs = "path/to/esub/analysis/adam"     # Modify path to the spec location
-# )
-# nolint end
+# After required package are installed, the path variable needs to be defined
+# in the .Rprofile file
 
 # Setup -----------------
 ## Load libraries -------
@@ -33,9 +23,16 @@ library(datasetjson)
 library(purrr)
 
 ## Load datasets ------------
-dm <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "dm.rds")))
-qs <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "qs.rds")))
-adsl <- convert_blanks_to_na(readRDS(file.path(path$adam, "adsl.rds")))
+dat_to_load <- list(dm = file.path(path$sdtm, "dm.rds"),
+                    qs = file.path(path$sdtm, "qs.rds"),
+                    adsl = file.path(path$adam, "adsl.rds"))
+
+datasets <- map(
+  dat_to_load,
+  ~convert_blanks_to_na(readRDS(.x))
+)
+
+list2env(datasets, envir = .GlobalEnv)
 
 ## Load dataset specs -----------
 metacore <- spec_to_metacore(
