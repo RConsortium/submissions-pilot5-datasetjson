@@ -20,7 +20,8 @@ library(metatools)
 library(pilot5utils)
 library(xportr)
 library(janitor)
-library(datasetjson)
+library(purrr)
+library(glue)
 
 ## Load datasets ----------------------
 dat_to_load <- list(dm = file.path(path$sdtm, "dm.rds"),
@@ -105,7 +106,7 @@ ex_dose <- ex_dt %>%
 # are there subjects with mixed treatments?
 n_mixed_trt <- ex_dose[which(ex_dose[["cnt"]] > 1), "USUBJID"]
 if(nrow(n_mixed_trt) > 0) {
-  print(glue("Note - there are {nrow(n_mixed_treat)} subjects with mixed treatments"))
+  print(glue("Note - there is (are) {nrow(n_mixed_trt)} subject(s) with mixed treatments"))
 }
 
 adsl00 <- dm %>%
@@ -172,7 +173,6 @@ eff <- qs %>%
 
 adsl02 <- adsl01 %>%
   left_join(eff, by = c("STUDYID", "USUBJID")) %>%
-  derive_var_merged_exist_flag()
   mutate(
     SAFFL = case_when(
       ARMCD != "Scrnfail" & ARMCD != "" & !is.na(TRTSDT) ~ "Y",
@@ -337,6 +337,17 @@ adsl <- adsl07 %>%
   xportr_df_label(adsl_spec, domain = "adsl") %>% 
   xportr_format(adsl_spec$var_spec %>%
        mutate_at(c("format"), ~ replace_na(., "")), "ADSL")
+
+# FIX: attribute issues where sas.format attributes set to DATE9. are changed to DATE9,
+# and missing formats are set to NULL (instead of an empty character vector)
+# when reading original xpt file
+for (col in colnames(adsl)) {
+  if (attr(adsl[[col]], "format.sas") == "") {
+    attr(adsl[[col]], "format.sas") <- NULL
+  } else if (attr(adsl[[col]], "format.sas") == "DATE9.") {
+    attr(adsl[[col]], "format.sas") <- "DATE9"
+  }
+}
 
 # Saving the dataset as rds format --------------
 saveRDS(adsl, file.path(path$adam, "adsl.rds"))
