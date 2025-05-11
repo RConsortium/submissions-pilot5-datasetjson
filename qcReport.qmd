@@ -4,6 +4,13 @@ format: html
 editor: visual
 ---
 
+```{r}
+library(safetyData)
+library(diffdf)
+library(tibble)
+library(stringr)
+```
+
 ## Quarto
 
 Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
@@ -24,3 +31,42 @@ You can add options to executable code like this
 ```
 
 The `echo: false` option disables the printing of code (only output is displayed).
+
+```{r data_load}
+input_dataset_paths <- list.files("pilot5-submission/pilot5-input/adamdata")
+input_dataset_paths <- input_dataset_paths[endsWith(input_dataset_paths, ".rds") ]
+input_dataset_names <- tools::file_path_sans_ext(input_dataset_paths)
+
+for (i in seq_along(input_dataset_names)) {
+  assign(
+    paste0("new_", input_dataset_names[i]), 
+    readRDS(paste0("pilot5-submission/pilot5-input/adamdata/", input_dataset_paths[i]))
+    )
+}
+dataset_map <- tribble(
+  ~comp_dataset, ~new_dataset,
+  "safetyData::adam_adqsadas", "new_adadas",
+  "safetyData::adam_adae", "new_adae",
+  "safetyData::adam_adlbc", "new_adlbc",
+  "safetyData::adam_adsl", "new_adsl",
+)
+
+```
+
+
+```{r data_check}
+#| warning: false
+#| message: false
+#| echo: false
+#| output: asis
+#| 
+for (y in input_dataset_names) {
+  cat(str_glue("## Dataset: {y}\n"))
+  
+  new_dataset <- paste0("new_", y)
+  comp_dataset <- dataset_map[dataset_map$new_dataset == new_dataset, "comp_dataset"]
+  diffdf(get(new_dataset), comp_dataset)
+  
+   cat("\n\n")
+}
+```
