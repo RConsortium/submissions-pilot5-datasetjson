@@ -32,18 +32,18 @@ adtte <- readRDS(file.path(path$adam, "adtte.rds"))
 
 ## ------------------------------------------------------------------------------------------------------------------------------
 anl <- adsl %>%
-  dplyr::filter(
+  filter(
     SAFFL == "Y",
     STUDYID == "CDISCPILOT01"
   ) %>%
-  dplyr::select(STUDYID, USUBJID, TRT01A) %>%
-  dplyr::inner_join(
+  select(STUDYID, USUBJID, TRT01A) %>%
+  inner_join(
     filter(
       adtte, PARAMCD == "TTDE", STUDYID == "CDISCPILOT01"
     ) %>% select(STUDYID, USUBJID, AVAL, CNSR, PARAM, PARAMCD),
     by = c("STUDYID", "USUBJID")
   ) %>%
-  dplyr::mutate(
+  mutate(
     TRT01A = factor(TRT01A, levels = c("Placebo", "Xanomeline Low Dose", "Xanomeline High Dose"))
   )
 

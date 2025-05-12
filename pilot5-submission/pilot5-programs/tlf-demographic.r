@@ -28,11 +28,11 @@ lbls <- c("Age", "Pooled Age Group 1", "Race", "Baseline Height (cm)", "Baseline
 
 ## ------------------------------------------------------------------------------------------------------------------------------
 adsl <- adsl %>%
-  dplyr::filter(
+  filter(
     STUDYID == "CDISCPILOT01",
     ITTFL == "Y"
   ) %>%
-  dplyr::mutate(
+  mutate(
     TRT01P = factor(TRT01P, levels = c("Placebo", "Xanomeline Low Dose", "Xanomeline High Dose")),
     AGEGR1 = factor(AGEGR1, levels = c("<65", "65-80", ">80")),
     RACE = factor(RACE, levels = c("WHITE", "BLACK OR AFRICAN AMERICAN", "AMERICAN INDIAN OR ALASKA NATIVE"))

@@ -20,7 +20,7 @@ adsl <- readRDS(file.path(path$adam, "adsl.rds"))
 
 ## ------------------------------------------------------------------------------------------------------------------------------
 adas <- adas %>%
-  dplyr::filter(
+  filter(
     EFFFL == "Y",
     ITTFL == "Y",
     PARAMCD == "ACTOT",
@@ -50,18 +50,18 @@ t <- Tplyr::tplyr_table(adas, TRTP) %>%
   )
 
 hdr <- adas %>%
-  dplyr::distinct(TRTP, TRTPN) %>%
-  dplyr::arrange(TRTPN) %>%
-  dplyr::pull(TRTP)
+  distinct(TRTP, TRTPN) %>%
+  arrange(TRTPN) %>%
+  pull(TRTP)
 hdr_ext <- sapply(hdr, FUN = function(x) paste0("|", x, "\\line(N=**", x, "**)"), USE.NAMES = FALSE)
 hdr_fin <- paste(hdr_ext, collapse = "")
 # Want the header to wrap properly in the RTF file
-hdr_fin <- stringr::str_replace_all(hdr_fin, "\\|Xanomeline ", "|Xanomeline\\\\line ")
+hdr_fin <- str_replace_all(hdr_fin, "\\|Xanomeline ", "|Xanomeline\\\\line ")
 
 sum_data <- t %>%
   Tplyr::build() %>%
   pilot5utils::nest_rowlabels() %>%
-  dplyr::select(row_label, var1_Placebo, `var1_Xanomeline Low Dose`, `var1_Xanomeline High Dose`) %>%
+  select(row_label, var1_Placebo, `var1_Xanomeline Low Dose`, `var1_Xanomeline High Dose`) %>%
   Tplyr::add_column_headers(
     hdr_fin,
     header_n(t)
@@ -73,7 +73,7 @@ model_portion <- pilot5utils::efficacy_models(adas, "CHG", 24)
 
 
 ## ------------------------------------------------------------------------------------------------------------------------------
-final <- dplyr::bind_rows(sum_data, model_portion)
+final <- bind_rows(sum_data, model_portion)
 
 ht <- huxtable::as_hux(final, add_colnames = FALSE) %>%
   huxtable::set_bold(1, seq_len(ncol(final)), TRUE) %>%

@@ -32,29 +32,29 @@ adlb <- readRDS(file.path(path$adam, "adlbc.rds"))
 itt <- adsl[adsl[["ITTFL"]] == "Y", c("STUDYID", "USUBJID")]
 
 adlb1 <- adlb %>%
-  dplyr::right_join(itt, by = c("STUDYID", "USUBJID")) %>%
+  right_join(itt, by = c("STUDYID", "USUBJID")) %>%
   subset(TRTPN %in% c(0, 81) & PARAMCD == "GLUC" & !is.na(AVISITN)) %>%
-  dplyr::mutate(TRTPN = ifelse(TRTPN == 0, 99, TRTPN)) # change treatment order for pairwise comparison
+  mutate(TRTPN = ifelse(TRTPN == 0, 99, TRTPN)) # change treatment order for pairwise comparison
 
 ## Fit data for linear model
 gluc_lmfit <- adlb1 %>%
-  dplyr::filter(AVISITN == 20) %>%
-  stats::lm(CHG ~ BASE + TRTPN, data = .)
+  filter(AVISITN == 20) %>%
+  lm(CHG ~ BASE + TRTPN, data = .)
 
 ## Raw summary statistics
 t10 <- adlb1 %>%
-  dplyr::filter(AVISITN == 0) %>%
-  dplyr::group_by(TRTPN, TRTP) %>%
-  dplyr::summarise(
+  filter(AVISITN == 0) %>%
+  group_by(TRTPN, TRTP) %>%
+  summarise(
     N = n(),
     mean_bl = mean(BASE),
     sd_bl = sd(BASE)
   )
 
 t11 <- adlb1 %>%
-  dplyr::filter(AVISITN == 20, !is.na(CHG), !is.na(BASE)) %>%
-  dplyr::group_by(TRTPN, TRTP) %>%
-  dplyr::summarise(
+  filter(AVISITN == 20, !is.na(CHG), !is.na(BASE)) %>%
+  group_by(TRTPN, TRTP) %>%
+  summarise(
     N_20 = n(),
     mean_chg = mean(CHG),
     sd_chg = sd(CHG),
@@ -63,13 +63,13 @@ t11 <- adlb1 %>%
   )
 
 ## Calculate LS mean
-t12 <- emmeans::emmeans(gluc_lmfit, "TRTPN")
+t12 <- emmeans(gluc_lmfit, "TRTPN")
 
 ## Merge and format data for reporting
 apr0ancova1 <- merge(t10, t11) %>%
   merge(t12) %>%
-  dplyr::mutate(emmean_sd = SE * sqrt(df)) %>%
-  dplyr::mutate(
+  mutate(emmean_sd = SE * sqrt(df)) %>%
+  mutate(
     Trt = c("Xanomeline High Dose", "Placebo"),
     N1 = N,
     Mean1 = pilot5utils::fmt_est(mean_bl, sd_bl),
@@ -79,7 +79,7 @@ apr0ancova1 <- merge(t10, t11) %>%
     Mean3 = pilot5utils::fmt_est(mean_chg, sd_chg),
     CI = pilot5utils::fmt_ci(emmean, lower.CL, upper.CL)
   ) %>%
-  dplyr::select(Trt:CI)
+  select(Trt:CI)
 
 apr0ancova1
 
@@ -89,16 +89,16 @@ t2 <- data.frame(pairs(t12))
 
 ## Treatment Comparison
 apr0ancova2 <- t2 %>%
-  dplyr::mutate(
+  mutate(
     lower = estimate - 1.96 * SE,
     upper = estimate + 1.96 * SE
   ) %>%
-  dplyr::mutate(
+  mutate(
     comp = "Xanomeline High Dose vs. Placebo",
     mean = pilot5utils::fmt_ci(estimate, lower, upper),
     p = pilot5utils::fmt_pval(p.value)
   ) %>%
-  dplyr::select(comp:p)
+  select(comp:p)
 
 apr0ancova2
 
