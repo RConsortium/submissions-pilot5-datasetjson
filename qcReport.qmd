@@ -71,9 +71,9 @@ for (y in input_dataset_names) {
   
   new_dataset <- paste0("new_", y)
   comp_dataset <- paste0("comp_", y)
-  cat("```\n")
+  cat("```\n\n")
   print(diffdf(get(new_dataset), get(comp_dataset)))
-  cat("```\n")
+  cat("```\n\n")
   
   cat("</details>")
    cat("\n\n")
