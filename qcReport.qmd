@@ -1,54 +1,79 @@
 ---
 title: "QC Report"
 format: html
+date: "`r Sys.Date()`"
 editor: visual
 execute:
   keep-md: true
 ---
 
-```{r}
+```{r, echo = FALSE}
 library(safetyData)
 library(diffdf)
 library(tibble)
 library(stringr)
+library(haven)
+input_path <- "pilot5-submission/pilot5-input/adamdata"
+comp_path <- "~/GitHub/submissions-pilot3-adam/submission/adam"
 ```
 
+This is the QC report dated `r Sys.Date()`. The report compares the datasets in the `pilot5-submission/pilot5-input/adamdata` directory with the datasets in the `~/GitHub/submissions-pilot3-adam/submission/adam` directory. The datasets are compared using the `diffdf` package.
+
+This run was initiated by `r Sys.getenv("GITHUB_ACTOR")` on the `r Sys.getenv("GITHUB_REF")` Git ref. 
+
+```{r session_info}
+#| echo: false
+SessionInfo()
+```
 
 ```{r data_load}
-input_dataset_paths <- list.files("pilot5-submission/pilot5-input/adamdata")
+#| echo: false
+input_dataset_paths <- list.files(input_path)
 input_dataset_paths <- input_dataset_paths[endsWith(input_dataset_paths, ".rds") ]
 input_dataset_names <- tools::file_path_sans_ext(input_dataset_paths)
+comp_dataset_paths <- list.files(comp_path)
+comp_dataset_paths <- comp_dataset_paths[endsWith(comp_dataset_paths, ".xpt") ]
+comp_dataset_names <- tools::file_path_sans_ext(comp_dataset_paths)
 
 for (i in seq_along(input_dataset_names)) {
   assign(
     paste0("new_", input_dataset_names[i]), 
-    readRDS(paste0("pilot5-submission/pilot5-input/adamdata/", input_dataset_paths[i]))
+    readRDS(file.path(input_path, input_dataset_paths[i]))
     )
 }
-dataset_map <- tribble(
-  ~comp_dataset, ~new_dataset,
-  "safetyData::adam_adqsadas", "new_adadas",
-  "safetyData::adam_adae", "new_adae",
-  "safetyData::adam_adlbc", "new_adlbc",
-  "safetyData::adam_adsl", "new_adsl",
-)
+
+for (i in seq_along(comp_dataset_names)) {
+  if (!file.exists(file.path(comp_path, comp_dataset_paths[i]))) {
+    next
+  }
+  assign(
+    paste0("comp_", comp_dataset_names[i]), 
+    read_xpt(file.path(comp_path, comp_dataset_paths[i]))
+    )
+}
 
 ```
+
+`r length(input_dataset_names)` datasets were found in the `pilot5-submission/pilot5-input/adamdata` directory.
+The datasets are `r input_dataset_names`
+
 ```{r data_html}
-
-
 #| echo: false
 #| output: false
 sink("qc.Rmd")
+cat("Date: ", Sys.Date(), "\n")
+cat("Run by: ", Sys.getenv('GITHUB_ACTOR'))
+cat("Git Ref: ", Sys.getenv("GITHUB_REF"))
 for (y in input_dataset_names) {
   cat("<details>\n")
   
   cat(str_glue("<summary>Dataset: {y}</summary>\n\n"))
   
   new_dataset <- paste0("new_", y)
-  comp_dataset <- dataset_map[dataset_map$new_dataset == new_dataset, "comp_dataset"]
-  print(diffdf(get(new_dataset), comp_dataset))
-  
+  comp_dataset <- paste0("comp_", y)
+  cat("```\n")
+  print(diffdf(get(new_dataset), get(comp_dataset)))
+  cat("```\n")
   
   cat("</details>")
    cat("\n\n")

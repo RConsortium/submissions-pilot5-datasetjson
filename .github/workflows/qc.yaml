@@ -18,9 +18,9 @@ jobs:
       - name: Check out CDISC_pilot_replication repository
         uses: actions/checkout@v4
         with:
-          repository: atorus-research/CDISC_pilot_replication
-          sparse-checkout: 'output'
-          path: CDISC_pilot_replication
+          repository: RConsortium/submissions-pilot3-adam
+          sparse-checkout: 'submission/adam'
+          path: submissions-pilot3-adam
     
       - name: Set up R
         uses: r-lib/actions/setup-r@v2
