@@ -14,7 +14,7 @@ library(tibble)
 library(stringr)
 library(haven)
 input_path <- "pilot5-submission/pilot5-input/adamdata"
-comp_path <- "~/GitHub/submissions-pilot3-adam/submission/adam"
+comp_path <- "submissions-pilot3-adam/submission/adam"
 ```
 
 This is the QC report dated `r Sys.Date()`. The report compares the datasets in the `pilot5-submission/pilot5-input/adamdata` directory with the datasets in the `~/GitHub/submissions-pilot3-adam/submission/adam` directory. The datasets are compared using the `diffdf` package.
