@@ -23,7 +23,7 @@ This run was initiated by `r Sys.getenv("GITHUB_ACTOR")` on the `r Sys.getenv("G
 
 ```{r session_info}
 #| echo: false
-SessionInfo()
+sessionInfo()
 ```
 
 ```{r data_load}
