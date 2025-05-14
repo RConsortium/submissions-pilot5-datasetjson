@@ -61,18 +61,22 @@ The datasets are `r input_dataset_names`
 #| echo: false
 #| output: false
 sink("qc.Rmd")
+cat("## Dataset QC Check Complete!", "\n\n")
 cat("Date: ", Sys.Date(), "\n")
-cat("Run by: ", Sys.getenv('GITHUB_ACTOR'))
-cat("Git Ref: ", Sys.getenv("GITHUB_REF"))
+cat("Run by: ", Sys.getenv('GITHUB_ACTOR'), "\n")
+cat("Git Ref: ", Sys.getenv("GITHUB_REF"), "\n")
 for (y in input_dataset_names) {
+  diffs <- diffdf(get(new_dataset), get(comp_dataset))
+
   cat("<details>\n")
   
-  cat(str_glue("<summary>Dataset: {y}</summary>\n\n"))
+  status_emoji <- if (length(diffs) == 0) "✅" else "❌"
+  cat(str_glue("<summary>{status_emoji} Dataset: {y}</summary>\n\n"))
   
   new_dataset <- paste0("new_", y)
   comp_dataset <- paste0("comp_", y)
   cat("\n\n```\n\n")
-  print(diffdf(get(new_dataset), get(comp_dataset)))
+  print(diffs)
   cat("```\n\n")
   
   cat("</details>")
