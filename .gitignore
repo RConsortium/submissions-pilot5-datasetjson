@@ -3,8 +3,10 @@
 .RData
 .Ruserdata
 docs
-
 inst/doc
 pilot5.Rcheck/
 pilot5*.tar.gz
 pilot5*.tgz
+qcReport.html
+qcReport_files
+project.Rproj

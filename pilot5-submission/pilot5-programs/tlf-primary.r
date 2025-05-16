@@ -2,7 +2,7 @@
 # To rerun the code below, please refer ADRG appendix.
 # After required package are installed.
 
-## ----setup, message=FALSE------------------------------------------------------------------------------------------------------
+## ----setup, message=FALSE--------------------------------------------------------------------------------------------
 # CRAN package, please using install.packages() to install
 library(tidyr)
 library(dplyr)
@@ -10,15 +10,14 @@ library(Tplyr)
 library(pharmaRTF)
 library(pilot5utils)
 
-## ------------------------------------------------------------------------------------------------------------------------------
+## --------------------------------------------------------------------------------------------------------------------
 options(huxtable.add_colnames = FALSE)
 
 ## ------------------------------------------------------------------------------------------------------------------------------
 adas <- readRDS(file.path(path$adam, "adadas.rds"))
 adsl <- readRDS(file.path(path$adam, "adsl.rds"))
 
-
-## ------------------------------------------------------------------------------------------------------------------------------
+## --------------------------------------------------------------------------------------------------------------------
 adas <- adas %>%
   filter(
     EFFFL == "Y",
@@ -28,24 +27,24 @@ adas <- adas %>%
   )
 
 
-## ------------------------------------------------------------------------------------------------------------------------------
-t <- Tplyr::tplyr_table(adas, TRTP) %>%
-  Tplyr::set_pop_data(adsl) %>%
-  Tplyr::set_pop_treat_var(TRT01P) %>%
-  Tplyr::set_pop_where(EFFFL == "Y" & ITTFL == "Y") %>%
-  Tplyr::set_distinct_by(USUBJID) %>%
-  Tplyr::set_desc_layer_formats(
+## --------------------------------------------------------------------------------------------------------------------
+t <- tplyr_table(adas, TRTP) %>%
+  set_pop_data(adsl) %>%
+  set_pop_treat_var(TRT01P) %>%
+  set_pop_where(EFFFL == "Y" & ITTFL == "Y") %>%
+  set_distinct_by(USUBJID) %>%
+  set_desc_layer_formats(
     "n" = f_str("xx", n),
     "Mean (SD)" = f_str("xx.x (xx.xx)", mean, sd),
     "Median (Range)" = f_str("xx.x (xxx;xx)", median, min, max)
   ) %>%
-  Tplyr::add_layer(
+  add_layer(
     group_desc(AVAL, where = AVISITN == 0, by = "Baseline")
   ) %>%
-  Tplyr::add_layer(
+  add_layer(
     group_desc(AVAL, where = AVISITN == 24, by = "Week 24")
   ) %>%
-  Tplyr::add_layer(
+  add_layer(
     group_desc(CHG, where = AVISITN == 24, by = "Change from Baseline")
   )
 
@@ -68,11 +67,12 @@ sum_data <- t %>%
   )
 
 
-## ------------------------------------------------------------------------------------------------------------------------------
-model_portion <- pilot5utils::efficacy_models(adas, "CHG", 24)
+## --------------------------------------------------------------------------------------------------------------------
+model_portion <- efficacy_models(adas, "CHG", 24)
+=======
 
 
-## ------------------------------------------------------------------------------------------------------------------------------
+## --------------------------------------------------------------------------------------------------------------------
 final <- bind_rows(sum_data, model_portion)
 
 ht <- huxtable::as_hux(final, add_colnames = FALSE) %>%
@@ -86,12 +86,13 @@ ht <- huxtable::as_hux(final, add_colnames = FALSE) %>%
 cat(huxtable::to_screen(ht))
 
 
-## ------------------------------------------------------------------------------------------------------------------------------
-doc <- pharmaRTF::rtf_doc(ht) %>%
-  pharmaRTF::set_font_size(10) %>%
-  pharmaRTF::set_ignore_cell_padding(TRUE) %>%
-  pharmaRTF::set_column_header_buffer(top = 1) %>%
-  pharmaRTF::add_titles(
+## --------------------------------------------------------------------------------------------------------------------
+# nolint start
+doc <- rtf_doc(ht) %>%
+  set_font_size(10) %>%
+  set_ignore_cell_padding(TRUE) %>%
+  set_column_header_buffer(top = 1) %>%
+  add_titles(
     hf_line(
       "Protocol: CDISCPILOT01",
       "PAGE_FORMAT: Page %s of %s",
@@ -139,6 +140,6 @@ doc <- pharmaRTF::rtf_doc(ht) %>%
       italic = TRUE
     )
   )
-
+# nolint end
 # Write out the RTF
 pharmaRTF::write_rtf(doc, file = file.path(path$output, "tlf-primary-pilot5.rtf"))

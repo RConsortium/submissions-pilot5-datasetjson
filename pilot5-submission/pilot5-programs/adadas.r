@@ -49,8 +49,10 @@ adas1 <- adadas_pred %>%
     by_vars = exprs(STUDYID, USUBJID, QSSEQ)
   ) %>%
   # subset to interested PARAMCD(QSTESTCD)
-  filter(PARAMCD %in%
-    c(str_c("ACITM", str_pad(1:14, 2, pad = "0")), "ACTOT")) %>%
+  filter(
+    PARAMCD %in%
+      c(str_c("ACITM", str_pad(1:14, 2, pad = "0")), "ACTOT")
+  ) %>%
   # ADT
   derive_vars_dt(
     new_vars_prefix = "A",
@@ -124,7 +126,7 @@ adas_locf2 <- adas4 %>%
   restrict_derivation(
     derivation = derive_locf_records,
     args = params(
-      dataset_ref  = actot_expected_obsv,
+      dataset_ref = actot_expected_obsv,
       by_vars = exprs(
         STUDYID, SITEID, SITEGR1, USUBJID, TRTSDT, TRTEDT,
         TRTP, TRTPN, AGE, AGEGR1, AGEGR1N, RACE, RACEN, SEX,
@@ -167,15 +169,18 @@ adas5 <- adas_locf2 %>%
     filter = is.na(ABLFL)
   )
 
-## Final data 
+## Final data
 adas <- adas5 %>%
-  drop_unspec_vars(adadas_spec) %>% 
-  order_cols(adadas_spec) %>% 
-  set_variable_labels(adadas_spec) %>% 
-  xportr_format(adadas_spec$var_spec %>%
-                  mutate_at(c("format"), ~ replace_na(., "")), "ADADAS") %>%
+  drop_unspec_vars(adadas_spec) %>%
+  order_cols(adadas_spec) %>%
+  set_variable_labels(adadas_spec) %>%
+  xportr_format(
+    adadas_spec$var_spec %>%
+      mutate_at(c("format"), ~ replace_na(., "")),
+    "ADADAS"
+  ) %>%
   xportr_df_label(adadas_spec, domain = "adadas")
 
 
-#saving the dataset as rds format
+# saving the dataset as rds format
 saveRDS(adas, file.path(path$adam, "adadas.rds"))
