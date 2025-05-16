@@ -2,13 +2,6 @@
 # To rerun the code below, please refer ADRG appendix.
 # After required package are installed.
 # The path variable needs to be defined by using example code below
-#
-# nolint start
-# path <- list(
-#   adam = "path/to/esub/analysis/adam",      # Modify path to the adam location
-#   output = "path/to/esub/analysis/output"   # Modify path to the output location
-# )
-# nolint end
 
 ## ------------------------------------------------------------------------------------------------------------------------------
 # Working directory requires write permission
@@ -33,52 +26,56 @@ library(pilot5utils)
 
 
 ## ------------------------------------------------------------------------------------------------------------------------------
-adsl <- read_xpt(file.path(path$adam, "adsl.xpt"))
-adtte <- read_xpt(file.path(path$adam, "adtte.xpt"))
+adsl <- readRDS(file.path(path$adam, "adsl.rds"))
+adtte <- readRDS(file.path(path$adam, "adtte.rds"))
 
 
 ## ------------------------------------------------------------------------------------------------------------------------------
 anl <- adsl %>%
-  dplyr::filter(
+  filter(
     SAFFL == "Y",
     STUDYID == "CDISCPILOT01"
   ) %>%
-  dplyr::select(STUDYID, USUBJID, TRT01A) %>%
-  dplyr::inner_join(
+  select(STUDYID, USUBJID, TRT01A) %>%
+  inner_join(
     filter(
       adtte, PARAMCD == "TTDE", STUDYID == "CDISCPILOT01"
     ) %>% select(STUDYID, USUBJID, AVAL, CNSR, PARAM, PARAMCD),
     by = c("STUDYID", "USUBJID")
   ) %>%
-  dplyr::mutate(
+  mutate(
     TRT01A = factor(TRT01A, levels = c("Placebo", "Xanomeline Low Dose", "Xanomeline High Dose"))
   )
 
 
 ## ------------------------------------------------------------------------------------------------------------------------------
 # estimate survival
-surv_mod <- ggsurvfit::estimate_KM(data = anl, strata = "TRT01A")
+surv_mod <- ggsurvfit::survfit2(Surv(AVAL, 1-CNSR) ~ TRT01A, data = anl)
 
 # save plot
 ggplot2::theme_set(theme_bw())
 
-pdf.options(reset = TRUE, onefile = FALSE)
+km <- (surv_mod %>%
+  ggsurvfit(linewidth = 1) +
+  add_censor_mark() +
+  add_confidence_interval() +
+  add_risktable(risktable_stats = c("n.risk")) +
+  scale_ggsurvfit(x_scales = list(name = "Time to First Dermatologic Event (Days)",
+                                  breaks = seq(0, 200, by = 20),
+                                  limits = c(0, 200)
+                                  ),
+                  y_scales = list(name = "Probability of event",
+                                  expand = c(0.025, 0),
+                                  limits = c(0, 1),
+                                  breaks = seq(0, 1, by = 0.10),
+                                  label = NULL
+                                  )
+  ) +
+  ggsurvfit::add_legend_title(title = "TRT01A") + 
+  ggplot2::theme(legend.position = "right") + 
+  ggplot2::geom_hline(yintercept = 0.5, linetype = "dashed")) %>%
+  ggsurvfit_build()
 
-pdf(file.path(path$output, "tlf-kmplot-pilot5.pdf"))
-
-km <- ggsurvfit::visr(surv_mod,
-  y_label = "Probability of event\n",
-  x_label = "Time to First Dermatologic Event (Days)",
-  y_ticks = seq(0, 1, 0.10)
-) %>%
-  add_CNSR() %>%
-  add_CI()
-
-km <- km +
-  ggplot2::geom_hline(yintercept = 0.5, linetype = "dashed")
-
-km <- km %>%
-  ggsurvfit::add_risktable(group = "statlist", rowgutter = 0.25)
 
 title <- cowplot::ggdraw() +
   cowplot::draw_label(
@@ -93,13 +90,14 @@ caption <- cowplot::ggdraw() +
     paste0("\nProgram: tlf-kmplot.r [", Sys.time(), "]"),
     fontfamily = "sans",
     size = 10
-  )
+  ) 
 
-km <- cowplot::plot_grid(
+file <- cowplot::plot_grid(
   title, km, caption,
   ncol = 1,
-  rel_heights = c(0.1, 0.8, 0.1)
+  rel_heights = c(0.1, 0.75, 0.1)
 )
 
-print(km)
-dev.off()
+ggsave(file, filename = file.path(path$output, "tlf-kmplot-pilot5.pdf"))
+
+while (!is.null(dev.list()))  dev.off()

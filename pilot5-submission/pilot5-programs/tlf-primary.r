@@ -1,15 +1,6 @@
 # Note to Reviewer
 # To rerun the code below, please refer ADRG appendix.
 # After required package are installed.
-# The path variable needs to be defined by using example code below
-#
-# nolint start
-# path <- list(
-#  sdtm = "path/to/esub/tabulations/sdtm",   # Modify path to the sdtm location
-#  adam = "path/to/esub/analysis/adam",    # Modify path to the adam location
-#  output = "path/to/esub/.../output"    # Modify path to the output location
-# )
-# nolint end
 
 ## ----setup, message=FALSE------------------------------------------------------------------------------------------------------
 # CRAN package, please using install.packages() to install
@@ -23,8 +14,8 @@ library(pilot5utils)
 options(huxtable.add_colnames = FALSE)
 
 ## ------------------------------------------------------------------------------------------------------------------------------
-adas <- haven::read_xpt(file.path(path$adam, "adadas.xpt"))
-adsl <- haven::read_xpt(file.path(path$adam, "adsl.xpt"))
+adas <- readRDS(file.path(path$adam, "adadas.rds"))
+adsl <- readRDS(file.path(path$adam, "adsl.rds"))
 
 
 ## ------------------------------------------------------------------------------------------------------------------------------
@@ -38,23 +29,23 @@ adas <- adas %>%
 
 
 ## ------------------------------------------------------------------------------------------------------------------------------
-t <- tplyr_table(adas, TRTP) %>%
-  set_pop_data(adsl) %>%
-  set_pop_treat_var(TRT01P) %>%
-  set_pop_where(EFFFL == "Y" & ITTFL == "Y") %>%
-  set_distinct_by(USUBJID) %>%
-  set_desc_layer_formats(
+t <- Tplyr::tplyr_table(adas, TRTP) %>%
+  Tplyr::set_pop_data(adsl) %>%
+  Tplyr::set_pop_treat_var(TRT01P) %>%
+  Tplyr::set_pop_where(EFFFL == "Y" & ITTFL == "Y") %>%
+  Tplyr::set_distinct_by(USUBJID) %>%
+  Tplyr::set_desc_layer_formats(
     "n" = f_str("xx", n),
     "Mean (SD)" = f_str("xx.x (xx.xx)", mean, sd),
     "Median (Range)" = f_str("xx.x (xxx;xx)", median, min, max)
   ) %>%
-  add_layer(
+  Tplyr::add_layer(
     group_desc(AVAL, where = AVISITN == 0, by = "Baseline")
   ) %>%
-  add_layer(
+  Tplyr::add_layer(
     group_desc(AVAL, where = AVISITN == 24, by = "Week 24")
   ) %>%
-  add_layer(
+  Tplyr::add_layer(
     group_desc(CHG, where = AVISITN == 24, by = "Change from Baseline")
   )
 
@@ -65,20 +56,20 @@ hdr <- adas %>%
 hdr_ext <- sapply(hdr, FUN = function(x) paste0("|", x, "\\line(N=**", x, "**)"), USE.NAMES = FALSE)
 hdr_fin <- paste(hdr_ext, collapse = "")
 # Want the header to wrap properly in the RTF file
-hdr_fin <- stringr::str_replace_all(hdr_fin, "\\|Xanomeline ", "|Xanomeline\\\\line ")
+hdr_fin <- str_replace_all(hdr_fin, "\\|Xanomeline ", "|Xanomeline\\\\line ")
 
 sum_data <- t %>%
-  build() %>%
-  nest_rowlabels() %>%
+  Tplyr::build() %>%
+  pilot5utils::nest_rowlabels() %>%
   select(row_label, var1_Placebo, `var1_Xanomeline Low Dose`, `var1_Xanomeline High Dose`) %>%
-  add_column_headers(
+  Tplyr::add_column_headers(
     hdr_fin,
     header_n(t)
   )
 
 
 ## ------------------------------------------------------------------------------------------------------------------------------
-model_portion <- efficacy_models(adas, "CHG", 24)
+model_portion <- pilot5utils::efficacy_models(adas, "CHG", 24)
 
 
 ## ------------------------------------------------------------------------------------------------------------------------------
@@ -96,11 +87,11 @@ cat(huxtable::to_screen(ht))
 
 
 ## ------------------------------------------------------------------------------------------------------------------------------
-doc <- rtf_doc(ht) %>%
-  set_font_size(10) %>%
-  set_ignore_cell_padding(TRUE) %>%
-  set_column_header_buffer(top = 1) %>%
-  add_titles(
+doc <- pharmaRTF::rtf_doc(ht) %>%
+  pharmaRTF::set_font_size(10) %>%
+  pharmaRTF::set_ignore_cell_padding(TRUE) %>%
+  pharmaRTF::set_column_header_buffer(top = 1) %>%
+  pharmaRTF::add_titles(
     hf_line(
       "Protocol: CDISCPILOT01",
       "PAGE_FORMAT: Page %s of %s",
@@ -125,7 +116,7 @@ doc <- rtf_doc(ht) %>%
       italic = TRUE
     )
   ) %>%
-  add_footnotes(
+  pharmaRTF::add_footnotes(
     hf_line(
       "[1] Based on Analysis of covariance (ANCOVA) model with treatment and site group as factors and baseline value as a covariate.",
       align = "left",
@@ -150,4 +141,4 @@ doc <- rtf_doc(ht) %>%
   )
 
 # Write out the RTF
-write_rtf(doc, file = file.path(path$output, "tlf-primary-pilot5.rtf"))
+pharmaRTF::write_rtf(doc, file = file.path(path$output, "tlf-primary-pilot5.rtf"))

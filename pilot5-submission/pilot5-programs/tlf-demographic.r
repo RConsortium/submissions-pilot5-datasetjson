@@ -1,14 +1,6 @@
 # Note to Reviewer
 # To rerun the code below, please refer ADRG appendix.
 # After required package are installed.
-# The path variable needs to be defined by using example code below
-#
-# nolint start
-# path <- list(
-#   adam = "path/to/esub/analysis/adam",      # Modify path to the adam location
-#   output = "path/to/esub/analysis/output"   # Modify path to the output location
-# )
-# nolint end
 
 ## ------------------------------------------------------------------------------------------------------------------------------
 # Working directory requires write permission
@@ -29,31 +21,31 @@ library(rtables)
 
 
 ## ------------------------------------------------------------------------------------------------------------------------------
-adsl <- read_xpt(file.path(path$adam, "adsl.xpt"))
-adsl_labels <- var_labels(adsl)
+adsl <- readRDS(file.path(path$adam, "adsl.rds"))
 
+vars <- c("AGE", "AGEGR1", "RACE", "HEIGHTBL", "WEIGHTBL", "BMIBL", "MMSETOT")
+lbls <- c("Age", "Pooled Age Group 1", "Race", "Baseline Height (cm)", "Baseline Weight (kg)", "Baseline BMI (kg/m^2)", "MMSE Total")
 
 ## ------------------------------------------------------------------------------------------------------------------------------
 adsl <- adsl %>%
-  dplyr::filter(
+  filter(
     STUDYID == "CDISCPILOT01",
     ITTFL == "Y"
   ) %>%
-  dplyr::mutate(
+  mutate(
     TRT01P = factor(TRT01P, levels = c("Placebo", "Xanomeline Low Dose", "Xanomeline High Dose")),
     AGEGR1 = factor(AGEGR1, levels = c("<65", "65-80", ">80")),
     RACE = factor(RACE, levels = c("WHITE", "BLACK OR AFRICAN AMERICAN", "AMERICAN INDIAN OR ALASKA NATIVE"))
   )
 
-
 ## ------------------------------------------------------------------------------------------------------------------------------
 # Table layout
-vars <- c("AGE", "AGEGR1", "RACE", "HEIGHTBL", "WEIGHTBL", "BMIBL", "MMSETOT")
-lyt <- basic_table(
+
+tbl <- basic_table(
   title = "Protocol: CDISCPILOT01",
   subtitles = "Population: Intent-to-Treat",
   main_footer = paste0("Program: tlf-demographic.r \n", Sys.time())
-) %>%
+  ) %>% 
   split_cols_by("TRT01P") %>%
   add_colcounts() %>%
   analyze(vars, function(x, ...) {
@@ -70,11 +62,9 @@ lyt <- basic_table(
       stop("type not supproted")
     }
   },
-  var_labels = adsl_labels[vars]
-  )
-
-# Table build
-tbl <- build_table(lyt, adsl)
+  var_labels = lbls
+  ) %>%
+  build_table(df = adsl)
 
 tbl
 
