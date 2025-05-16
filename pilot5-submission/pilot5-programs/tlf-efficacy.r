@@ -1,16 +1,8 @@
 # Note to Reviewer
 # To rerun the code below, please refer ADRG appendix.
 # After required package are installed.
-# The path variable needs to be defined by using example code below
-#
-# nolint start
-# path <- list(
-#   adam = "path/to/esub/analysis/adam",      # Modify path to the adam location
-#   output = "path/to/esub/analysis/output"   # Modify path to the output location
-# )
-# nolint end
+## ------------------------------------------------------------------------------------------------------------------------------
 
-## --------------------------------------------------------------------------------------------------------------------
 # Working directory requires write permission
 if (file.access(".", 2) != 0) {
   warning(
@@ -30,18 +22,16 @@ library(r2rtf)
 library(emmeans)
 library(pilot5utils)
 
-
-## --------------------------------------------------------------------------------------------------------------------
-adsl <- read_xpt(file.path(path$adam, "adsl.xpt"))
-adlb <- read_xpt(file.path(path$adam, "adlbc.xpt"))
-
+## ------------------------------------------------------------------------------------------------------------------------------
+adsl <- readRDS(file.path(path$adam, "adsl.rds"))
+adlb <- readRDS(file.path(path$adam, "adlbc.rds"))
 
 ## --------------------------------------------------------------------------------------------------------------------
 
 itt <- adsl[adsl[["ITTFL"]] == "Y", c("STUDYID", "USUBJID")]
 
 adlb1 <- adlb %>%
-  dplyr::right_join(itt, by = c("STUDYID", "USUBJID")) %>%
+  right_join(itt, by = c("STUDYID", "USUBJID")) %>%
   subset(TRTPN %in% c(0, 81) & PARAMCD == "GLUC" & !is.na(AVISITN)) %>%
   mutate(TRTPN = ifelse(TRTPN == 0, 99, TRTPN)) # change treatment order for pairwise comparison
 
@@ -124,30 +114,30 @@ apr0ancova3
 
 ## --------------------------------------------------------------------------------------------------------------------
 tbl_1 <- apr0ancova1 %>%
-  rtf_title(
+  r2rtf::rtf_title(
     title = "ANCOVA of Change from Baseline at Week 20"
   ) %>%
-  rtf_colheader(
+  r2rtf::rtf_colheader(
     colheader = " | Baseline{^a} | Week 20 | Change from Baseline",
     col_rel_width = c(4, 3.5, 3.5, 7.5)
   ) %>%
-  rtf_colheader(
+  r2rtf::rtf_colheader(
     colheader = "Treatment | N | Mean (SD) | N | Mean (SD) | N | Mean (SD) | LS Mean (95% CI){^b}",
     col_rel_width = c(4, 1, 2.5, 1, 2.5, 1, 2.5, 4)
   ) %>%
-  rtf_body(
+  r2rtf::rtf_body(
     col_rel_width = c(4, 1, 2.5, 1, 2.5, 1, 2.5, 4),
     text_justification = c("l", rep("c", 7)),
     last_row = FALSE
   ) %>%
-  rtf_footnote(
+  r2rtf::rtf_footnote(
     footnote = c(
       "{^a} Table is based on participants who have observable data at Baseline and Week 20.",
       "{^b} Based on an Analysis of covariance (ANCOVA) model with treatment and baseline value as covariates",
       "CI = Confidence Interval, LS = Least Squares, SD = Standard Deviation"
     )
   ) %>%
-  rtf_source(
+  r2rtf::rtf_source(
     source = c(paste("Table generated on:", Sys.time()), "Source: [pilot5: adam-adsl; adlbc]"),
     text_justification = "c"
   )
@@ -155,12 +145,12 @@ tbl_1 <- apr0ancova1 %>%
 
 ## --------------------------------------------------------------------------------------------------------------------
 tbl_2 <- apr0ancova2 %>%
-  rtf_colheader(
+  r2rtf::rtf_colheader(
     colheader = "Pairwise Comparison | Difference in LS Mean (95% CI){^b} | p-Value",
     text_justification = c("l", "c", "c"),
     col_rel_width = c(7.5, 7, 4)
   ) %>%
-  rtf_body(
+  r2rtf::rtf_body(
     col_rel_width = c(7.5, 7, 4),
     text_justification = c("l", "c", "c"),
     last_row = FALSE
@@ -169,7 +159,7 @@ tbl_2 <- apr0ancova2 %>%
 
 ## --------------------------------------------------------------------------------------------------------------------
 tbl_3 <- apr0ancova3 %>%
-  rtf_body(
+  r2rtf::rtf_body(
     as_colheader = FALSE,
     text_justification = "l"
   )
@@ -178,5 +168,5 @@ tbl_3 <- apr0ancova3 %>%
 ## --------------------------------------------------------------------------------------------------------------------
 tbl <- list(tbl_1, tbl_2, tbl_3)
 tbl %>%
-  rtf_encode() %>%
-  write_rtf(file.path(path$output, "tlf-efficacy-pilot5.rtf"))
+  r2rtf::rtf_encode() %>%
+  r2rtf::write_rtf(file.path(path$output, "tlf-efficacy-pilot5.rtf"))

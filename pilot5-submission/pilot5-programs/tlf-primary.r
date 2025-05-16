@@ -1,15 +1,6 @@
 # Note to Reviewer
 # To rerun the code below, please refer ADRG appendix.
 # After required package are installed.
-# The path variable needs to be defined by using example code below
-#
-# nolint start
-# path <- list(
-#  sdtm = "path/to/esub/tabulations/sdtm",   # Modify path to the sdtm location
-#  adam = "path/to/esub/analysis/adam",    # Modify path to the adam location
-#  output = "path/to/esub/.../output"    # Modify path to the output location
-# )
-# nolint end
 
 ## ----setup, message=FALSE--------------------------------------------------------------------------------------------
 # CRAN package, please using install.packages() to install
@@ -22,10 +13,9 @@ library(pilot5utils)
 ## --------------------------------------------------------------------------------------------------------------------
 options(huxtable.add_colnames = FALSE)
 
-## --------------------------------------------------------------------------------------------------------------------
-adas <- haven::read_xpt(file.path(path$adam, "adadas.xpt"))
-adsl <- haven::read_xpt(file.path(path$adam, "adsl.xpt"))
-
+## ------------------------------------------------------------------------------------------------------------------------------
+adas <- readRDS(file.path(path$adam, "adadas.rds"))
+adsl <- readRDS(file.path(path$adam, "adsl.rds"))
 
 ## --------------------------------------------------------------------------------------------------------------------
 adas <- adas %>%
@@ -65,13 +55,13 @@ hdr <- adas %>%
 hdr_ext <- sapply(hdr, FUN = function(x) paste0("|", x, "\\line(N=**", x, "**)"), USE.NAMES = FALSE)
 hdr_fin <- paste(hdr_ext, collapse = "")
 # Want the header to wrap properly in the RTF file
-hdr_fin <- stringr::str_replace_all(hdr_fin, "\\|Xanomeline ", "|Xanomeline\\\\line ")
+hdr_fin <- str_replace_all(hdr_fin, "\\|Xanomeline ", "|Xanomeline\\\\line ")
 
 sum_data <- t %>%
-  build() %>%
-  nest_rowlabels() %>%
+  Tplyr::build() %>%
+  pilot5utils::nest_rowlabels() %>%
   select(row_label, var1_Placebo, `var1_Xanomeline Low Dose`, `var1_Xanomeline High Dose`) %>%
-  add_column_headers(
+  Tplyr::add_column_headers(
     hdr_fin,
     header_n(t)
   )
@@ -79,6 +69,7 @@ sum_data <- t %>%
 
 ## --------------------------------------------------------------------------------------------------------------------
 model_portion <- efficacy_models(adas, "CHG", 24)
+=======
 
 
 ## --------------------------------------------------------------------------------------------------------------------
@@ -126,7 +117,7 @@ doc <- rtf_doc(ht) %>%
       italic = TRUE
     )
   ) %>%
-  add_footnotes(
+  pharmaRTF::add_footnotes(
     hf_line(
       "[1] Based on Analysis of covariance (ANCOVA) model with treatment and site group as factors and baseline value as a covariate.",
       align = "left",
@@ -151,4 +142,4 @@ doc <- rtf_doc(ht) %>%
   )
 # nolint end
 # Write out the RTF
-write_rtf(doc, file = file.path(path$output, "tlf-primary-pilot5.rtf"))
+pharmaRTF::write_rtf(doc, file = file.path(path$output, "tlf-primary-pilot5.rtf"))
