@@ -51,7 +51,6 @@ metacore <- spec_to_metacore(
   where_sep_sheet = FALSE
 )
 
-### Get the specifications for the dataset we are currently building
 adsl_spec <- metacore %>%
   select_dataset("ADSL")
 
@@ -340,7 +339,7 @@ adsl <- adsl07 %>%
   xportr_label(adsl_spec) %>%  
   xportr_df_label(adsl_spec, domain = "adsl") %>% 
   xportr_format(adsl_spec$var_spec %>%
-       mutate_at(c("format"), ~ replace_na(., "")), "ADSL")
+  mutate_at(c("format"), ~ replace_na(., "")), "ADSL")
 
 # FIX: attribute issues where sas.format attributes set to DATE9. are changed to DATE9,
 # and missing formats are set to NULL (instead of an empty character vector)
@@ -355,3 +354,5 @@ for (col in colnames(adsl)) {
 
 # Saving the dataset as rds format --------------
 saveRDS(adsl, file.path(path$adam, "adsl.rds"))
+       mutate_at(c("format"), ~ replace_na(., "")), "ADSL") 
+

@@ -11,7 +11,7 @@ library(tidyr)
 spec_path <- list.files(path = path$adam, pattern = "adam-pilot-5.xlsx", full.names = T)
 
 specs <- spec_path %>%
-  metacore::spec_to_metacore(where_sep_sheet = FALSE)
+  spec_to_metacore(where_sep_sheet = FALSE)
 
 # Input Files -------------------------------------------------------------
 
@@ -29,13 +29,13 @@ for (rds_file in rds_files) {
     select_dataset(toupper(df_name))
 
   OIDcols <- df_spec$ds_vars %>%
-    dplyr::select(dataset, variable, key_seq) %>%
-    dplyr::left_join(df_spec$var_spec, by = c("variable")) %>%
-    dplyr::rename(name = variable, dataType = type, keySequence = key_seq, displayFormat = format) %>%
-    dplyr::mutate(itemOID = paste0("IT.", dataset, ".", name)) %>%
-    dplyr::select(itemOID, name, label, dataType, length, keySequence, displayFormat) %>%
-    dplyr::mutate(dataType = 
-                    dplyr::case_when(
+    select(dataset, variable, key_seq) %>%
+    left_join(df_spec$var_spec, by = c("variable")) %>%
+    rename(name = variable, dataType = type, keySequence = key_seq, displayFormat = format) %>%
+    mutate(itemOID = paste0("IT.", dataset, ".", name)) %>%
+    select(itemOID, name, label, dataType, length, keySequence, displayFormat) %>%
+    mutate(dataType = 
+                    case_when(
                       displayFormat == "DATE9." ~ "date",
                       displayFormat == "DATETIME20." ~ "datetime",
                       substr(name, nchar(name)-3+1, nchar(name)) == "DTC" & length == "8" ~ "date",
@@ -44,12 +44,12 @@ for (rds_file in rds_files) {
                       .default = as.character(dataType)
                     ),
                   targetDataType =
-                    dplyr::case_when(
+                    case_when(
                       displayFormat == "DATE9." ~ "integer",
                       displayFormat == "DATETIME20." ~ "integer",
                       .default = NA
                     ),
-                  length = dplyr::case_when(
+                  length = case_when(
                     dataType == "string" ~ length,
                     .default = NA
                   )) %>%
