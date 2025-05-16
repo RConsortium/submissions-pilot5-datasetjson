@@ -19,11 +19,6 @@ library(xportr)
 library(janitor)
 library(datasetjson)
 
-path <- list(
-  sdtm = "pilot5-submission/pilot5-input/sdtmdata/",  # Modify path to the sdtm location
-  adam = "pilot5-submission/pilot5-input/adamdata/", # Modify path to the adam location
-  dapm3 = "pilot5-submission/")    
-
 
 # read source -------------------------------------------------------------
 # When SAS datasets are imported into R using read_sas(), missing
@@ -44,7 +39,7 @@ mh <-convert_blanks_to_na(readRDS(file.path(path$sdtm, "mh.rds")))
 
 
 ## placeholder for origin=predecessor, use metatool::build_from_derived()
-metacore <- spec_to_metacore(file.path(path$dapm3, "adam-pilot-5.xlsx"), where_sep_sheet = FALSE)
+metacore <- spec_to_metacore(file.path(path$adam, "adam-pilot-5.xlsx"), where_sep_sheet = FALSE)
 # Get the specifications for the dataset we are currently building
 adsl_spec <- metacore %>%
   select_dataset("ADSL")
@@ -348,7 +343,7 @@ adsl07 <- left_join(adsl07, adsl07_, by = c("SITEID", "TRT01A")) %>%
 
 
 # Export to xpt -----------------------------------------------------
-adsl07 %>%
+adsl <- adsl07 %>%
   drop_unspec_vars(adsl_spec) %>% 
   check_ct_data(adsl_spec, na_acceptable = TRUE) %>%
   order_cols(adsl_spec) %>% 
@@ -361,7 +356,7 @@ adsl07 %>%
 
 
 #saving the dataset as rds format
-saveRDS(adsl07, file.path(path$adam, "adsl.rds"))
+saveRDS(adsl, file.path(path$adam, "adsl.rds"))
 
 
 
