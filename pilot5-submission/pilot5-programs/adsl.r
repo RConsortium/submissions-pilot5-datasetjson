@@ -28,20 +28,13 @@ library(glue)
 # character values from SAS appear as "" characters in R, instead of appearing
 # as NA values. Further details can be obtained via the following link:
 # https://pharmaverse.github.io/admiral/articles/admiral.html#handling-of-missing-values
-dat_to_load <- list(dm = file.path(path$sdtm, "dm.rds"),
-                    ds = file.path(path$sdtm, "ds.rds"),
-                    qs = file.path(path$sdtm, "qs.rds"),
-                    ex = file.path(path$sdtm, "ex.rds"),
-                    qs = file.path(path$sdtm, "qs.rds"),
-                    sv = file.path(path$sdtm, "sv.rds"),
-                    vs = file.path(path$sdtm, "vs.rds"),
-                    sc = file.path(path$sdtm, "sc.rds"),
-                    mh = file.path(path$sdtm, "mh.rds"))
+dat_to_load <- c("dm", "ds", "qs", "ex", "qs", "sv", "vs", "sc", "mh")
 
 datasets <- map(
   dat_to_load,
-  ~convert_blanks_to_na(readRDS(.x))
-)
+  ~convert_blanks_to_na(readRDS(file.path(path$sdtm, paste0(.x, ".rds"))))
+) %>%
+  setNames(dat_to_load)
 
 list2env(datasets, envir = .GlobalEnv)
 
@@ -354,5 +347,3 @@ for (col in colnames(adsl)) {
 
 # Saving the dataset as rds format --------------
 saveRDS(adsl, file.path(path$adam, "adsl.rds"))
-       mutate_at(c("format"), ~ replace_na(., "")), "ADSL") 
-
