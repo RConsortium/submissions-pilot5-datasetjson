@@ -17,13 +17,13 @@ xpt_files <- list.files(source_dir, pattern = "\\.xpt$", full.names = TRUE)
 for (xpt_file in xpt_files) {
   # Read the XPT file
   data <- read_xpt(xpt_file)
-  
+
   # Create an RDS file path
   file_name <- tools::file_path_sans_ext(basename(xpt_file))
   rds_file <- file.path(destination_dir, paste0(file_name, ".rds"))
-  
+
   # Save as RDS
   saveRDS(data, file = rds_file)
-  
+
   cat("Converted:", xpt_file, "to", rds_file, "\n")
 }

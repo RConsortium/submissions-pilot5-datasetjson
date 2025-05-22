@@ -27,7 +27,7 @@ adlbc_spec <- metacore %>%
 # Formats -----------------------------------------------------------------
 ## map parameter code and parameter
 format_paramn <- function(x) {
-  case_when(
+  dplyr::case_when(
     x == "SODIUM" ~ 18,
     x == "K" ~ 19,
     x == "CL" ~ 20,
@@ -134,9 +134,11 @@ eot <- adlb05 %>%
 
 
 adlb06 <- adlb05 %>%
-  filter(grepl("WEEK", VISIT, fixed = TRUE) |
-           grepl("UNSCHEDULED", VISIT, fixed = TRUE) |
-           grepl("SCREENING", VISIT, fixed = TRUE)) %>% # added conditions to include screening and unscheduled visits
+  filter(
+    grepl("WEEK", VISIT, fixed = TRUE) |
+      grepl("UNSCHEDULED", VISIT, fixed = TRUE) |
+      grepl("SCREENING", VISIT, fixed = TRUE)
+  ) %>% # added conditions to include screening and unscheduled visits
   mutate(
     AVISIT = case_when(
       ABLFL == "Y" ~ "Baseline",
@@ -199,7 +201,6 @@ adlb08 <- adlb07 %>%
     ANRIND = ifelse(AVAL < (0.5 * LBSTNRLO), "L", ifelse(AVAL > (1.5 * LBSTNRHI), "H", "N")),
     ANRIND = ifelse(is.na(AVAL), "N", ANRIND)
   ) %>%
-  # derive_var_anrind() %>%
   derive_var_base(
     by_vars = exprs(STUDYID, USUBJID, PARAMCD),
     source_var = ANRIND,
@@ -235,9 +236,9 @@ adlbc <- adlb09 %>%
   drop_unspec_vars(adlbc_spec) %>% 
   mutate_if(is.character, ~replace_na(., "")) %>% 
   order_cols(adlbc_spec) %>%
-  set_variable_labels(adlbc_spec) 
+  set_variable_labels(adlbc_spec)
 
-#saving the dataset as RDS format
+# saving the dataset as RDS format
 saveRDS(adlbc, file.path(path$adam, "adlbc.rds"))
 
 library(haven)

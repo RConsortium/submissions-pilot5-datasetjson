@@ -11,12 +11,12 @@ on:
         default: 'false'
         required: false
         type: string
-#  push:
-#    branches:
-#      - main
-#  pull_request:
-#    branches:
-#      - main
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 name: Check Lint
 
@@ -58,7 +58,7 @@ jobs:
       ##################### BEGIN boilerplate steps #####################
       - name: Get branch names
         id: branch-name
-        uses: tj-actions/branch-names@v5.4
+        uses: tj-actions/branch-names@v8.2.1
 
       - name: Checkout repo (PR) 🛎
         uses: actions/checkout@v3
@@ -92,14 +92,6 @@ jobs:
             ~/.staged.dependencies
           key: staged-deps
 
-      - name: Run Staged dependencies
-        uses: insightsengineering/staged-dependencies-action@v1
-        with:
-          run-system-dependencies: false
-          renv-restore: false
-          enable-check: false
-        env:
-          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       ##################### END boilerplate steps #####################
 
       - name: Changed files
@@ -111,7 +103,8 @@ jobs:
 
       - name: Lint
         run: |
-          install.packages("lintr")
+          install.packages("lintr", repos = "cran.rstudio.com")
+          library(lintr)
           exclusions_list <- NULL
           if (!identical("${{ inputs.lint-all-files }}", "true")) {
             changed_files <- jsonlite::fromJSON('${{ steps.files.outputs.added_modified }}')
@@ -122,7 +115,11 @@ jobs:
               NULL
             }
           }
-          lints <- lintr::lint_dir(exclusions = exclusions_list)
+          lints <- lint_dir(
+            "pilot5-submission/pilot5-programs", 
+            linters_with_defaults(line_length_linter = line_length_linter(120L)),
+            exclusions = exclusions_list
+            )
           saveRDS(lints, file = "lints.rds")
         shell: Rscript {0}
 

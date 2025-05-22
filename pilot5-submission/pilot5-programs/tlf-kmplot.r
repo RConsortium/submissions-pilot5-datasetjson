@@ -3,7 +3,7 @@
 # After required package are installed.
 # The path variable needs to be defined by using example code below
 
-## ------------------------------------------------------------------------------------------------------------------------------
+## --------------------------------------------------------------------------------------------------------------------
 # Working directory requires write permission
 if (file.access(".", 2) != 0) {
   warning(
@@ -13,7 +13,7 @@ if (file.access(".", 2) != 0) {
 }
 
 
-## ----setup, message=FALSE------------------------------------------------------------------------------------------------------
+## ----setup, message=FALSE--------------------------------------------------------------------------------------------
 knitr::opts_chunk$set(echo = TRUE)
 
 # CRAN package, please using install.packages() to install
@@ -24,13 +24,11 @@ library(cowplot)
 library(ggsurvfit)
 library(pilot5utils)
 
-
-## ------------------------------------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 adsl <- readRDS(file.path(path$adam, "adsl.rds"))
 adtte <- readRDS(file.path(path$adam, "adtte.rds"))
 
-
-## ------------------------------------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 anl <- adsl %>%
   filter(
     SAFFL == "Y",
@@ -48,9 +46,9 @@ anl <- adsl %>%
   )
 
 
-## ------------------------------------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 # estimate survival
-surv_mod <- ggsurvfit::survfit2(Surv(AVAL, 1-CNSR) ~ TRT01A, data = anl)
+surv_mod <- ggsurvfit::survfit2(Surv(AVAL, 1 - CNSR) ~ TRT01A, data = anl)
 
 # save plot
 ggplot2::theme_set(theme_bw())
@@ -60,19 +58,22 @@ km <- (surv_mod %>%
   add_censor_mark() +
   add_confidence_interval() +
   add_risktable(risktable_stats = c("n.risk")) +
-  scale_ggsurvfit(x_scales = list(name = "Time to First Dermatologic Event (Days)",
-                                  breaks = seq(0, 200, by = 20),
-                                  limits = c(0, 200)
-                                  ),
-                  y_scales = list(name = "Probability of event",
-                                  expand = c(0.025, 0),
-                                  limits = c(0, 1),
-                                  breaks = seq(0, 1, by = 0.10),
-                                  label = NULL
-                                  )
+  scale_ggsurvfit(
+    x_scales = list(
+      name = "Time to First Dermatologic Event (Days)",
+      breaks = seq(0, 200, by = 20),
+      limits = c(0, 200)
+    ),
+    y_scales = list(
+      name = "Probability of event",
+      expand = c(0.025, 0),
+      limits = c(0, 1),
+      breaks = seq(0, 1, by = 0.10),
+      label = NULL
+    )
   ) +
-  ggsurvfit::add_legend_title(title = "TRT01A") + 
-  ggplot2::theme(legend.position = "right") + 
+  ggsurvfit::add_legend_title(title = "TRT01A") +
+  ggplot2::theme(legend.position = "right") +
   ggplot2::geom_hline(yintercept = 0.5, linetype = "dashed")) %>%
   ggsurvfit_build()
 
@@ -90,7 +91,7 @@ caption <- cowplot::ggdraw() +
     paste0("\nProgram: tlf-kmplot.r [", Sys.time(), "]"),
     fontfamily = "sans",
     size = 10
-  ) 
+  )
 
 file <- cowplot::plot_grid(
   title, km, caption,
@@ -100,4 +101,4 @@ file <- cowplot::plot_grid(
 
 ggsave(file, filename = file.path(path$output, "tlf-kmplot-pilot5.pdf"))
 
-while (!is.null(dev.list()))  dev.off()
+while (!is.null(dev.list())) dev.off()
