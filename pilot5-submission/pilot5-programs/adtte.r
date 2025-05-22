@@ -102,5 +102,5 @@ adtte <- adtte_rds %>%
   order_cols(adtte_spec) %>% # order columns based on define
   set_variable_labels(adtte_spec)
 
-#saving the dataset as RDS format
+# saving the dataset as RDS format
 saveRDS(adtte, file.path(path$adam, "adtte.rds"))

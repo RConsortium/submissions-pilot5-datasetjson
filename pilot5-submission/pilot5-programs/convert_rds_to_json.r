@@ -32,25 +32,27 @@ for (rds_file in rds_files) {
     rename(name = variable, dataType = type, keySequence = key_seq, displayFormat = format) %>%
     mutate(itemOID = paste0("IT.", dataset, ".", name)) %>%
     select(itemOID, name, label, dataType, length, keySequence, displayFormat) %>%
-    mutate(dataType = 
-                    case_when(
-                      displayFormat == "DATE9." ~ "date",
-                      displayFormat == "DATETIME20." ~ "datetime",
-                      substr(name, nchar(name)-3+1, nchar(name)) == "DTC" & length == "8" ~ "date",
-                      substr(name, nchar(name)-3+1, nchar(name)) == "DTC" & length == "20"  ~ "datetime",
-                      dataType == "text" ~ "string",
-                      .default = as.character(dataType)
-                    ),
-                  targetDataType =
-                    case_when(
-                      displayFormat == "DATE9." ~ "integer",
-                      displayFormat == "DATETIME20." ~ "integer",
-                      .default = NA
-                    ),
-                  length = case_when(
-                    dataType == "string" ~ length,
-                    .default = NA
-                  )) %>%
+    mutate(
+      dataType =
+        case_when(
+          displayFormat == "DATE9." ~ "date",
+          displayFormat == "DATETIME20." ~ "datetime",
+          substr(name, nchar(name) - 3 + 1, nchar(name)) == "DTC" & length == "8" ~ "date",
+          substr(name, nchar(name) - 3 + 1, nchar(name)) == "DTC" & length == "20" ~ "datetime",
+          dataType == "text" ~ "string",
+          .default = as.character(dataType)
+        ),
+      targetDataType =
+        case_when(
+          displayFormat == "DATE9." ~ "integer",
+          displayFormat == "DATETIME20." ~ "integer",
+          .default = NA
+        ),
+      length = case_when(
+        dataType == "string" ~ length,
+        .default = NA
+      )
+    ) %>%
     data.frame()
 
   dataset_json(df,

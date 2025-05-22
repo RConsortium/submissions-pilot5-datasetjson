@@ -343,7 +343,7 @@ adsl07 <- left_join(adsl07, adsl07_, by = c("SITEID", "TRT01A")) %>%
 
 # Export to xpt -----------------------------------------------------
 adsl <- adsl07 %>%
-  drop_unspec_vars(adsl_spec) %>% 
+  drop_unspec_vars(adsl_spec) %>%
   check_ct_data(adsl_spec, na_acceptable = TRUE) %>%
   order_cols(adsl_spec) %>%
   sort_by_key(adsl_spec) %>%
@@ -357,6 +357,5 @@ adsl <- adsl07 %>%
   )
 
 
-#saving the dataset as rds format
+# saving the dataset as rds format
 saveRDS(adsl, file.path(path$adam, "adsl.rds"))
-

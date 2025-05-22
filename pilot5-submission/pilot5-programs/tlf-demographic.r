@@ -43,7 +43,7 @@ tbl <- basic_table(
   title = "Protocol: CDISCPILOT01",
   subtitles = "Population: Intent-to-Treat",
   main_footer = paste0("Program: tlf-demographic.r \n", Sys.time())
-  ) %>% 
+) %>%
   split_cols_by("TRT01P") %>%
   add_colcounts() %>%
   analyze(vars, function(x, ...) {
