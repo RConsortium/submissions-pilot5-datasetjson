@@ -26,7 +26,7 @@ for (rds_file in rds_files) {
   df_spec <- specs %>%
     select_dataset(toupper(df_name))
 
-  OIDcols <- df_spec$ds_vars %>%
+  oid_cols <- df_spec$ds_vars %>%
     select(dataset, variable, key_seq) %>%
     left_join(df_spec$var_spec, by = c("variable")) %>%
     rename(name = variable, dataType = type, keySequence = key_seq, displayFormat = format) %>%
@@ -68,7 +68,7 @@ for (rds_file in rds_files) {
     name = toupper(df_name),
     dataset_label = df_spec$ds_spec[["label"]],
     file_oid = file.path(path$adam, df_name),
-    columns = OIDcols
+    columns = oid_cols
   ) %>%
     write_dataset_json(file = file.path(path$adam_json, paste0(df_name, ".json")))
 }
