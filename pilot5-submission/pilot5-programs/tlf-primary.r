@@ -2,7 +2,7 @@
 # To rerun the code below, please refer ADRG appendix.
 # After required package are installed.
 
-## ----setup, message=FALSE------------------------------------------------------------------------------------------------------
+## ----setup, message=FALSE--------------------------------------------------------------------------------------------
 # CRAN package, please using install.packages() to install
 library(tidyr)
 library(dplyr)
@@ -10,15 +10,14 @@ library(Tplyr)
 library(pharmaRTF)
 library(pilot5utils)
 
-## ------------------------------------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 options(huxtable.add_colnames = FALSE)
 
-## ------------------------------------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 adas <- readRDS(file.path(path$adam, "adadas.rds"))
 adsl <- readRDS(file.path(path$adam, "adsl.rds"))
 
-
-## ------------------------------------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 adas <- adas %>%
   filter(
     EFFFL == "Y",
@@ -28,24 +27,24 @@ adas <- adas %>%
   )
 
 
-## ------------------------------------------------------------------------------------------------------------------------------
-t <- Tplyr::tplyr_table(adas, TRTP) %>%
-  Tplyr::set_pop_data(adsl) %>%
-  Tplyr::set_pop_treat_var(TRT01P) %>%
-  Tplyr::set_pop_where(EFFFL == "Y" & ITTFL == "Y") %>%
-  Tplyr::set_distinct_by(USUBJID) %>%
-  Tplyr::set_desc_layer_formats(
+## -----------------------------------------------------------------------------
+t <- tplyr_table(adas, TRTP) %>%
+  set_pop_data(adsl) %>%
+  set_pop_treat_var(TRT01P) %>%
+  set_pop_where(EFFFL == "Y" & ITTFL == "Y") %>%
+  set_distinct_by(USUBJID) %>%
+  set_desc_layer_formats(
     "n" = f_str("xx", n),
     "Mean (SD)" = f_str("xx.x (xx.xx)", mean, sd),
     "Median (Range)" = f_str("xx.x (xxx;xx)", median, min, max)
   ) %>%
-  Tplyr::add_layer(
+  add_layer(
     group_desc(AVAL, where = AVISITN == 0, by = "Baseline")
   ) %>%
-  Tplyr::add_layer(
+  add_layer(
     group_desc(AVAL, where = AVISITN == 24, by = "Week 24")
   ) %>%
-  Tplyr::add_layer(
+  add_layer(
     group_desc(CHG, where = AVISITN == 24, by = "Change from Baseline")
   )
 
@@ -53,7 +52,10 @@ hdr <- adas %>%
   distinct(TRTP, TRTPN) %>%
   arrange(TRTPN) %>%
   pull(TRTP)
-hdr_ext <- sapply(hdr, FUN = function(x) paste0("|", x, "\\line(N=**", x, "**)"), USE.NAMES = FALSE)
+hdr_ext <- sapply(hdr,
+  FUN = function(x) paste0("|", x, "\\line(N=**", x, "**)"),
+  USE.NAMES = FALSE
+)
 hdr_fin <- paste(hdr_ext, collapse = "")
 # Want the header to wrap properly in the RTF file
 hdr_fin <- str_replace_all(hdr_fin, "\\|Xanomeline ", "|Xanomeline\\\\line ")
@@ -61,18 +63,21 @@ hdr_fin <- str_replace_all(hdr_fin, "\\|Xanomeline ", "|Xanomeline\\\\line ")
 sum_data <- t %>%
   Tplyr::build() %>%
   pilot5utils::nest_rowlabels() %>%
-  select(row_label, var1_Placebo, `var1_Xanomeline Low Dose`, `var1_Xanomeline High Dose`) %>%
+  select(
+    row_label, var1_Placebo, `var1_Xanomeline Low Dose`,
+    `var1_Xanomeline High Dose`
+  ) %>%
   Tplyr::add_column_headers(
     hdr_fin,
     header_n(t)
   )
 
 
-## ------------------------------------------------------------------------------------------------------------------------------
-model_portion <- pilot5utils::efficacy_models(adas, "CHG", 24)
+## -----------------------------------------------------------------------------
+model_portion <- efficacy_models(adas, "CHG", 24)
 
 
-## ------------------------------------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 final <- bind_rows(sum_data, model_portion)
 
 ht <- huxtable::as_hux(final, add_colnames = FALSE) %>%
@@ -86,12 +91,13 @@ ht <- huxtable::as_hux(final, add_colnames = FALSE) %>%
 cat(huxtable::to_screen(ht))
 
 
-## ------------------------------------------------------------------------------------------------------------------------------
-doc <- pharmaRTF::rtf_doc(ht) %>%
-  pharmaRTF::set_font_size(10) %>%
-  pharmaRTF::set_ignore_cell_padding(TRUE) %>%
-  pharmaRTF::set_column_header_buffer(top = 1) %>%
-  pharmaRTF::add_titles(
+## -----------------------------------------------------------------------------
+# nolint start
+doc <- rtf_doc(ht) %>%
+  set_font_size(10) %>%
+  set_ignore_cell_padding(TRUE) %>%
+  set_column_header_buffer(top = 1) %>%
+  add_titles(
     hf_line(
       "Protocol: CDISCPILOT01",
       "PAGE_FORMAT: Page %s of %s",
@@ -118,7 +124,10 @@ doc <- pharmaRTF::rtf_doc(ht) %>%
   ) %>%
   pharmaRTF::add_footnotes(
     hf_line(
-      "[1] Based on Analysis of covariance (ANCOVA) model with treatment and site group as factors and baseline value as a covariate.",
+      paste(
+        "[1] Based on Analysis of covariance (ANCOVA) model with treatment and",
+        " site group as factors and baseline value as a covariate."
+      ),
       align = "left",
       italic = TRUE
     ),
@@ -128,7 +137,10 @@ doc <- pharmaRTF::rtf_doc(ht) %>%
       italic = TRUE
     ),
     hf_line(
-      "[3] Pairwise comparison with treatment as a categorical variable: p-values without adjustment for multiple comparisons.",
+      paste(
+        "[3] Pairwise comparison with treatment as a categorical variable:",
+        " p-values without adjustment for multiple comparisons."
+      ),
       align = "left",
       italic = TRUE
     ),
@@ -139,6 +151,6 @@ doc <- pharmaRTF::rtf_doc(ht) %>%
       italic = TRUE
     )
   )
-
+# nolint end
 # Write out the RTF
 pharmaRTF::write_rtf(doc, file = file.path(path$output, "tlf-primary-pilot5.rtf"))
