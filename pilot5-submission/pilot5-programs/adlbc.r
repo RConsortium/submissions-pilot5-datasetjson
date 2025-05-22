@@ -221,7 +221,7 @@ adlb09 <- adlb08 %>%
   arrange(desc(ANL01FL)) %>%
   select(USUBJID, PARAMCD, LBSEQ, ANL01FL) %>%
   slice(1) %>%
-  full_join(adlb08, by = c("USUBJID", "PARAMCD", "LBSEQ"), multiple = "all") %>% 
+  full_join(adlb08, by = c("USUBJID", "PARAMCD", "LBSEQ"), multiple = "all") %>%
   ungroup()
 
 # Treatment Vars ------------------------------------------------------------
@@ -233,8 +233,8 @@ adlbc <- adlb09 %>%
     TRTA = TRT01A,
     TRTAN = TRT01AN
   ) %>%
-  drop_unspec_vars(adlbc_spec) %>% 
-  mutate_if(is.character, ~replace_na(., "")) %>% 
+  drop_unspec_vars(adlbc_spec) %>%
+  mutate_if(is.character, ~ replace_na(., "")) %>%
   order_cols(adlbc_spec) %>%
   set_variable_labels(adlbc_spec)
 
@@ -248,6 +248,6 @@ library(tidyr)
 
 adlbc_p3 <- read_xpt(file.path(getwd(), "original-adamdata/adlbc.xpt"))
 
-qcadlbc <- readRDS(file.path(path$adam, "adlbc.rds")) 
+qcadlbc <- readRDS(file.path(path$adam, "adlbc.rds"))
 
-a <- diffdf(base=adlbc_p3, compare=qcadlbc, keys=c("STUDYID", "USUBJID", "AVISIT", "LBSEQ"))
+a <- diffdf(base = adlbc_p3, compare = qcadlbc, keys = c("STUDYID", "USUBJID", "AVISIT", "LBSEQ"))
