@@ -22,8 +22,10 @@ library(rtables)
 adsl <- readRDS(file.path(path$adam, "adsl.rds"))
 
 vars <- c("AGE", "AGEGR1", "RACE", "HEIGHTBL", "WEIGHTBL", "BMIBL", "MMSETOT")
-lbls <- c("Age", "Pooled Age Group 1", "Race", "Baseline Height (cm)",
-          "Baseline Weight (kg)", "Baseline BMI (kg/m^2)", "MMSE Total")
+lbls <- c(
+  "Age", "Pooled Age Group 1", "Race", "Baseline Height (cm)",
+  "Baseline Weight (kg)", "Baseline BMI (kg/m^2)", "MMSE Total"
+)
 
 ## -----------------------------------------------------------------------------
 adsl <- adsl %>%
@@ -32,11 +34,15 @@ adsl <- adsl %>%
     ITTFL == "Y"
   ) %>%
   mutate(
-    TRT01P = factor(TRT01P, levels = c("Placebo", "Xanomeline Low Dose",
-                                       "Xanomeline High Dose")),
+    TRT01P = factor(TRT01P, levels = c(
+      "Placebo", "Xanomeline Low Dose",
+      "Xanomeline High Dose"
+    )),
     AGEGR1 = factor(AGEGR1, levels = c("<65", "65-80", ">80")),
-    RACE = factor(RACE, levels = c("WHITE", "BLACK OR AFRICAN AMERICAN",
-                                   "AMERICAN INDIAN OR ALASKA NATIVE"))
+    RACE = factor(RACE, levels = c(
+      "WHITE", "BLACK OR AFRICAN AMERICAN",
+      "AMERICAN INDIAN OR ALASKA NATIVE"
+    ))
   )
 
 ## -----------------------------------------------------------------------------

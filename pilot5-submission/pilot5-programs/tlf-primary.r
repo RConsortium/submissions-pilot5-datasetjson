@@ -52,8 +52,10 @@ hdr <- adas %>%
   distinct(TRTP, TRTPN) %>%
   arrange(TRTPN) %>%
   pull(TRTP)
-hdr_ext <- sapply(hdr, FUN = function(x) paste0("|", x, "\\line(N=**", x, "**)"),
-                  USE.NAMES = FALSE)
+hdr_ext <- sapply(hdr,
+  FUN = function(x) paste0("|", x, "\\line(N=**", x, "**)"),
+  USE.NAMES = FALSE
+)
 hdr_fin <- paste(hdr_ext, collapse = "")
 # Want the header to wrap properly in the RTF file
 hdr_fin <- str_replace_all(hdr_fin, "\\|Xanomeline ", "|Xanomeline\\\\line ")
@@ -61,8 +63,10 @@ hdr_fin <- str_replace_all(hdr_fin, "\\|Xanomeline ", "|Xanomeline\\\\line ")
 sum_data <- t %>%
   Tplyr::build() %>%
   pilot5utils::nest_rowlabels() %>%
-  select(row_label, var1_Placebo, `var1_Xanomeline Low Dose`,
-         `var1_Xanomeline High Dose`) %>%
+  select(
+    row_label, var1_Placebo, `var1_Xanomeline Low Dose`,
+    `var1_Xanomeline High Dose`
+  ) %>%
   Tplyr::add_column_headers(
     hdr_fin,
     header_n(t)
@@ -120,8 +124,10 @@ doc <- rtf_doc(ht) %>%
   ) %>%
   pharmaRTF::add_footnotes(
     hf_line(
-      paste("[1] Based on Analysis of covariance (ANCOVA) model with treatment and", 
-      " site group as factors and baseline value as a covariate."),
+      paste(
+        "[1] Based on Analysis of covariance (ANCOVA) model with treatment and",
+        " site group as factors and baseline value as a covariate."
+      ),
       align = "left",
       italic = TRUE
     ),
@@ -131,8 +137,10 @@ doc <- rtf_doc(ht) %>%
       italic = TRUE
     ),
     hf_line(
-      paste("[3] Pairwise comparison with treatment as a categorical variable:",
-      " p-values without adjustment for multiple comparisons."),
+      paste(
+        "[3] Pairwise comparison with treatment as a categorical variable:",
+        " p-values without adjustment for multiple comparisons."
+      ),
       align = "left",
       italic = TRUE
     ),
