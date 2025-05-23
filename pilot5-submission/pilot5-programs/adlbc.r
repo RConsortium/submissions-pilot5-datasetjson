@@ -240,14 +240,3 @@ adlbc <- adlb09 %>%
 
 # saving the dataset as RDS format
 saveRDS(adlbc, file.path(path$adam, "adlbc.rds"))
-
-library(haven)
-library(diffdf)
-library(dplyr)
-library(tidyr)
-
-adlbc_p3 <- read_xpt(file.path(getwd(), "original-adamdata/adlbc.xpt"))
-
-qcadlbc <- readRDS(file.path(path$adam, "adlbc.rds"))
-
-a <- diffdf(base = adlbc_p3, compare = qcadlbc, keys = c("STUDYID", "USUBJID", "AVISIT", "LBSEQ"))
