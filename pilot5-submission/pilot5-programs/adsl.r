@@ -28,7 +28,7 @@ dat_to_load <- c("dm", "ds", "qs", "ex", "qs", "sv", "vs", "sc", "mh")
 
 datasets <- map(
   dat_to_load,
-  ~convert_blanks_to_na(readRDS(file.path(path$sdtm, paste0(.x, ".rds"))))
+  ~ convert_blanks_to_na(readRDS(file.path(path$sdtm, paste0(.x, ".rds"))))
 ) %>%
   setNames(dat_to_load)
 
@@ -106,9 +106,11 @@ adsl00 <- dm %>%
   select(-DOMAIN) %>%
   filter(ACTARMCD != "Scrnfail") %>%
   mutate(TRT01P = ARM) %>%
-  create_var_from_codelist(metacore = adsl_spec,
-                           input_var = TRT01P,
-                           out_var = TRT01PN) %>%
+  create_var_from_codelist(
+    metacore = adsl_spec,
+    input_var = TRT01P,
+    out_var = TRT01PN
+  ) %>%
   # actual treatment - It is assumed TRT01A=TRT01P which is not really true.
   mutate(
     TRT01A = TRT01P,
@@ -117,10 +119,7 @@ adsl00 <- dm %>%
   # treatment start
   derive_vars_merged(
     dataset_add = ex_dt,
-    filter_add = (EXDOSE > 0 |
-                    (EXDOSE == 0 &
-                       grepl("PLACEBO", EXTRT, fixed = TRUE))) &
-      !is.na(EXSTDT),
+    filter_add = (EXDOSE > 0 | (EXDOSE == 0 & grepl("PLACEBO", EXTRT, fixed = TRUE))) & !is.na(EXSTDT),
     new_vars = exprs(TRTSDT = EXSTDT),
     order = exprs(EXSTDT, EXSEQ),
     mode = "first",
@@ -129,10 +128,7 @@ adsl00 <- dm %>%
   # treatment end
   derive_vars_merged(
     dataset_add = ex_dt,
-    filter_add = (EXDOSE > 0 |
-                    (EXDOSE == 0 &
-                       grepl("PLACEBO", EXTRT, fixed = TRUE))) &
-      !is.na(EXENDT),
+    filter_add = (EXDOSE > 0 | (EXDOSE == 0 & grepl("PLACEBO", EXTRT, fixed = TRUE))) & !is.na(EXENDT),
     new_vars = exprs(TRTEDT = EXENDT),
     order = exprs(EXENDT, EXSEQ),
     mode = "last",
@@ -326,8 +322,7 @@ adsl <- adsl07 %>%
   xportr_length(adsl_spec) %>%
   xportr_label(adsl_spec) %>%
   xportr_df_label(adsl_spec, domain = "adsl") %>%
-  xportr_format(adsl_spec$var_spec %>%
-                  mutate_at(c("format"), ~ replace_na(., "")), "ADSL")
+  xportr_format(adsl_spec$var_spec %>% mutate_at(c("format"), ~ replace_na(., "")), "ADSL")
 
 # FIX: attribute issues where sas.format attributes set to DATE9. are changed to DATE9,
 # and missing formats are set to NULL (instead of an empty character vector)
