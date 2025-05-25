@@ -23,13 +23,15 @@ library(datasetjson)
 library(purrr)
 
 ## Load datasets ------------
-dat_to_load <- list(dm = file.path(path$sdtm, "dm.rds"),
-                    qs = file.path(path$sdtm, "qs.rds"),
-                    adsl = file.path(path$adam, "adsl.rds"))
+dat_to_load <- list(
+  dm = file.path(path$sdtm, "dm.rds"),
+  qs = file.path(path$sdtm, "qs.rds"),
+  adsl = file.path(path$adam, "adsl.rds")
+)
 
 datasets <- map(
   dat_to_load,
-  ~convert_blanks_to_na(readRDS(.x))
+  ~ convert_blanks_to_na(readRDS(.x))
 )
 
 list2env(datasets, envir = .GlobalEnv)
@@ -185,7 +187,7 @@ adas <- adas5 %>%
   xportr_length(adadas_spec) %>%
   xportr_df_label(adadas_spec, domain = "adadas") %>%
   xportr_format(adadas_spec$var_spec %>%
-                  mutate_at(c("format"), ~ replace_na(., "")), "ADADAS")
+    mutate_at(c("format"), ~ replace_na(., "")), "ADADAS")
 
 # FIX: attribute issues where sas.format attributes set to DATE9. are changed to DATE9,
 # and missing formats are set to NULL (instead of an empty character vector)
