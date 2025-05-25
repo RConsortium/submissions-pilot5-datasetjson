@@ -180,8 +180,7 @@ adas5 <- adas_locf2 %>%
 adas <- adas5 %>%
   drop_unspec_vars(adadas_spec) %>%
   check_ct_data(adadas_spec, na_acceptable = TRUE) %>%
-  order_cols(adadas_spec) %>% 
-  sort_by_key(adadas_spec) %>%
+  order_cols(adadas_spec) %>%
   set_variable_labels(adadas_spec) %>%
   xportr_length(adadas_spec) %>%
   xportr_df_label(adadas_spec, domain = "adadas") %>%
