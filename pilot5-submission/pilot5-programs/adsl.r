@@ -98,7 +98,7 @@ ex_dose <- ex_dt %>%
 
 # are there subjects with mixed treatments?
 n_mixed_trt <- ex_dose[which(ex_dose[["cnt"]] > 1), "USUBJID"]
-if(nrow(n_mixed_trt) > 0) {
+if (nrow(n_mixed_trt) > 0) {
   print(glue("Note - there is (are) {nrow(n_mixed_trt)} subject(s) with mixed treatments"))
 }
 
@@ -106,10 +106,9 @@ adsl00 <- dm %>%
   select(-DOMAIN) %>%
   filter(ACTARMCD != "Scrnfail") %>%
   mutate(TRT01P = ARM) %>%
-  create_var_from_codelist(
-    metacore = adsl_spec,
-    input_var = TRT01P,
-    out_var = TRT01PN) %>%
+  create_var_from_codelist(metacore = adsl_spec,
+                           input_var = TRT01P,
+                           out_var = TRT01PN) %>%
   # actual treatment - It is assumed TRT01A=TRT01P which is not really true.
   mutate(
     TRT01A = TRT01P,
@@ -222,12 +221,11 @@ adsl04 <- adsl03 %>%
     new_vars = exprs(DCSREAS = DSDECOD),
     filter_add = !is.na(USUBJID)
   ) %>%
-  mutate(
-    DCSREAS = case_when(
-      DCDECOD != "COMPLETED" & DSTERM == "PROTOCOL ENTRY CRITERIA NOT MET" ~ "I/E Not Met",
-      DCDECOD != "COMPLETED" ~ DCSREAS,
-      TRUE ~ ""
-    ))
+  mutate(DCSREAS = case_when(
+    DCDECOD != "COMPLETED" & DSTERM == "PROTOCOL ENTRY CRITERIA NOT MET" ~ "I/E Not Met",
+    DCDECOD != "COMPLETED" ~ DCSREAS,
+    TRUE ~ ""
+  ))
 
 ## Baseline variables -------------------------
 # selection definition from define
@@ -315,21 +313,21 @@ adsl07 <- adsl07 %>%
   group_by(SITEID, TRT01A) %>%
   mutate(n = n()) %>%
   ungroup() %>%
-  mutate(SITEGR1= if_else(n <=3, "900", SITEID)) %>%
+  mutate(SITEGR1 = if_else(n <= 3, "900", SITEID)) %>%
   select(-n)
 
 # Export to xpt ----------------
 adsl <- adsl07 %>%
-  drop_unspec_vars(adsl_spec) %>% 
+  drop_unspec_vars(adsl_spec) %>%
   check_ct_data(adsl_spec, na_acceptable = TRUE) %>%
   order_cols(adsl_spec) %>%
   sort_by_key(adsl_spec) %>%
   set_variable_labels(adsl_spec) %>%
-  xportr_length(adsl_spec) %>% 
-  xportr_label(adsl_spec) %>%  
-  xportr_df_label(adsl_spec, domain = "adsl") %>% 
+  xportr_length(adsl_spec) %>%
+  xportr_label(adsl_spec) %>%
+  xportr_df_label(adsl_spec, domain = "adsl") %>%
   xportr_format(adsl_spec$var_spec %>%
-       mutate_at(c("format"), ~ replace_na(., "")), "ADSL")
+                  mutate_at(c("format"), ~ replace_na(., "")), "ADSL")
 
 # FIX: attribute issues where sas.format attributes set to DATE9. are changed to DATE9,
 # and missing formats are set to NULL (instead of an empty character vector)
