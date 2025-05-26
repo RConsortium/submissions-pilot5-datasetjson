@@ -238,5 +238,10 @@ adlbc <- adlb09 %>%
   order_cols(adlbc_spec) %>%
   set_variable_labels(adlbc_spec)
 
+### Update format.sas attribute
+attr(adlbc$ADT, "format.sas") <- "DATE9"
+attr(adlbc$TRTEDT, "format.sas") <- "DATE9"
+attr(adlbc$TRTSDT, "format.sas") <- "DATE9"
+
 # saving the dataset as RDS format
 saveRDS(adlbc, file.path(path$adam, "adlbc.rds"))
