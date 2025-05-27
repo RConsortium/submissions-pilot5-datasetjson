@@ -1,12 +1,16 @@
-###########################################################################
-#' developers : Steven Haesendonckx/Declan Hodges/Thomas Neitmann
-#' date: 09DEC2022
-#' modification History:Sai janardhan
-#' date:31MAR2025
-###########################################################################
+#************************************************************************
+# Purpose:     Generate ADSL dataset
+# Input:       DM, DS, EX, QS, SV, VS, SC, MH datasets
+# Output:      adsl.rds
+#************************************************************************
 
-# Set up ------------------------------------------------------------------
+# Note to Reviewer
+# To rerun the code below, please refer ADRG appendix.
+# After required package are installed, the path variable needs to be defined
+# in the .Rprofile file
 
+# Setup -----------------
+## Load libraries -------
 library(haven)
 library(admiral)
 library(dplyr)
@@ -16,32 +20,31 @@ library(metatools)
 library(pilot5utils)
 library(xportr)
 library(janitor)
-library(datasetjson)
+library(purrr)
+library(glue)
 
-# read source -------------------------------------------------------------
-# When SAS datasets are imported into R using read_sas(), missing
-# character values from SAS appear as "" characters in R, instead of appearing
-# as NA values. Further details can be obtained via the following link:
-# https://pharmaverse.github.io/admiral/articles/admiral.html#handling-of-missing-values
+## Load datasets ----------------------
+dat_to_load <- c("dm", "ds", "qs", "ex", "qs", "sv", "vs", "sc", "mh")
 
+datasets <- map(
+  dat_to_load,
+  ~ convert_blanks_to_na(readRDS(file.path(path$sdtm, paste0(.x, ".rds"))))
+) %>%
+  setNames(dat_to_load)
 
-dm <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "dm.rds")))
-ds <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "ds.rds")))
-ex <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "ex.rds")))
-qs <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "qs.rds")))
-sv <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "sv.rds")))
-vs <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "vs.rds")))
-sc <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "sc.rds")))
-mh <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "mh.rds")))
+list2env(datasets, envir = .GlobalEnv)
 
+## Load dataset specs -------------
+metacore <- spec_to_metacore(
+  file.path(path$adam, "adam-pilot-5.xlsx"),
+  where_sep_sheet = FALSE
+)
 
-
-## placeholder for origin=predecessor, use metatool::build_from_derived()
-metacore <- spec_to_metacore(file.path(path$adam, "adam-pilot-5.xlsx"), where_sep_sheet = FALSE)
 # Get the specifications for the dataset we are currently building
 adsl_spec <- metacore %>%
   select_dataset("ADSL")
 
+# Create ADSL dataset -----------------
 ds00 <- ds %>%
   filter(DSCAT == "DISPOSITION EVENT", DSDECOD != "SCREEN FAILURE") %>%
   derive_vars_dt(
@@ -56,11 +59,7 @@ ds00 <- ds %>%
   ) %>%
   select(STUDYID, USUBJID, EOSDT, DISCONFL, DSRAEFL, DSDECOD, DSTERM, DCDECOD)
 
-
-# Treatment information ---------------------------------------------------
-
-mh <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "mh.rds")))
-
+# Treatment information --------------------------------------
 mh <- derive_vars_dt(
   mh,
   dtc = MHDTC,
@@ -68,17 +67,14 @@ mh <- derive_vars_dt(
   highest_imputation = "M",
 )
 
-colnames(mh)
-mh[, c("MHDTC", "ASTDT")]
-
-
 ex_dt <- ex %>%
   derive_vars_dt(
     dtc = EXSTDTC,
     new_vars_prefix = "EXST",
     highest_imputation = "n",
   ) %>%
-  # treatment end is imputed by discontinuation if subject discontinued after visit 3 = randomization as per protocol
+  # treatment end is imputed by discontinuation if subject discontinued after
+  # visit 3 = randomization as per protocol
   derive_vars_merged(
     dataset_add = ds00,
     by_vars = exprs(STUDYID, USUBJID),
@@ -97,21 +93,23 @@ ex_dt <- ex %>%
 
 ex_dose <- ex_dt %>%
   group_by(STUDYID, USUBJID, EXTRT) %>%
-  summarise(cnt = n_distinct(EXTRT), CUMDOSE = sum(DOSE))
+  summarise(cnt = n_distinct(EXTRT), CUMDOSE = sum(DOSE)) %>%
+  ungroup()
 
-ex_dose[which(ex_dose[["cnt"]] > 1), "USUBJID"] # are there subjects with mixed treatments?
+# are there subjects with mixed treatments?
+n_mixed_trt <- ex_dose[which(ex_dose[["cnt"]] > 1), "USUBJID"]
+if (nrow(n_mixed_trt) > 0) {
+  print(glue("Note - there is (are) {nrow(n_mixed_trt)} subject(s) with mixed treatments"))
+}
 
 adsl00 <- dm %>%
   select(-DOMAIN) %>%
   filter(ACTARMCD != "Scrnfail") %>%
-  # planned treatment
-  mutate(
-    TRT01P = ARM,
-    TRT01PN = case_when(
-      ARM == "Placebo" ~ 0,
-      ARM == "Xanomeline High Dose" ~ 81,
-      ARM == "Xanomeline Low Dose" ~ 54
-    )
+  mutate(TRT01P = ARM) %>%
+  create_var_from_codelist(
+    metacore = adsl_spec,
+    input_var = TRT01P,
+    out_var = TRT01PN
   ) %>%
   # actual treatment - It is assumed TRT01A=TRT01P which is not really true.
   mutate(
@@ -121,11 +119,7 @@ adsl00 <- dm %>%
   # treatment start
   derive_vars_merged(
     dataset_add = ex_dt,
-    filter_add = (
-      EXDOSE > 0 |
-        (EXDOSE == 0 & grepl("PLACEBO", EXTRT, fixed = TRUE))
-    ) &
-      !is.na(EXSTDT),
+    filter_add = (EXDOSE > 0 | (EXDOSE == 0 & grepl("PLACEBO", EXTRT, fixed = TRUE))) & !is.na(EXSTDT),
     new_vars = exprs(TRTSDT = EXSTDT),
     order = exprs(EXSTDT, EXSEQ),
     mode = "first",
@@ -134,10 +128,7 @@ adsl00 <- dm %>%
   # treatment end
   derive_vars_merged(
     dataset_add = ex_dt,
-    filter_add = (
-      EXDOSE > 0 | (EXDOSE == 0 & grepl("PLACEBO", EXTRT, fixed = TRUE))
-    ) &
-      !is.na(EXENDT),
+    filter_add = (EXDOSE > 0 | (EXDOSE == 0 & grepl("PLACEBO", EXTRT, fixed = TRUE))) & !is.na(EXENDT),
     new_vars = exprs(TRTEDT = EXENDT),
     order = exprs(EXENDT, EXSEQ),
     mode = "last",
@@ -150,14 +141,12 @@ adsl00 <- dm %>%
   select(-cnt) %>%
   mutate(AVGDD = round_half_up(as.numeric(CUMDOSE) / TRTDURD, digits = 1))
 
-# Demographic grouping ----------------------------------------------------
+# Demographic grouping --------
 adsl01 <- adsl00 %>%
   create_cat_var(adsl_spec, AGE, AGEGR1, AGEGR1N) %>%
   create_var_from_codelist(adsl_spec, RACE, RACEN)
 
-
-
-# Population flag ---------------------------------------------------------
+# Population flags --------
 # SAFFL - Y if ITTFL='Y' and TRTSDT ne missing. N otherwise
 # ITTFL - Y if ARMCD ne ' '. N otherwise
 # EFFFL - Y if SAFFL='Y AND at least one record in QS for ADAS-Cog and for CIBIC+ with VISITNUM>3, N otherwise
@@ -190,9 +179,8 @@ adsl02 <- adsl01 %>%
     )
   )
 
-# Study Visit compliance --------------------------------------------------
+## Study Visit compliance -----------------
 # these variables are also in suppdm, but define said derived
-
 sv00 <- sv %>%
   select(STUDYID, USUBJID, VISIT, VISITDY, SVSTDTC) %>%
   mutate(
@@ -212,10 +200,7 @@ sv00 <- sv %>%
 adsl03 <- adsl02 %>%
   left_join(sv00, by = c("STUDYID", "USUBJID"))
 
-# Disposition -------------------------------------------------------------
-
-
-
+## Disposition -----------------
 adsl04 <- adsl03 %>%
   left_join(ds00, by = c("STUDYID", "USUBJID")) %>%
   select(-DSDECOD) %>%
@@ -238,10 +223,8 @@ adsl04 <- adsl03 %>%
     TRUE ~ ""
   ))
 
-
-# Baseline variables ------------------------------------------------------
+## Baseline variables -------------------------
 # selection definition from define
-
 vs00 <- vs %>%
   filter((VSTESTCD == "HEIGHT" & VISITNUM == 1) | (VSTESTCD == "WEIGHT" & VISITNUM == 3)) %>%
   mutate(AVAL = round_half_up(VSSTRESN, digits = 1)) %>%
@@ -261,8 +244,7 @@ adsl05 <- adsl04 %>%
   left_join(vs00, by = c("STUDYID", "USUBJID")) %>%
   left_join(sc00, by = c("STUDYID", "USUBJID"))
 
-# Disease information -----------------------------------------------------
-
+## Disease information -----------------
 visit1dt <- sv %>%
   filter(VISITNUM == 1) %>%
   derive_vars_dt(
@@ -277,7 +259,12 @@ visnumen <- sv %>%
   group_by(STUDYID, USUBJID) %>%
   slice(n()) %>%
   ungroup() %>%
-  mutate(VISNUMEN = ifelse(round_half_up(VISITNUM, digits = 0) == 13, 12, round_half_up(VISITNUM, digits = 0))) %>%
+  mutate(
+    VISNUMEN = ifelse(
+      round_half_up(VISITNUM, digits = 0) == 13, 12,
+      round_half_up(VISITNUM, digits = 0)
+    )
+  ) %>%
   select(STUDYID, USUBJID, VISNUMEN)
 
 disonsdt <- mh %>%
@@ -296,18 +283,11 @@ adsl06 <- adsl05 %>%
     new_var = DURDIS,
     start_date = DISONSDT,
     end_date = VISIT1DT,
-    out_unit = "days",
-    add_one = TRUE
+    out_unit = "months",
+    add_one = TRUE,
+    type = "duration"
   ) %>%
-  # derive_vars_duration(..., out_unit = "months") is not used here because
-  # it calculates months based on date internals, while the original CDISC
-  # adsl.DURDIS was derived assuming each month has the same number of days,
-  # i.e., 365.25/12=30.4375.
-  # Feature requested: https://github.com/pharmaverse/admiral/issues/1875
-  # Workaround: derive days first and then convert it to months
-  mutate(
-    DURDIS = round_half_up(DURDIS / (365.25 / 12), digits = 1)
-  ) %>%
+  mutate(DURDIS = round_half_up(DURDIS, digits = 1)) %>%
   create_cat_var(adsl_spec, DURDIS, DURDSGR1) %>%
   derive_vars_dt(
     dtc = RFENDTC,
@@ -323,39 +303,37 @@ mmsetot <- qs %>%
 adsl07 <- adsl06 %>%
   left_join(mmsetot, by = c("STUDYID", "USUBJID"))
 
-
-# generating the SITEGR1 variable
+## Site group ----------
 # Grouping by SITEID, TRT01A to get the count fewer than 3 patients in any one treatment group.
-
-adsl07_ <- adsl07 %>%
+adsl07 <- adsl07 %>%
   group_by(SITEID, TRT01A) %>%
-  count(SITEID) %>%
-  ungroup(SITEID, TRT01A)
-
-
-
-adsl07 <- left_join(adsl07, adsl07_, by = c("SITEID", "TRT01A")) %>%
+  mutate(n = n()) %>%
+  ungroup() %>%
   mutate(SITEGR1 = if_else(n <= 3, "900", SITEID)) %>%
   select(-n)
 
-
-
-
-# Export to xpt -----------------------------------------------------
+# Export to xpt ----------------
 adsl <- adsl07 %>%
   drop_unspec_vars(adsl_spec) %>%
   check_ct_data(adsl_spec, na_acceptable = TRUE) %>%
   order_cols(adsl_spec) %>%
   sort_by_key(adsl_spec) %>%
+  set_variable_labels(adsl_spec) %>%
   xportr_length(adsl_spec) %>%
   xportr_label(adsl_spec) %>%
   xportr_df_label(adsl_spec, domain = "adsl") %>%
-  xportr_format(
-    adsl_spec$var_spec %>%
-      mutate_at(c("format"), ~ replace_na(., "")),
-    "ADSL"
-  )
+  xportr_format(adsl_spec$var_spec %>% mutate_at(c("format"), ~ replace_na(., "")), "ADSL")
 
+# FIX: attribute issues where sas.format attributes set to DATE9. are changed to DATE9,
+# and missing formats are set to NULL (instead of an empty character vector)
+# when reading original xpt file
+for (col in colnames(adsl)) {
+  if (attr(adsl[[col]], "format.sas") == "") {
+    attr(adsl[[col]], "format.sas") <- NULL
+  } else if (attr(adsl[[col]], "format.sas") == "DATE9.") {
+    attr(adsl[[col]], "format.sas") <- "DATE9"
+  }
+}
 
-# saving the dataset as rds format
+# Saving the dataset as rds format --------------
 saveRDS(adsl, file.path(path$adam, "adsl.rds"))
