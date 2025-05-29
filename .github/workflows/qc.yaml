@@ -1,9 +1,7 @@
 
-name: QC Check ✅
+name: QC Dataset Check ✅
 
 on:
-  schedule:
-  - cron: '0 0 * * *'
   pull_request:
     branches:
       - main
@@ -12,6 +10,9 @@ jobs:
   qc-check:
     runs-on: ubuntu-latest
     steps:
+      - name: Set US Eastern timezone
+        run: sudo timedatectl set-timezone America/New_York
+    
       - name: Check out this repository
         uses: actions/checkout@v4
     

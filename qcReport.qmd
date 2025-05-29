@@ -65,6 +65,8 @@ cat("## Dataset QC Check Complete!", "\n\n")
 cat("Date: ", Sys.Date(), "\n")
 cat("Run by: ", Sys.getenv('GITHUB_ACTOR'), "\n")
 cat("Git Ref: ", Sys.getenv("GITHUB_REF"), "\n")
+cat("BASE: ", "Pilot 5 Datasets", "\n")
+cat("COMPARE: ", "Pilot 3 Datasets", "\n")
 for (y in input_dataset_names) {
   new_dataset <- paste0("new_", y)
   comp_dataset <- paste0("comp_", y)
