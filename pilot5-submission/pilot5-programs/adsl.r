@@ -89,7 +89,7 @@ ex_dt <- ex %>%
     date_imputation = "last",
     flag_imputation = "none"
   ) %>%
-  mutate(DOSE = EXDOSE * (EXENDT - EXSTDT + 1))
+  mutate(DOSE = as.numeric(EXDOSE * (EXENDT - EXSTDT + 1)))
 
 ex_dose <- ex_dt %>%
   group_by(STUDYID, USUBJID, EXTRT) %>%
