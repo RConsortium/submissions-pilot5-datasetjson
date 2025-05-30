@@ -13,6 +13,7 @@
 #         required: false
 #         type: string
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
