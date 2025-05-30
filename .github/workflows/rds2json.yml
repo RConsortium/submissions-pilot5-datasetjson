@@ -1,6 +1,7 @@
 # rds2json, 
 
 on:
+  pr_request:
   workflow_dispatch:
 #    inputs:
 #      r-version:
