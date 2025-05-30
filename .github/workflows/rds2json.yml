@@ -5,7 +5,7 @@
 
 on:
   workflow_dispatch:
-  pull_request:
+#  pull_request:
   push:
     branches:
       - '50_automatic_convert_rds_to_json'
