@@ -1,18 +1,18 @@
 # rds2json, 
 
-on:
-  workflow_dispatch:
+#  workflow_dispatch:
 #    inputs:
 #      r-version:
 #        description: 'The version of R to use'
 #        default: '4.2'
 #        required: false
 #        type: string
-       lint-all-files:
-         description: 'Lint all files every time'
-         default: 'false'
-         required: false
-         type: string
+#       lint-all-files:
+#         description: 'Lint all files every time'
+#         default: 'false'
+#         required: false
+#         type: string
+on:
   push:
     branches:
       - main
