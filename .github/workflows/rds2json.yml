@@ -26,8 +26,9 @@ jobs:
 #    container:
 #         image:  rocker/r-ver:latest
     steps:
-      - name: Check out this repository
+      - name: Check out this repository & branch
         uses: actions/checkout@v4
+          ref: '50_automatic_convert_rds_to_json'
 
       - name: Set up R
         uses: r-lib/actions/setup-r@v2
