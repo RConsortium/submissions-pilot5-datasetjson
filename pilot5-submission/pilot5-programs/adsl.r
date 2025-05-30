@@ -214,14 +214,16 @@ adsl04 <- adsl03 %>%
   derive_vars_merged(
     dataset_add = ds00,
     by_vars = exprs(STUDYID, USUBJID),
-    new_vars = exprs(DCSREAS = DSDECOD),
+    new_vars = exprs(DISCREAS = DSDECOD),
     filter_add = !is.na(USUBJID)
   ) %>%
+  create_var_from_codelist(adsl_spec, DISCREAS, DCSREAS) %>%
   mutate(DCSREAS = case_when(
     DCDECOD != "COMPLETED" & DSTERM == "PROTOCOL ENTRY CRITERIA NOT MET" ~ "I/E Not Met",
     DCDECOD != "COMPLETED" ~ DCSREAS,
     TRUE ~ ""
-  ))
+  )) %>%
+  select(-DISCREAS)
 
 ## Baseline variables -------------------------
 # selection definition from define
