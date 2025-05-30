@@ -28,6 +28,7 @@ jobs:
     steps:
       - name: Check out this repository & branch
         uses: actions/checkout@v4
+        with:
           ref: '50_automatic_convert_rds_to_json'
 
       - name: Set up R
