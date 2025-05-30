@@ -2,6 +2,15 @@
 
 on:
   workflow_dispatch:
+    inputs:
+      r-version:
+        description: 'The version of R to use'
+        default: '4.2'
+        required: false
+        type: string
+      lint-all-files:
+        default: 'false'
+        type: string
   push:
     branches:
       - main
@@ -47,6 +56,7 @@ jobs:
           }
           fi
           echo "R_VERSION=$R_VERSION" >> $GITHUB_OUTPUT
+          echo "R_VERSION=$R_VERSION"
         shell: bash
   lint:
     name: Lint
