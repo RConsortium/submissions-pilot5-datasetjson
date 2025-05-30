@@ -1,30 +1,12 @@
-# rds2json, 
+
+---
+# reports changed files
+# rds2json
 
 on:
   workflow_dispatch:
-    inputs:
-      r-version:
-        description: 'The version of R to use'
-        default: '4.2'
-        required: false
-        type: string
-      lint-all-files:
-        default: 'false'
-        type: string
+  push:
 
-#  pull_request:
-#    branches:
-#      - main
-
-#  push:
-#    branches:
-#      - main
-
-#       lint-all-files:
-#         description: 'Lint all files every time'
-#         default: 'false'
-#         required: false
-#         type: string
 
 name: rds2json EXPERIMENTAL
 
@@ -33,113 +15,37 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  get_r_version:
-    name: Get R version
+  convert_rds:
     runs-on: ubuntu-latest
-    if: >
-      !contains(github.event.commits[0].message, '[skip lint]')
-    outputs:
-      r-version: ${{ steps.normalizer.outputs.R_VERSION }}
-    steps:
-      - name: Normalize inputs
-        id: normalizer
-        run: |
-          R_VERSION="${{ inputs.r-version }}"
-          if [ "$R_VERSION" == "" ]
-          then {
-            R_VERSION="4.2"
-          }
-          fi
-          echo "R_VERSION=$R_VERSION" >> $GITHUB_OUTPUT
-          echo "R_VERSION=$R_VERSION"
-        shell: bash
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
-    container:
-      image: "ghcr.io/pharmaverse/admiralci-${{needs.get_r_version.outputs.r-version}}:latest"
-    if: >
-      !contains(github.event.commits[0].message, '[skip lint]')
     env:
-      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-    needs: get_r_version
+         GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+#    container:
+#         image:  rocker/r-ver:latest
     steps:
-      ##################### BEGIN boilerplate steps #####################
-      - name: Get branch names
-        id: branch-name
-        uses: tj-actions/branch-names@v8.2.1
+      - name: Check out this repository
+        uses: actions/checkout@v4
 
-      - name: Checkout repo (PR) 🛎
-        uses: actions/checkout@v3
-        if: github.event_name == 'pull_request'
-        with:
-          ref: ${{ steps.branch-name.outputs.head_ref_branch }}
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
 
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        if: github.event_name != 'pull_request'
-        with:
-          ref: ${{ steps.branch-name.outputs.head_ref_branch }}
-
-      - name: Normalize inputs
-        id: normalizer
+      - name: Install R dependencies
         run: |
-          R_VERSION="${{ inputs.r-version }}"
-          if [ "$R_VERSION" == "" ]
-          then {
-            R_VERSION="4.2"
-          }
-          fi
-          echo "R_VERSION=$R_VERSION" >> $GITHUB_OUTPUT
+          Rscript -e 'install.packages(c("dplyr", "datasetjson", "metacore", "tidyr"), 
+          repos = "https://packagemanager.posit.co/cran/__linux__/noble/latest")'
+
+      - name: run code rds to json
+        run: |
+          Rscript -e 'source("pilot5-submission/pilot5-programs/convert_rds_to_json.r")'
         shell: bash
 
-      - name: Restore cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.staged.dependencies
-          key: staged-deps
-
-      ##################### END boilerplate steps #####################
-
-      - name: Changed files
-        id: files
-        uses: Ana06/get-changed-files@v2.2.0
-        with:
-          format: 'json'
-          filter: '*'
-
-      - name: Lint
+      - name: Commit
         run: |
-          install.packages("lintr", repos = "cran.rstudio.com")
-          library(lintr)
-          exclusions_list <- NULL
-          if (!identical("${{ inputs.lint-all-files }}", "true")) {
-            changed_files <- jsonlite::fromJSON('${{ steps.files.outputs.added_modified }}')
-            all_files <- list.files(recursive = TRUE)
-            exclusions_list <- if (any(changed_files %in% c(".lintr", "renv.lock"))) {
-              as.list(setdiff(all_files, changed_files))
-            } else {
-              NULL
-            }
-          }
-          lints <- lint_dir(
-            "pilot5-submission/pilot5-programs", 
-            linters_with_defaults(line_length_linter = line_length_linter(120L)),
-            exclusions = exclusions_list
-            )
-          saveRDS(lints, file = "lints.rds")
-          print(changed_files)
-        shell: Rscript {0}
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Update json files" || \
+            echo "no changes; nothing to commit"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-
-
-      - name: Error if lints are detected
-        run: |
-          lints <- readRDS("lints.rds")
-          if (length(lints) > 0L) {
-            print(lints)
-            stop("Lints detected. Please review and adjust code according to the comments provided.", call. = FALSE)
-          }
-        shell: Rscript {0}
