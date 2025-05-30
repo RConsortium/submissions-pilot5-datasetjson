@@ -11,20 +11,15 @@ on:
       lint-all-files:
         default: 'false'
         type: string
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
 
-#  workflow_dispatch:
-#    inputs:
-#      r-version:
-#        description: 'The version of R to use'
-#        default: '4.2'
-#        required: false
-#        type: string
+#  pull_request:
+#    branches:
+#      - main
+
+#  push:
+#    branches:
+#      - main
+
 #       lint-all-files:
 #         description: 'Lint all files every time'
 #         default: 'false'
@@ -135,7 +130,10 @@ jobs:
             exclusions = exclusions_list
             )
           saveRDS(lints, file = "lints.rds")
+          print(changed_files)
         shell: Rscript {0}
+
+
 
       - name: Error if lints are detected
         run: |
