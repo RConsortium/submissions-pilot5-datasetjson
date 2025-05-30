@@ -6,7 +6,7 @@
 on:
   workflow_dispatch:
   push:
-  - path:  **/*.rds
+  - paths:  **/*.rds
 
 name: rds2json EXPERIMENTAL
 
