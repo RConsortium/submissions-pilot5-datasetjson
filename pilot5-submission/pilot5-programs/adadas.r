@@ -185,7 +185,10 @@ adas <- adas5 %>%
   order_cols(adadas_spec) %>%
   set_variable_labels(adadas_spec) %>%
   xportr_df_label(adadas_spec, domain = "adadas") %>%
-  xportr_format(adadas_spec$var_spec %>% mutate_at(c("format"), ~ replace_na(., "")), "ADADAS") %>%
+  xportr_format(
+    adadas_spec$var_spec %>% mutate_at(c("format"), ~ replace_na(., "")),
+    "ADADAS"
+  ) %>%
   convert_na_to_blanks()
 
 # FIX: attribute issues where sas.format attributes set to DATE9. are changed to DATE9,
