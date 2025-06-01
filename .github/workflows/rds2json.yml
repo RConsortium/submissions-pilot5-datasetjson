@@ -10,7 +10,6 @@ on:
       - '50_automatic_convert_rds_to_json'
     paths:
       - '**/*.rds'
-  pull_request:
   
 #  pull_request:
 #    branches:
@@ -19,7 +18,7 @@ on:
 
 name: rds2json EXPERIMENTAL
 
-run-name: Try ${{ github.run_number }}, @${{ github.actor }}
+run-name: Try ${{ github.run_number }}, @${{ github.actor }}, ${{ github.event }}
 
 concurrency:
   group: lint-${{ github.event.pull_request.number || github.ref }}
