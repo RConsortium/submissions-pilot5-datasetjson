@@ -50,7 +50,7 @@ jobs:
           MATRIX_CONTEXT: ${{ toJson(matrix) }}
         run: echo "$MATRIX_CONTEXT"
 
-build:
+  build:
     name: Build
     runs-on: ubuntu-latest
     steps:
