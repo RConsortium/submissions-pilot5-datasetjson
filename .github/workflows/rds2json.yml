@@ -10,7 +10,8 @@ on:
       - '50_automatic_convert_rds_to_json'
     paths:
       - '**/*.rds'
-  pull_request:
+
+# pull_request:
 
 name: rds2json EXPERIMENTAL
 
@@ -62,4 +63,5 @@ jobs:
         uses: thollander/actions-comment-pull-request@v3
         with:
           message: |
-             Hello world ! :wave:
+             Hello world ! :wave: :stop_sign:  :white_check_mark:
+	     :sunrise_over_mountains:
