@@ -49,3 +49,34 @@ jobs:
         env:
           MATRIX_CONTEXT: ${{ toJson(matrix) }}
         run: echo "$MATRIX_CONTEXT"
+
+build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: |
+          yarn
+
+      - name: Clean, build, format, lint, package, and test
+        run: |
+          yarn all
+
+      - name: Check if packaged properly
+        run: |
+          # If there are any unstaged or untracked files in 'dist/', then the action wasn't packaged properly
+          if git diff --name-only | grep '^dist/' || git ls-files --other --exclude-standard | grep '^dist/'; then
+            echo "You didn't package the action properly before pushing to remote." \
+            echo "Always run 'yarn all' before staging a commit."
+            echo "Below are the modified files in 'dist/' after running 'yarn && rm -rf dist/ && yarn all':"
+            git diff --name-only | grep '^dist/'
+            git ls-files --other --exclude-standard | grep '^dist/'
+            exit 1
+          fi
