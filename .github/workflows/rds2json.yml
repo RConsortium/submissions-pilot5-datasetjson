@@ -11,6 +11,9 @@ on:
     paths:
       - '**/*.rds'
   pull_request:
+    branches:
+      - '50_automatic_convert_rds_to_json'
+
 
 name: rds2json EXPERIMENTAL
 
