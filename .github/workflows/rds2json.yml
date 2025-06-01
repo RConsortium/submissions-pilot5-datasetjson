@@ -1,16 +1,16 @@
 name: Convert RDS files to DATASETJSON files
 
-on:
-  workflow_dispatch:
-  push:
-    branches:
-      - '50_automatic_convert_rds_to_json'
-    paths:
-      - '**/*.rds'
-  
-#  pull_request:
+#on:
+#  workflow_dispatch:
+#  push:
 #    branches:
 #      - '50_automatic_convert_rds_to_json'
+#    paths:
+#      - '**/*.rds'
+on:
+  pull_request:
+    branches:
+      - '50_automatic_convert_rds_to_json'
 
 run-name: Try ${{ github.run_number }}, @${{ github.actor }}, ${{ github.event }}
 
