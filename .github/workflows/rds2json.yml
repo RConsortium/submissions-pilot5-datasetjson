@@ -1,7 +1,4 @@
-
----
-# reports changed files
-# rds2json
+name: Convert RDS files to DATASETJSON files
 
 on:
   workflow_dispatch:
@@ -14,9 +11,6 @@ on:
 #  pull_request:
 #    branches:
 #      - '50_automatic_convert_rds_to_json'
-
-
-name: rds2json EXPERIMENTAL
 
 run-name: Try ${{ github.run_number }}, @${{ github.actor }}, ${{ github.event }}
 
