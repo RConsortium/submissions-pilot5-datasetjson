@@ -206,8 +206,8 @@ adae <- adae0 %>%
   sort_by_key(adae_spec) %>%
   xportr_df_label(adae_spec, domain = "ADAE") %>%
   xportr_label(adae_spec) %>%
-  convert_blanks_to_na() %>%
-  xportr_format(adae_spec$var_spec, "ADAE")
+  xportr_format(adae_spec$var_spec, "ADAE") %>%
+  convert_na_to_blanks()
 
 # NOTE : When reading in original ADAE dataset to check against, it
 # seems the sas.format attributes set to DATE9. are changed to DATE9,

@@ -89,7 +89,7 @@ ex_dt <- ex %>%
     date_imputation = "last",
     flag_imputation = "none"
   ) %>%
-  mutate(DOSE = EXDOSE * (EXENDT - EXSTDT + 1))
+  mutate(DOSE = as.numeric(EXDOSE * (EXENDT - EXSTDT + 1)))
 
 ex_dose <- ex_dt %>%
   group_by(STUDYID, USUBJID, EXTRT) %>%
@@ -214,14 +214,16 @@ adsl04 <- adsl03 %>%
   derive_vars_merged(
     dataset_add = ds00,
     by_vars = exprs(STUDYID, USUBJID),
-    new_vars = exprs(DCSREAS = DSDECOD),
+    new_vars = exprs(DISCREAS = DSDECOD),
     filter_add = !is.na(USUBJID)
   ) %>%
+  create_var_from_codelist(adsl_spec, DISCREAS, DCSREAS) %>%
   mutate(DCSREAS = case_when(
     DCDECOD != "COMPLETED" & DSTERM == "PROTOCOL ENTRY CRITERIA NOT MET" ~ "I/E Not Met",
     DCDECOD != "COMPLETED" ~ DCSREAS,
     TRUE ~ ""
-  ))
+  )) %>%
+  select(-DISCREAS)
 
 ## Baseline variables -------------------------
 # selection definition from define
@@ -306,11 +308,7 @@ adsl07 <- adsl06 %>%
 ## Site group ----------
 # Grouping by SITEID, TRT01A to get the count fewer than 3 patients in any one treatment group.
 adsl07 <- adsl07 %>%
-  group_by(SITEID, TRT01A) %>%
-  mutate(n = n()) %>%
-  ungroup() %>%
-  mutate(SITEGR1 = if_else(n <= 3, "900", SITEID)) %>%
-  select(-n)
+  mutate(SITEGR1 = format_sitegr1(SITEID))
 
 # Export to xpt ----------------
 adsl <- adsl07 %>%
@@ -319,10 +317,13 @@ adsl <- adsl07 %>%
   order_cols(adsl_spec) %>%
   sort_by_key(adsl_spec) %>%
   set_variable_labels(adsl_spec) %>%
-  xportr_length(adsl_spec) %>%
   xportr_label(adsl_spec) %>%
   xportr_df_label(adsl_spec, domain = "adsl") %>%
-  xportr_format(adsl_spec$var_spec %>% mutate_at(c("format"), ~ replace_na(., "")), "ADSL")
+  xportr_format(
+    adsl_spec$var_spec %>% mutate_at(c("format"), ~ replace_na(., "")),
+    "ADSL"
+  ) %>%
+  convert_na_to_blanks()
 
 # FIX: attribute issues where sas.format attributes set to DATE9. are changed to DATE9,
 # and missing formats are set to NULL (instead of an empty character vector)
