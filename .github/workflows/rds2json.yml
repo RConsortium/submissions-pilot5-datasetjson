@@ -10,7 +10,7 @@ name: Convert RDS files to DATASETJSON files
 on:
   pull_request:
     branches:
-      - '50_automatic_convert_rds_to_json'
+      - main
 
 run-name: Try ${{ github.run_number }}, @${{ github.actor }}, ${{ github.event }}
 
