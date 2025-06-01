@@ -5,7 +5,9 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch
+  workflow_dispatch:
+
+run-name: Try ${{ github.run_number }}, @${{ github.actor }}
 
 jobs:
   debug:
