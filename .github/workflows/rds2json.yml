@@ -10,7 +10,8 @@ on:
       - '50_automatic_convert_rds_to_json'
     paths:
       - '**/*.rds'
-
+  pull_request:
+  
 #  pull_request:
 #    branches:
 #      - '50_automatic_convert_rds_to_json'
