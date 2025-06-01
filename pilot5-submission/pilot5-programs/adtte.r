@@ -46,6 +46,7 @@ adsl <- adsl %>%
   derive_vars_merged(
     dataset_add = ds00,
     by_vars = exprs(STUDYID, USUBJID),
+    new_vars = exprs(EOSDT = DSSTDT),
     filter_add = DSCAT == "DISPOSITION EVENT" & DSDECOD != "SCREEN FAILURE" & DSDECOD != "FINAL LAB VISIT"
   ) %>%
   mutate(EOS2DT = case_when(
@@ -89,7 +90,8 @@ adtte_pre <- derive_param_tte(
     TRTAN = TRT01AN,
     TRTDUR = TRTDURD,
     TRTP = TRT01P
-  )
+  ) %>%
+  mutate(CNSR = as.numeric(CNSR))
 
 adtte_rds <- adtte_pre %>%
   drop_unspec_vars(adtte_spec) %>% # only keep vars from define
@@ -100,7 +102,25 @@ adtte_rds <- adtte_pre %>%
 adtte <- adtte_rds %>%
   drop_unspec_vars(adtte_spec) %>% # only keep vars from define
   order_cols(adtte_spec) %>% # order columns based on define
-  set_variable_labels(adtte_spec)
+  set_variable_labels(adtte_spec) %>%
+  xportr_label(adtte_spec) %>%
+  xportr_df_label(adtte_spec, domain = "adtte") %>%
+  xportr_format(
+    adtte_spec$var_spec %>% mutate_at(c("format"), ~ replace_na(., "")),
+    "ADTTE"
+  ) %>%
+  convert_na_to_blanks()
+
+# FIX: attribute issues where sas.format attributes set to DATE9. are changed to DATE9,
+# and missing formats are set to NULL (instead of an empty character vector)
+# when reading original xpt file
+for (col in colnames(adtte)) {
+  if (attr(adtte[[col]], "format.sas") == "") {
+    attr(adtte[[col]], "format.sas") <- NULL
+  } else if (attr(adtte[[col]], "format.sas") == "DATE9.") {
+    attr(adtte[[col]], "format.sas") <- "DATE9"
+  }
+}
 
 # saving the dataset as RDS format
 saveRDS(adtte, file.path(path$adam, "adtte.rds"))
