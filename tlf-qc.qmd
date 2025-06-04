@@ -50,7 +50,7 @@ pilot5_pdf_files <- list.files(pilot5_pdf_path, pattern = ".pdf")
 ```{r sink_setup}
 sink("qc-tlf.Rmd", append = TRUE)
 cat("## TLF QC Check Complete!", "\n\n")
-cat("Date: ", Sys.Date(), "\n")
+cat("Date: ", format(Sys.Date()), "\n")
 cat("Run by: ", Sys.getenv('GITHUB_ACTOR'), "\n")
 cat("Git Ref: ", Sys.getenv("GITHUB_REF"), "\n")
 sink()
