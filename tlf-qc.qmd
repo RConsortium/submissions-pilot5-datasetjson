@@ -26,15 +26,15 @@ sessionInfo()
 
 pilot3_out_path <- "pilot5-submission/pilot5-output/pilot3-tlfs/out"
 pilot5_out_path <- "pilot5-submission/pilot5-output/pilot5-tlfs/out"
-pilot5_out_files <- list.files(pilot5_out_path)
+pilot5_out_files <- list.files(pilot5_out_path, pattern = ".out")
 
 pilot3_rtf_path <- "pilot5-submission/pilot5-output/pilot3-tlfs/rtf"
 pilot5_rtf_path <- "pilot5-submission/pilot5-output/pilot5-tlfs/rtf"
-pilot5_rtf_files <- list.files(pilot5_rtf_path)
+pilot5_rtf_files <- list.files(pilot5_rtf_path, pattern = ".rtf")
 
 pilot3_pdf_path <- "pilot5-submission/pilot5-output/pilot3-tlfs/pdf"
 pilot5_pdf_path <- "pilot5-submission/pilot5-output/pilot5-tlfs/pdf"
-pilot5_pdf_files <- list.files(pilot5_pdf_path)
+pilot5_pdf_files <- list.files(pilot5_pdf_path, pattern = ".pdf")
 
   chat <- chat_anthropic()
   prompt <- "compare these two images and provide a detailed list of any differences found between them? Also, please provide an overall assessment of whether these images appear to be similar enough where a human reviewer would draw the same general conclusion. Finally, give a score from 0-100 of how similar the images are, where 100 is an exact pixel-perfect match and 0 is they are completely different."
@@ -77,7 +77,7 @@ for (i in pilot5_out_files) {
    cat("\n\n")
 
 }
-
+sink()
 
 ```
 
@@ -110,7 +110,7 @@ for (i in pilot5_pdf_files) {
 new_image <- content_image_file(new_png_path)
 comp_image <- content_image_file(comp_png_path)
 
-    res <- chat$structured_chat(
+    res <- chat$chat_structured(
     prompt,
     new_image,
     comp_image,
@@ -149,7 +149,7 @@ for (i in pilot5_rtf_files) {
    system(
     paste0(
         "libreoffice --headless --convert-to pdf --outdir ",
-        pilot5_rtf_path, " ", new_pdf_path
+        pilot5_rtf_path, " ", new_tlf_path
     ),
     intern = TRUE,
     ignore.stdout = FALSE,
@@ -160,7 +160,7 @@ for (i in pilot5_rtf_files) {
        system(
     paste0(
         "libreoffice --headless --convert-to pdf --outdir ",
-        pilot3_rtf_path, " ", comp_pdf_path
+        pilot3_rtf_path, " ", comp_tlf_path
     ),
     intern = TRUE,
     ignore.stdout = FALSE,
@@ -169,14 +169,14 @@ for (i in pilot5_rtf_files) {
   )
     
     system(
-    paste0("convert -adjoin ", new_tlf_path, " ", new_png_path),
+    paste0("convert -adjoin -append ", new_pdf_path, " ", new_png_path),
     intern = TRUE,
-    ignore.stdout = TRUE,
-    ignore.stderr = TRUE,
+    ignore.stdout = FALSE,
+    ignore.stderr = FALSE,
     wait = TRUE
     )
     system(
-    paste0("convert -adjoin ", comp_tlf_path, " ", comp_png_path),
+    paste0("convert -adjoin -append ", comp_pdf_path, " ", comp_png_path),
     intern = TRUE,
     ignore.stdout = TRUE,
     ignore.stderr = TRUE,
@@ -186,7 +186,7 @@ for (i in pilot5_rtf_files) {
     new_image <- content_image_file(new_png_path)
     comp_image <- content_image_file(comp_png_path)
 
-    res <- chat$structured_chat(
+    res <- chat$chat_structured(
     prompt,
     new_image,
     comp_image,
