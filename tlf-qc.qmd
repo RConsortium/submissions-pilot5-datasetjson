@@ -1,0 +1,225 @@
+---
+title: "QC Report"
+format: html
+date: "`r Sys.Date()`"
+editor: visual
+execute:
+  keep-md: true
+---
+
+```{r, echo = FALSE}
+library(waldo)
+library(ellmer)
+library(stringr)
+library()
+```
+
+This is the QC report dated `r Sys.Date()`. The report compares the datasets in the `pilot5-submission/pilot5-input/adamdata` directory with the datasets in the `~/GitHub/submissions-pilot3-adam/submission/adam` directory. The datasets are compared using the `diffdf` package.
+
+This run was initiated by `r Sys.getenv("GITHUB_ACTOR")` on the `r Sys.getenv("GITHUB_REF")` Git ref.
+
+```{r session_info}
+#| echo: false
+sessionInfo()
+```
+
+```{r path_setup}
+
+pilot3_out_path <- "pilot5-submission/pilot5-output/pilot3-tlfs/out"
+pilot5_out_path <- "pilot5-submission/pilot5-output/pilot5-tlfs/out"
+pilot5_out_files <- list.files(pilot5_out_path)
+
+pilot3_rtf_path <- "pilot5-submission/pilot5-output/pilot3-tlfs/rtf"
+pilot5_rtf_path <- "pilot5-submission/pilot5-output/pilot5-tlfs/rtf"
+pilot5_rtf_files <- list.files(pilot5_rtf_path)
+
+pilot3_pdf_path <- "pilot5-submission/pilot5-output/pilot3-tlfs/pdf"
+pilot5_pdf_path <- "pilot5-submission/pilot5-output/pilot5-tlfs/pdf"
+pilot5_pdf_files <- list.files(pilot5_pdf_path)
+
+  chat <- chat_anthropic()
+  prompt <- "compare these two images and provide a detailed list of any differences found between them? Also, please provide an overall assessment of whether these images appear to be similar enough where a human reviewer would draw the same general conclusion. Finally, give a score from 0-100 of how similar the images are, where 100 is an exact pixel-perfect match and 0 is they are completely different."
+
+  type_qc_diff <- type_object(
+    difference_list = type_string(),
+    same_conclusion = type_boolean(),
+    difference_score = type_integer()
+  )
+  type_qc_diffs <- type_array(items = type_qc_diff)
+```
+
+```{r sink_setup}
+sink("qc-tlf.Rmd", append = TRUE)
+cat("## TLF QC Check Complete!", "\n\n")
+cat("Date: ", Sys.Date(), "\n")
+cat("Run by: ", Sys.getenv('GITHUB_ACTOR'), "\n")
+cat("Git Ref: ", Sys.getenv("GITHUB_REF"), "\n")
+sink()
+
+```
+
+```{r out_compare}
+sink("qc-tlf.Rmd", append = TRUE)
+
+for (i in pilot5_out_files) {
+
+    new_tlf_path <- file.path(pilot5_out_path, i)
+    comp_tlf_path <- file.path(pilot3_out_path, sub("pilot5", "pilot3", i))
+
+  diffs <- waldo::compare(readLines(new_dataset), readLines(comp_dataset))
+
+  cat("<details>\n")
+  status_emoji <- if (length(diffs) == 0) "✅" else "❌"
+  cat(str_glue("<summary>{status_emoji} Dataset: {y}</summary>\n\n"))
+  cat("\n\n```\n\n")
+  print(diffs)
+  cat("```\n\n")
+  cat("</details>")
+   cat("\n\n")
+
+}
+
+
+>   chat$chat_strcutured(
+    prompt,
+    new_image,
+    compare_image,
+    type = type_qc_diffs
+  )
+sink()
+system(
+    paste0(
+        "libreoffice --headless, --convert-to pdf --outdir ",
+        pilot5_rtf_path, " ", pilot5_rtf_path, "/new_file"
+    )
+  )
+
+  Sys.setenv("LD_LIBRARY_PATH" = paste0("/usr/lib/libreoffice/program:", Sys.getenv("LD_LIBRARY_PATH")))
+   system(
+    paste0(
+        "libreoffice --headless --convert-to pdf --outdir ",
+        pilot5_rtf_path, " ", pilot5_rtf_path, "/", new_file
+    ),
+    intern = TRUE,
+    ignore.stdout = FALSE,
+    ignore.stderr = FALSE,
+    wait = TRUE
+  )
+
+  convert /home/eli/submissions-pilot5-datasetjson/pilot5-submission/pilot5-output/pilot5-tlfs/rtf/tlf-efficacy-pilot5.rtf as a Writer document -> /home/eli/submissions-pilot5-datasetjson/pilot5-submission/pilot5-output/pilot5-tlfs/rtf/tlf-efficacy-pilot5.pdf using filter 
+
+  system(
+    paste0("convert -adjoin ", new_pdf_path, " ", new_png_path),
+    intern = TRUE,
+    ignore.stdout = TRUE,
+    ignore.stderr = TRUE,
+    wait = TRUE
+    )
+```
+
+
+```{r pdf_compare}
+sink("qc-tlf.Rmd", append = TRUE)
+
+for (i in pilot5_pdf_files) {
+
+    new_tlf_path <- file.path(pilot5_pdf_path, i)
+    #new_png_path <- sub(".pdf", ".png", new_tlf_path)
+    new_png_path <- tempfile(fileext = ".png")
+    comp_tlf_path <- file.path(pilot3_pdf_path, sub("pilot5", "pilot3", i))
+    #comp_png_path <- sub(".pdf", ".png", comp_tlf_path)
+    comp_png_path <- tempfile(fileext = ".png")
+
+    system(
+    paste0("convert -adjoin ", new_tlf_path, " ", new_png_path),
+    intern = TRUE,
+    ignore.stdout = TRUE,
+    ignore.stderr = TRUE,
+    wait = TRUE
+    )
+    system(
+    paste0("convert -adjoin ", comp_tlf_path, " ", comp_png_path),
+    intern = TRUE,
+    ignore.stdout = TRUE,
+    ignore.stderr = TRUE,
+    wait = TRUE
+    )
+
+new_image <- content_image_file(new_png_path)
+comp_image <- content_image_file(comp_png_path)
+
+    res <- chat$chat_strcutured(
+    prompt,
+    new_image,
+    compare_image,
+    type = type_qc_diffs
+  )
+
+  cat("<details>\n")
+  status_emoji <- if (res$same_conclusion) "✅" else "❌"
+  cat(str_glue("<summary>{status_emoji} TLF: {i} - Score: {res$difference_score}</summary>\n\n"))
+  cat("\n\n```\n\n")
+  print(res$difference_list)
+  cat("```\n\n")
+  cat("</details>")
+   cat("\n\n")
+
+}
+
+sink()
+```
+
+
+```{r rtf_compare}
+sink("qc-tlf.Rmd", append = TRUE)
+
+for (i in pilot5_rtf_files) {
+
+    new_tlf_path <- file.path(pilot5_rtf_path, i)
+    #new_png_path <- sub(".pdf", ".png", new_tlf_path)
+    new_pdf_path <- tempfile(fileext = ".pdf")
+    new_png_path <- tempfile(fileext = ".png")
+    comp_tlf_path <- file.path(pilot3_rtf_path, sub("pilot5", "pilot3", i))
+    #comp_png_path <- sub(".pdf", ".png", comp_tlf_path)
+    comp_pdf_path <- tempfile(fileext = ".pdf")
+    comp_png_path <- <- tempfile(fileext = ".png")
+
+    system(
+    paste0("convert -adjoin ", new_tlf_path, " ", new_png_path),
+    intern = TRUE,
+    ignore.stdout = TRUE,
+    ignore.stderr = TRUE,
+    wait = TRUE
+    )
+    system(
+    paste0("convert -adjoin ", comp_tlf_path, " ", comp_png_path),
+    intern = TRUE,
+    ignore.stdout = TRUE,
+    ignore.stderr = TRUE,
+    wait = TRUE
+    )
+
+    new_image <- content_image_file(new_png_path)
+    comp_image <- content_image_file(comp_png_path)
+
+    res <- chat$chat_strcutured(
+    prompt,
+    new_image,
+    compare_image,
+    type = type_qc_diffs
+  )
+
+  cat("<details>\n")
+  status_emoji <- if (res$same_conclusion) "✅" else "❌"
+  cat(str_glue("<summary>{status_emoji} TLF: {i} - Score: {res$difference_score}</summary>\n\n"))
+  cat("\n\n```\n\n")
+  print(res$difference_list)
+  cat("```\n\n")
+  cat("</details>")
+   cat("\n\n")
+
+}
+
+sink()
+
+```
