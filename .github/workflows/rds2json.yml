@@ -67,6 +67,5 @@ jobs:
           message: |
              Hello world ! :wave: :stop_sign:  :white_check_mark:
              :sunrise_over_mountains:
-	     ${{ github.event.name }}
 
 
