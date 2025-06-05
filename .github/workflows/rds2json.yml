@@ -1,30 +1,19 @@
-name: 50_Convert RDS files to DATASETJSON files
+name: 50_Convert RDS to JSON
 
 on:
-#  workflow_dispatch:
-#  pull_request:
-  push:
+  pull_request:
     branches:
-      - '50_automatic_convert_rds_to_json'
+      - main 
     paths:
       - '**/*.rds'
       - '**/*.yml'
       - '**/*.yaml'
-#on:
-#  pull_request:
-#    branches:
-#      - main
-
-### 3 comment
-
-
 
 run-name: 50_Try \#${{ github.run_number }}, @${{ github.actor }}, ${{ github.event }}, ${{ github.ref_name}}
 
 concurrency:
   group: lint-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
-## 2 comment
 
 jobs:
   convert_rds:
@@ -37,7 +26,6 @@ jobs:
       - name: Check out this repository & branch
         uses: actions/checkout@v4
         with:
-          ref: '50_automatic_convert_rds_to_json'
 
       - name: Set up R
         uses: r-lib/actions/setup-r@v2
@@ -63,7 +51,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-#          file-path: qc.Rmd
       - name: PR comment with file
         uses: thollander/actions-comment-pull-request@v3
         with:
