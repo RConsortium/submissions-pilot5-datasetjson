@@ -8,7 +8,8 @@ on:
       - '50_automatic_convert_rds_to_json'
     paths:
       - '**/*.rds'
-      - '.github/workflows/*.yml'
+      - '**/*.yml'
+      - '**/*.yaml'
 #on:
 #  pull_request:
 #    branches:
