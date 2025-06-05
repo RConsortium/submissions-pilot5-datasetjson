@@ -1,22 +1,27 @@
-name: Convert RDS files to DATASETJSON files
+name: 50_Convert RDS files to DATASETJSON files
 
-#on:
-#  workflow_dispatch:
-#  push:
-#    branches:
-#      - '50_automatic_convert_rds_to_json'
-#    paths:
-#      - '**/*.rds'
 on:
-  pull_request:
+#  workflow_dispatch:
+  push:
     branches:
-      - main
+      - '50_automatic_convert_rds_to_json'
+    paths:
+      - '**/*.rds'
+#on:
+#  pull_request:
+#    branches:
+#      - main
 
-run-name: Try ${{ github.run_number }}, @${{ github.actor }}, ${{ github.event }}
+### 3 comment
+
+
+
+run-name: 50_Try ${{ github.run_number }}, @${{ github.actor }}, ${{ github.event }}, ${{ github.ref_name}}
 
 concurrency:
   group: lint-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
+## 2 comment
 
 jobs:
   convert_rds:
@@ -62,3 +67,6 @@ jobs:
           message: |
              Hello world ! :wave: :stop_sign:  :white_check_mark:
              :sunrise_over_mountains:
+	     ${{ github.event.name }}
+
+
