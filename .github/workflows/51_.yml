@@ -34,16 +34,16 @@ jobs:
     runs-on: ubuntu-latest
     env:
          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-#    container:
-#         image:  rocker/r-ver:latest
+    container:
+         image:  rocker/r-ver:latest
     steps:
       - name: Check out this repository & branch
         uses: actions/checkout@v4
         with:
           ref: '50_automatic_convert_rds_to_json'
 
-      - name: Set up R
-        uses: r-lib/actions/setup-r@v2
+#      - name: Set up R
+#        uses: r-lib/actions/setup-r@v2
 
       - name: Install R dependencies
         run: |
@@ -52,7 +52,7 @@ jobs:
 
       - name: run code rds to json
         run: |
-          Rscript -e 'source("pilot5-submission/pilot5-programs/convert_rds_to_json.r")'
+#          Rscript -e 'source("pilot5-submission/pilot5-programs/convert_rds_to_json.r")'
         shell: bash
 
       - name: Commit
