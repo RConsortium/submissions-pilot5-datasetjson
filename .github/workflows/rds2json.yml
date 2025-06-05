@@ -19,7 +19,7 @@ on:
 
 
 
-run-name: 50_Try #${{ github.run_number }}, @${{ github.actor }}, ${{ github.event }}, ${{ github.ref_name}}
+run-name: 50_Try \#${{ github.run_number }}, @${{ github.actor }}, ${{ github.event }}, ${{ github.ref_name}}
 
 concurrency:
   group: lint-${{ github.event.pull_request.number || github.ref }}
