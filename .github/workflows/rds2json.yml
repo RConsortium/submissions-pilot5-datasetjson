@@ -9,7 +9,6 @@ on:
     paths:
       - '**/*.rds'
       - '.github/workflows/*.yml'
-      
 #on:
 #  pull_request:
 #    branches:
