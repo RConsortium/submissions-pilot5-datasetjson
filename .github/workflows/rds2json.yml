@@ -1,7 +1,7 @@
 name: 50_Convert RDS files to DATASETJSON files
 
 on:
-#  workflow_dispatch:
+  workflow_dispatch:
   push:
     branches:
       - '50_automatic_convert_rds_to_json'
