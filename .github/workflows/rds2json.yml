@@ -9,7 +9,7 @@ on:
       - '**/*.yml'
       - '**/*.yaml'
 
-run-name: 50_Try \#${{ github.run_number }}, @${{ github.actor }}, ${{ github.event }}, ${{ github.ref_name}}
+run-name: 50_ Convert RDS to JSON ( \#${{ github.run_number }}, @${{ github.actor }}, ${{ github.event }}, ${{ github.ref_name}})
 
 concurrency:
   group: lint-${{ github.event.pull_request.number || github.ref }}
@@ -25,7 +25,6 @@ jobs:
     steps:
       - name: Check out this repository & branch
         uses: actions/checkout@v4
-        with:
 
       - name: Set up R
         uses: r-lib/actions/setup-r@v2
