@@ -25,6 +25,8 @@ jobs:
     steps:
       - name: Check out this repository & branch
         uses: actions/checkout@v4
+        with:
+          ref:  ${{ github.head_ref }}    # required for PR
 
       - name: Set up R
         uses: r-lib/actions/setup-r@v2
