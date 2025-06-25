@@ -128,8 +128,10 @@ adtte <- adtte_pre %>%
   set_variable_labels(adtte_spec) %>%
   xportr_label(adtte_spec) %>%
   xportr_df_label(adtte_spec, domain = "adtte") %>%
+  #nolint start
   xportr_format(adtte_spec$var_spec %>%
     mutate_at(c("format"), ~ replace_na(., "")), "ADTTE") %>%
+  #nolint end
   convert_na_to_blanks()
 
 # FIX: attribute issues where sas.format attributes set to DATE9. are changed to DATE9,
