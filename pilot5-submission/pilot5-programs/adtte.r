@@ -114,7 +114,8 @@ adtte_pre <- derive_param_tte(
     TRTAN = TRT01AN,
     TRTDUR = TRTDURD,
     TRTP = TRT01P
-  )
+  ) %>%
+  mutate(CNSR = as.numeric(CNSR))
 
 # Export to xpt ----------------
 adtte <- adtte_pre %>%
@@ -124,7 +125,7 @@ adtte <- adtte_pre %>%
   sort_by_key(adtte_spec) %>%
   set_variable_labels(adtte_spec) %>%
   xportr_label(adtte_spec) %>%  
-  xportr_df_label(adtte_spec, domain = "adsl") %>% 
+  xportr_df_label(adtte_spec, domain = "adtte") %>% 
   xportr_format(adtte_spec$var_spec %>%
                   mutate_at(c("format"), ~ replace_na(., "")), "ADTTE")
 

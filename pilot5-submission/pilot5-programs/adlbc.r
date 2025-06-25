@@ -1,4 +1,16 @@
-# Set up ------------------------------------------------------------------
+#************************************************************************
+# Purpose:     Generate ADLBC dataset
+# Input:       LB, SUPPLB, and ADSL datasets
+# Output:      adlbc.rds
+#************************************************************************
+
+# Note to Reviewer
+# To rerun the code below, please refer ADRG appendix.
+# After required package are installed, the path variable needs to be defined
+# in the .Rprofile file
+
+# Setup -----------------
+## Load libraries -------
 library(dplyr)
 library(tidyr)
 library(admiral)
@@ -7,48 +19,30 @@ library(metatools)
 library(stringr)
 library(pilot5utils)
 
-# read source -------------------------------------------------------------
-## Laboratory Tests Results (LB)
-lb <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "lb.rds")))
+## Load datasets ------------
+dat_to_load <- list(lb = file.path(path$sdtm, "lb.rds"),
+                    supplb = file.path(path$sdtm, "supplb.rds"),
+                    adsl = file.path(path$adam, "adsl.rds"))
 
-## Supplemental Qualifiers for LB (SUPPLB)
-supplb <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "supplb.rds")))
+datasets <- map(
+  dat_to_load,
+  ~convert_blanks_to_na(readRDS(.x))
+)
 
-# Read and convert NA for ADaM DATASET
-## Subject-Level Analysis
-adsl <- convert_blanks_to_na(readRDS(file.path(path$adam, "adsl.rds")))
+list2env(datasets, envir = .GlobalEnv)
 
-# create labels
-metacore <- spec_to_metacore(file.path(path$adam, "adam-pilot-5.xlsx"), where_sep_sheet = FALSE, quiet = TRUE)
+## Load dataset specs -----------
+metacore <- spec_to_metacore(
+  file.path(path$adam, "adam-pilot-5.xlsx"),
+  where_sep_sheet = FALSE
+)
 
+### Get the specifications for the dataset we are currently building
 adlbc_spec <- metacore %>%
   select_dataset("ADLBC")
 
-# Formats -----------------------------------------------------------------
-## map parameter code and parameter
-format_paramn <- function(x) {
-  dplyr::case_when(
-    x == "SODIUM" ~ 18,
-    x == "K" ~ 19,
-    x == "CL" ~ 20,
-    x == "BILI" ~ 21,
-    x == "ALP" ~ 22,
-    x == "GGT" ~ 23,
-    x == "ALT" ~ 24,
-    x == "AST" ~ 25,
-    x == "BUN" ~ 26,
-    x == "CREAT" ~ 27,
-    x == "URATE" ~ 28,
-    x == "PHOS" ~ 29,
-    x == "CA" ~ 30,
-    x == "GLUC" ~ 31,
-    x == "PROT" ~ 32,
-    x == "ALB" ~ 33,
-    x == "CHOL" ~ 34,
-    x == "CK" ~ 35
-  )
-}
-# Add supplemental information --------------------------------------------
+# Create ADLBC dataset -----------------
+## Add supplemental information ----------
 sup <- supplb %>%
   select(STUDYID, USUBJID, IDVAR, IDVARVAL, QNAM, QLABEL, QVAL) %>%
   pivot_wider(
@@ -63,21 +57,36 @@ adlb00 <- lb %>%
   left_join(sup, by = c("STUDYID", "USUBJID", "LBSEQ")) %>%
   filter(LBCAT == "CHEMISTRY")
 
-# ADSL information --------------------------------------------------------
-
-adsl <- adsl %>%
-  select(
-    STUDYID, SUBJID, USUBJID, TRT01PN, TRT01P, TRT01AN, TRT01A, TRTSDT, TRTEDT, AGE, AGEGR1, AGEGR1N, RACE, RACEN, SEX,
-    COMP24FL, DSRAEFL, SAFFL
-  )
-
-
+## ADSL information ----------------------------------------------
+adsl_vars <- exprs(
+  STUDYID,
+  SUBJID,
+  USUBJID,
+  TRT01PN,
+  TRT01P,
+  TRT01AN,
+  TRT01A,
+  TRTSDT,
+  TRTEDT,
+  AGE,
+  AGEGR1,
+  AGEGR1N,
+  RACE,
+  RACEN,
+  SEX,
+  COMP24FL,
+  DSRAEFL,
+  SAFFL
+)
 
 adlb01 <- adlb00 %>%
-  left_join(adsl, by = c("STUDYID", "USUBJID"))
+  derive_vars_merged(
+    dataset_add = adsl,
+    new_vars = adsl_vars,
+    by = exprs(STUDYID, USUBJID)
+  ) 
 
-# Dates -------------------------------------------------------------------
-
+## Dates -------------------------------------------
 adlb02 <- adlb01 %>%
   derive_vars_dt(
     new_vars_prefix = "A",
@@ -86,31 +95,26 @@ adlb02 <- adlb01 %>%
   ) %>%
   derive_vars_dy(reference_date = TRTSDT, source_vars = exprs(ADT))
 
-
-
-# AVAL(C) -----------------------------------------------------------------
+## AVAL(C) ------------------------------------------------
 # No imputations are done for values below LL or above UL
-
 adlb03 <- adlb02 %>%
   mutate(
     AVAL = LBSTRESN,
     AVALC = ifelse(!is.na(AVAL), LBSTRESC, NA)
   )
 
-# Parameter ---------------------------------------------------------------
-
+## Parameter --------------------------------------------
 adlb04 <- adlb03 %>%
   mutate(
     PARAM = paste0(LBTEST, " (", LBSTRESU, ")"),
     PARAMCD = LBTESTCD,
-    PARAMN = format_paramn(LBTESTCD),
-    PARCAT1 = "CHEM" # changed to match prod dataset
-  )
+    PARCAT1 = "CHEM"
+  ) %>%
+  create_var_from_codelist(metacore = adlbc_spec,
+                           input_var = PARAM,
+                           out_var = PARAMN)
 
-# Baseline ----------------------------------------------------------------
-## updating to use admiral programming
-
-
+## Baseline ----------------------------------
 adlb05 <- adlb04 %>%
   mutate(ABLFL = LBBLFL) %>%
   derive_var_base(
@@ -122,8 +126,7 @@ adlb05 <- adlb04 %>%
   mutate(CHG = ifelse(VISITNUM == 1, NA, CHG))
 
 
-# VISITS ------------------------------------------------------------------
-
+## Visits ------------------------------
 eot <- adlb05 %>%
   filter(ENDPOINT == "Y" | VISITNUM == 12) %>%
   mutate(
@@ -132,13 +135,10 @@ eot <- adlb05 %>%
     AENTMTFL = "Y"
   )
 
-
 adlb06 <- adlb05 %>%
-  filter(
-    grepl("WEEK", VISIT, fixed = TRUE) |
-      grepl("UNSCHEDULED", VISIT, fixed = TRUE) |
-      grepl("SCREENING", VISIT, fixed = TRUE)
-  ) %>% # added conditions to include screening and unscheduled visits
+  filter(grepl("WEEK", VISIT, fixed = TRUE) |
+           grepl("UNSCHEDULED", VISIT, fixed = TRUE) |
+           grepl("SCREENING", VISIT, fixed = TRUE)) %>%
   mutate(
     AVISIT = case_when(
       ABLFL == "Y" ~ "Baseline",
@@ -157,7 +157,6 @@ adlb06 <- adlb05 %>%
   )
 
 # get EOT for those that did not make it to week 24
-
 eot2 <- adlb06 %>%
   arrange(STUDYID, USUBJID, PARAMCD, desc(AVISITN)) %>%
   group_by(STUDYID, USUBJID, PARAMCD) %>%
@@ -170,7 +169,6 @@ eot2 <- adlb06 %>%
     AENTMTFL = "Y"
   )
 
-
 adlb07 <- adlb06 %>%
   filter(VISITNUM <= 12 & AVISITN > 0 & AVISITN != 99 & !grepl("UN", VISIT)) %>%
   group_by(USUBJID, PARAMCD) %>%
@@ -182,9 +180,7 @@ adlb07 <- adlb06 %>%
   rbind(eot2) %>%
   ungroup()
 
-# Limits ------------------------------------------------------------------
-
-# updating to use admiral dataset
+## Limits -----------------------------------
 adlb08 <- adlb07 %>%
   mutate(
     ANRLO = LBSTNRLO,
@@ -210,7 +206,7 @@ adlb08 <- adlb07 %>%
   ungroup() %>%
   select(-ONE, -TWO)
 
-# Derive ANL01FL
+## Derive ANL01FL -----------
 adlb09 <- adlb08 %>%
   filter((VISITNUM >= 4 & VISITNUM <= 12) & !grepl("UN", VISIT)) %>%
   group_by(USUBJID, PARAMCD) %>%
@@ -221,27 +217,38 @@ adlb09 <- adlb08 %>%
   arrange(desc(ANL01FL)) %>%
   select(USUBJID, PARAMCD, LBSEQ, ANL01FL) %>%
   slice(1) %>%
-  full_join(adlb08, by = c("USUBJID", "PARAMCD", "LBSEQ"), multiple = "all") %>%
-  ungroup()
+  full_join(adlb08, by = c("USUBJID", "PARAMCD", "LBSEQ"), multiple = "all")
 
-# Treatment Vars ------------------------------------------------------------
-## ADLBC Production data
-adlbc <- adlb09 %>%
+# Export to xpt ---------------
+adlbc10 <- adlb09 %>%
   mutate(
     TRTP = TRT01P,
     TRTPN = TRT01PN,
     TRTA = TRT01A,
     TRTAN = TRT01AN
-  ) %>%
+  )
+
+adlbc <- adlbc10 %>%
   drop_unspec_vars(adlbc_spec) %>%
-  mutate_if(is.character, ~ replace_na(., "")) %>%
+  check_ct_data(adlbc_spec, na_acceptable = TRUE) %>%
   order_cols(adlbc_spec) %>%
-  set_variable_labels(adlbc_spec)
+  convert_na_to_blanks() %>%
+  set_variable_labels(adlbc_spec) %>%
+  xportr_label(adlbc_spec) %>%
+  xportr_df_label(adlbc_spec, domain = "adlbc") %>%
+  xportr_format(adlbc_spec$var_spec %>% mutate_at(c("format"), ~ replace_na(., "")),
+                "ADLBC")
 
-### Update format.sas attribute
-attr(adlbc$ADT, "format.sas") <- "DATE9"
-attr(adlbc$TRTEDT, "format.sas") <- "DATE9"
-attr(adlbc$TRTSDT, "format.sas") <- "DATE9"
+# FIX: attribute issues where sas.format attributes set to DATE9. are changed to DATE9,
+# and missing formats are set to NULL (instead of an empty character vector)
+# when reading original xpt file
+for (col in colnames(adlbc)) {
+  if (attr(adlbc[[col]], "format.sas") == "") {
+    attr(adlbc[[col]], "format.sas") <- NULL
+  } else if (attr(adlbc[[col]], "format.sas") == "DATE9.") {
+    attr(adlbc[[col]], "format.sas") <- "DATE9"
+  }
+}
 
-# saving the dataset as RDS format
+# Saving the dataset as rds format -------
 saveRDS(adlbc, file.path(path$adam, "adlbc.rds"))
