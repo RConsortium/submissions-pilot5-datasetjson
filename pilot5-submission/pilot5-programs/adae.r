@@ -1,22 +1,16 @@
+#************************************************************************
+# Purpose:     Generate ADAE dataset
+# Input:       AE, SUPPAE, and ADSL datasets
+# Output:      adae.rds
+#************************************************************************
+
 # Note to Reviewer
 # To rerun the code below, please refer ADRG appendix.
-# After required package are installed.
-# The path variable needs to be defined by using example code below
-#
-# nolint start
-# path <- list(
-# sdtm = "path/to/esub/tabulations/sdtm", # Modify path to the sdtm location
-# adam = "path/to/esub/analysis/adam"     # Modify path to the adam location
-# )
-# nolint end
+# After required package are installed, the path variable needs to be defined
+# in the .Rprofile file
 
-###########################################################################
-#' developers : Phani Tata/Joel Laxamana
-#' date: 07FEB2023
-#' modification History:
-#' program: adae.R
-###########################################################################
-
+# Setup -----------------
+## Load libraries -------
 library(admiral)
 library(dplyr)
 library(tidyr)
@@ -26,22 +20,30 @@ library(metacore)
 library(metatools)
 library(haven)
 
-# read in AE ----------
-ae <- readRDS(file.path(path$sdtm, "ae.rds"))
-suppae <- readRDS(file.path(path$sdtm, "suppae.rds"))
+## Load datasets ------------
+dat_to_load <- list(ae = file.path(path$sdtm, "ae.rds"),
+                    suppae = file.path(path$sdtm, "suppae.rds"),
+                    adsl = file.path(path$adam, "adsl.rds"))
 
+datasets <- map(
+  dat_to_load,
+  ~convert_blanks_to_na(readRDS(.x))
+)
 
-# read in ADSL ------------
-adsl <- readRDS(file.path(path$adam, "adsl.rds"))
+list2env(datasets, envir = .GlobalEnv)
 
-# ADAE derivation start ------------
-# Read in specifications from define
-## placeholder for origin=predecessor, use metatool::build_from_derived()
-metacore <- spec_to_metacore(file.path(path$adam, "adam-pilot-5.xlsx"), where_sep_sheet = FALSE, quiet = TRUE)
-adae_spec <- metacore %>% select_dataset("ADAE") # Get the specifications for the dataset we are currently building
+## Load dataset specs -----------
+metacore <- spec_to_metacore(
+  file.path(path$adam, "adam-pilot-5.xlsx"),
+  where_sep_sheet = FALSE
+)
 
+### Get the specifications for the dataset we are currently building
+adae_spec <- metacore %>%
+  select_dataset("ADAE")
 
-# Get list of ADSL vars -----------------
+# Create ADAE dataset -----------------
+## Get list of ADSL vars
 adsl_vars <- exprs(
   TRTSDT,
   TRTEDT,
@@ -60,7 +62,7 @@ adsl_vars <- exprs(
   TRTEDT
 )
 
-# Merge adsl to ae ----------------------
+## Merge adsl to ae
 adae0 <- ae %>%
   derive_vars_merged(
     dataset_add = adsl,
@@ -118,7 +120,7 @@ adae0 <- ae %>%
       new_var = AOCCFL,
       mode = "first"
     ), filter = TRTEMFL == "Y"
-  ) %>%
+  ) %>% 
   # AOCCSFL - 1st Occurrence of SOC Flag
   restrict_derivation(
     derivation = derive_var_extreme_flag,
@@ -128,7 +130,7 @@ adae0 <- ae %>%
       new_var = AOCCSFL,
       mode = "first"
     ), filter = TRTEMFL == "Y"
-  ) %>%
+  ) %>% 
   # AOCCPFL - 1st Occurrence of Preferred Term Flag
   restrict_derivation(
     derivation = derive_var_extreme_flag,
@@ -138,7 +140,7 @@ adae0 <- ae %>%
       new_var = AOCCPFL,
       mode = "first"
     ), filter = TRTEMFL == "Y"
-  ) %>%
+  ) %>% 
   # AOCC02FL - 1st Occurrence 02 Flag for Serious
   restrict_derivation(
     derivation = derive_var_extreme_flag,
@@ -148,7 +150,7 @@ adae0 <- ae %>%
       new_var = AOCC02FL,
       mode = "first"
     ), filter = TRTEMFL == "Y" & AESER == "Y"
-  ) %>%
+  ) %>% 
   # AOCC03FL - 1st Occurrence 03 Flag for Serious SOC
   restrict_derivation(
     derivation = derive_var_extreme_flag,
@@ -158,7 +160,7 @@ adae0 <- ae %>%
       new_var = AOCC03FL,
       mode = "first"
     ), filter = TRTEMFL == "Y" & AESER == "Y"
-  ) %>%
+  ) %>% 
   # AOCC04FL - 1st Occurrence 04 Flag for Serious PT
   restrict_derivation(
     derivation = derive_var_extreme_flag,
@@ -168,7 +170,7 @@ adae0 <- ae %>%
       new_var = AOCC04FL,
       mode = "first"
     ), filter = TRTEMFL == "Y" & AESER == "Y"
-  ) %>%
+  ) %>% 
   # CQ01NAM - Customized Query 01 Name
   mutate(
     CQ01NAM = ifelse(
@@ -177,11 +179,10 @@ adae0 <- ae %>%
         str_detect(AEDECOD, "ERYTHEMA") |
         str_detect(AEDECOD, "BLISTER") |
         str_detect(AEBODSYS, "SKIN AND SUBCUTANEOUS TISSUE DISORDERS") &
-          !str_detect(AEDECOD, "COLD SWEAT|HYPERHIDROSIS|ALOPECIA"),
+        !str_detect(AEDECOD, "COLD SWEAT|HYPERHIDROSIS|ALOPECIA"),
       "DERMATOLOGIC EVENTS",
       NA_character_
-    )
-  ) %>%
+    )) %>% 
   # AOCC01FL - 1st Occurrence 01 Flag for CQ01
   restrict_derivation(
     derivation = derive_var_extreme_flag,
@@ -193,31 +194,21 @@ adae0 <- ae %>%
     ), filter = TRTEMFL == "Y" & CQ01NAM == "DERMATOLOGIC EVENTS"
   )
 
-# ADAE derivation end
-
-# Create final ADAE --------
-# Check variables against define to ensure all variables specified (and no more) exist in the dataset,
-# and that all variables with CT only contain values within the CT
-# Assign dataset labels and var labels
+# Export to xpt ---------------
 adae <- adae0 %>%
   drop_unspec_vars(adae_spec) %>%
   check_ct_data(adae_spec, na_acceptable = TRUE) %>%
   order_cols(adae_spec) %>%
   sort_by_key(adae_spec) %>%
+  set_variable_labels(adae_spec) %>%
   xportr_df_label(adae_spec, domain = "ADAE") %>%
   xportr_label(adae_spec) %>%
   xportr_format(adae_spec$var_spec, "ADAE") %>%
   convert_na_to_blanks()
 
-# NOTE : When reading in original ADAE dataset to check against, it
-# seems the sas.format attributes set to DATE9. are changed to DATE9,
-# i.e. without the dot[.] at the end. Additionally, missing formats are
-# set to NULL (instead of an empty character vector). So when calling
-# diffdf() the workaround is to also remove the dot[.] and change the empty
-# character vector in the sas.format in the dataset generated here.
-# This will make the sas.format comparisons equal in diffdf().
-# See code below for work around.
-#----------------------------------------------------------------------------------------
+# FIX: attribute issues where sas.format attributes set to DATE9. are changed to DATE9,
+# and missing formats are set to NULL (instead of an empty character vector)
+# when reading original xpt file
 for (col in colnames(adae)) {
   if (attr(adae[[col]], "format.sas") == "") {
     attr(adae[[col]], "format.sas") <- NULL
