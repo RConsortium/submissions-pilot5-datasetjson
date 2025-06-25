@@ -120,7 +120,7 @@ adae0 <- ae %>%
       new_var = AOCCFL,
       mode = "first"
     ), filter = TRTEMFL == "Y"
-  ) %>% 
+  ) %>%
   # AOCCSFL - 1st Occurrence of SOC Flag
   restrict_derivation(
     derivation = derive_var_extreme_flag,
@@ -130,7 +130,7 @@ adae0 <- ae %>%
       new_var = AOCCSFL,
       mode = "first"
     ), filter = TRTEMFL == "Y"
-  ) %>% 
+  ) %>%
   # AOCCPFL - 1st Occurrence of Preferred Term Flag
   restrict_derivation(
     derivation = derive_var_extreme_flag,
@@ -140,7 +140,7 @@ adae0 <- ae %>%
       new_var = AOCCPFL,
       mode = "first"
     ), filter = TRTEMFL == "Y"
-  ) %>% 
+  ) %>%
   # AOCC02FL - 1st Occurrence 02 Flag for Serious
   restrict_derivation(
     derivation = derive_var_extreme_flag,
@@ -150,7 +150,7 @@ adae0 <- ae %>%
       new_var = AOCC02FL,
       mode = "first"
     ), filter = TRTEMFL == "Y" & AESER == "Y"
-  ) %>% 
+  ) %>%
   # AOCC03FL - 1st Occurrence 03 Flag for Serious SOC
   restrict_derivation(
     derivation = derive_var_extreme_flag,
@@ -160,7 +160,7 @@ adae0 <- ae %>%
       new_var = AOCC03FL,
       mode = "first"
     ), filter = TRTEMFL == "Y" & AESER == "Y"
-  ) %>% 
+  ) %>%
   # AOCC04FL - 1st Occurrence 04 Flag for Serious PT
   restrict_derivation(
     derivation = derive_var_extreme_flag,
@@ -170,19 +170,18 @@ adae0 <- ae %>%
       new_var = AOCC04FL,
       mode = "first"
     ), filter = TRTEMFL == "Y" & AESER == "Y"
-  ) %>% 
+  ) %>%
   # CQ01NAM - Customized Query 01 Name
-  mutate(
-    CQ01NAM = ifelse(
-      str_detect(AEDECOD, "APPLICATION") |
-        str_detect(AEDECOD, "DERMATITIS") |
-        str_detect(AEDECOD, "ERYTHEMA") |
-        str_detect(AEDECOD, "BLISTER") |
-        str_detect(AEBODSYS, "SKIN AND SUBCUTANEOUS TISSUE DISORDERS") &
+  mutate(CQ01NAM = ifelse(
+    str_detect(AEDECOD, "APPLICATION") |
+      str_detect(AEDECOD, "DERMATITIS") |
+      str_detect(AEDECOD, "ERYTHEMA") |
+      str_detect(AEDECOD, "BLISTER") |
+      str_detect(AEBODSYS, "SKIN AND SUBCUTANEOUS TISSUE DISORDERS") &
         !str_detect(AEDECOD, "COLD SWEAT|HYPERHIDROSIS|ALOPECIA"),
-      "DERMATOLOGIC EVENTS",
-      NA_character_
-    )) %>% 
+    "DERMATOLOGIC EVENTS",
+    NA_character_
+  )) %>%
   # AOCC01FL - 1st Occurrence 01 Flag for CQ01
   restrict_derivation(
     derivation = derive_var_extreme_flag,

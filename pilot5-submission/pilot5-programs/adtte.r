@@ -72,11 +72,10 @@ adsl <- adsl %>%
       DSDECOD != "SCREEN FAILURE" &
       DSDECOD != "FINAL LAB VISIT"
   ) %>%
-  mutate(
-    EOS2DT = case_when(
-      DCDECOD == "DEATH" ~ as.Date(RFENDTC),
-      DCDECOD != "DEATH" ~ EOSDT
-    ))
+  mutate(EOS2DT = case_when(
+    DCDECOD == "DEATH" ~ as.Date(RFENDTC),
+    DCDECOD != "DEATH" ~ EOSDT
+  ))
 
 censor <- censor_source(
   dataset_name = "adsl",
@@ -119,15 +118,16 @@ adtte_pre <- derive_param_tte(
 
 # Export to xpt ----------------
 adtte <- adtte_pre %>%
-  drop_unspec_vars(adtte_spec) %>% 
+  drop_unspec_vars(adtte_spec) %>%
   check_ct_data(adtte_spec, na_acceptable = TRUE) %>%
-  order_cols(adtte_spec) %>% 
+  order_cols(adtte_spec) %>%
   sort_by_key(adtte_spec) %>%
   set_variable_labels(adtte_spec) %>%
-  xportr_label(adtte_spec) %>%  
-  xportr_df_label(adtte_spec, domain = "adtte") %>% 
+  xportr_label(adtte_spec) %>%
+  xportr_df_label(adtte_spec, domain = "adtte") %>%
   xportr_format(adtte_spec$var_spec %>%
-                  mutate_at(c("format"), ~ replace_na(., "")), "ADTTE")
+                  mutate_at(c("format"), ~ replace_na(., "")), "ADTTE") %>%
+  convert_na_to_blanks()
 
 # FIX: attribute issues where sas.format attributes set to DATE9. are changed to DATE9,
 # and missing formats are set to NULL (instead of an empty character vector)

@@ -84,7 +84,7 @@ adlb01 <- adlb00 %>%
     dataset_add = adsl,
     new_vars = adsl_vars,
     by = exprs(STUDYID, USUBJID)
-  ) 
+  )
 
 ## Dates -------------------------------------------
 adlb02 <- adlb01 %>%
