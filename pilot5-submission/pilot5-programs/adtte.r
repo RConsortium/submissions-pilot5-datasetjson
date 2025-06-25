@@ -19,20 +19,23 @@ library(metatools)
 library(pilot5utils)
 
 ## Load datasets ------------
-dat_to_load <- list(ds = file.path(path$sdtm, "ds.rds"),
-                    adsl = file.path(path$adam, "adsl.rds"),
-                    adae = file.path(path$adam, "adae.rds"))
+dat_to_load <- list(
+  ds = file.path(path$sdtm, "ds.rds"),
+  adsl = file.path(path$adam, "adsl.rds"),
+  adae = file.path(path$adam, "adae.rds")
+)
 
 datasets <- map(
   dat_to_load,
-  ~convert_blanks_to_na(readRDS(.x))
+  ~ convert_blanks_to_na(readRDS(.x))
 )
 
 list2env(datasets, envir = .GlobalEnv)
 
 ## Load dataset specs -----------
 metacore <- spec_to_metacore(file.path(path$adam, "adam-pilot-5.xlsx"),
-                             where_sep_sheet = FALSE)
+  where_sep_sheet = FALSE
+)
 
 ### Get the specifications for the dataset we are currently building
 adtte_spec <- metacore %>%
@@ -126,7 +129,7 @@ adtte <- adtte_pre %>%
   xportr_label(adtte_spec) %>%
   xportr_df_label(adtte_spec, domain = "adtte") %>%
   xportr_format(adtte_spec$var_spec %>%
-                  mutate_at(c("format"), ~ replace_na(., "")), "ADTTE") %>%
+    mutate_at(c("format"), ~ replace_na(., "")), "ADTTE") %>%
   convert_na_to_blanks()
 
 # FIX: attribute issues where sas.format attributes set to DATE9. are changed to DATE9,

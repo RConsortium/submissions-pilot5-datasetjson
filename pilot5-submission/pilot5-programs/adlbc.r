@@ -20,13 +20,15 @@ library(stringr)
 library(pilot5utils)
 
 ## Load datasets ------------
-dat_to_load <- list(lb = file.path(path$sdtm, "lb.rds"),
-                    supplb = file.path(path$sdtm, "supplb.rds"),
-                    adsl = file.path(path$adam, "adsl.rds"))
+dat_to_load <- list(
+  lb = file.path(path$sdtm, "lb.rds"),
+  supplb = file.path(path$sdtm, "supplb.rds"),
+  adsl = file.path(path$adam, "adsl.rds")
+)
 
 datasets <- map(
   dat_to_load,
-  ~convert_blanks_to_na(readRDS(.x))
+  ~ convert_blanks_to_na(readRDS(.x))
 )
 
 list2env(datasets, envir = .GlobalEnv)
@@ -110,9 +112,11 @@ adlb04 <- adlb03 %>%
     PARAMCD = LBTESTCD,
     PARCAT1 = "CHEM"
   ) %>%
-  create_var_from_codelist(metacore = adlbc_spec,
-                           input_var = PARAM,
-                           out_var = PARAMN)
+  create_var_from_codelist(
+    metacore = adlbc_spec,
+    input_var = PARAM,
+    out_var = PARAMN
+  )
 
 ## Baseline ----------------------------------
 adlb05 <- adlb04 %>%
@@ -137,8 +141,8 @@ eot <- adlb05 %>%
 
 adlb06 <- adlb05 %>%
   filter(grepl("WEEK", VISIT, fixed = TRUE) |
-           grepl("UNSCHEDULED", VISIT, fixed = TRUE) |
-           grepl("SCREENING", VISIT, fixed = TRUE)) %>%
+    grepl("UNSCHEDULED", VISIT, fixed = TRUE) |
+    grepl("SCREENING", VISIT, fixed = TRUE)) %>%
   mutate(
     AVISIT = case_when(
       ABLFL == "Y" ~ "Baseline",
@@ -236,8 +240,10 @@ adlbc <- adlbc10 %>%
   set_variable_labels(adlbc_spec) %>%
   xportr_label(adlbc_spec) %>%
   xportr_df_label(adlbc_spec, domain = "adlbc") %>%
-  xportr_format(adlbc_spec$var_spec %>% mutate_at(c("format"), ~ replace_na(., "")),
-                "ADLBC")
+  xportr_format(
+    adlbc_spec$var_spec %>% mutate_at(c("format"), ~ replace_na(., "")),
+    "ADLBC"
+  )
 
 # FIX: attribute issues where sas.format attributes set to DATE9. are changed to DATE9,
 # and missing formats are set to NULL (instead of an empty character vector)

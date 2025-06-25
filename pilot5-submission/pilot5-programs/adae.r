@@ -21,13 +21,15 @@ library(metatools)
 library(haven)
 
 ## Load datasets ------------
-dat_to_load <- list(ae = file.path(path$sdtm, "ae.rds"),
-                    suppae = file.path(path$sdtm, "suppae.rds"),
-                    adsl = file.path(path$adam, "adsl.rds"))
+dat_to_load <- list(
+  ae = file.path(path$sdtm, "ae.rds"),
+  suppae = file.path(path$sdtm, "suppae.rds"),
+  adsl = file.path(path$adam, "adsl.rds")
+)
 
 datasets <- map(
   dat_to_load,
-  ~convert_blanks_to_na(readRDS(.x))
+  ~ convert_blanks_to_na(readRDS(.x))
 )
 
 list2env(datasets, envir = .GlobalEnv)
