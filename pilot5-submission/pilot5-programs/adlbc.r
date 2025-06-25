@@ -140,11 +140,11 @@ eot <- adlb05 %>%
   )
 
 adlb06 <- adlb05 %>%
-  #nolint start
+  # nolint start
   filter(grepl("WEEK", VISIT, fixed = TRUE) |
     grepl("UNSCHEDULED", VISIT, fixed = TRUE) |
     grepl("SCREENING", VISIT, fixed = TRUE)) %>%
-  #nolint end
+  # nolint end
   mutate(
     AVISIT = case_when(
       ABLFL == "Y" ~ "Baseline",
