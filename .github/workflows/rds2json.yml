@@ -59,10 +59,10 @@ jobs:
         uses: thollander/actions-comment-pull-request@v3
         with:
           message: |
-             I am a Pilot5 bot and noticed changes in *.rds or
-             *.yml (used in github actions)
-             Therefore I updated the datasetjson (*.json) files to very latest
+             I am a Pilot5 bot and noticed changes in \*.rds or
+             \*.yml (used in github actions)
+             Therefore I updated the datasetjson (\*.json) files to very latest
              version for submission.
-             :heavycheckmark:
+             :heavy_check_mark:
              _(event **${{ github.event_name }}** / attempt **${{ github.run_attempt }}**)_
 
