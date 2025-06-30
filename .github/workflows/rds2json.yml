@@ -1,13 +1,14 @@
 name: 50_Convert RDS to JSON
 
+## use workflow_dispatch till fully DEBUGGED
 on:
-  pull_request:
-    branches:
-      - main 
-    paths:
-      - '**/*.rds'
-      - '**/*.yml'
-      - '**/*.yaml'
+#  pull_request:
+#    branches:
+#      - main 
+#    paths:
+#      - '**/*.rds'
+#      - '**/*.yml'
+#      - '**/*.yaml'
   workflow_dispatch:
 
 run-name: 50_ Convert RDS to JSON (  @${{ github.actor }}, ${{ github.event }}, ${{ github.ref_name}})
