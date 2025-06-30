@@ -1,7 +1,5 @@
-# jim removed renv; avoids problems with github actions
-#source("renv/activate.R")
-#if (Sys.getenv("CI") != "true") source("renv/activate.R")
-#Sys.setenv(RENV_DOWNLOAD_FILE_METHOD = "libcurl")
+if (Sys.getenv("CI") != "true") source("renv/activate.R")
+Sys.setenv(RENV_DOWNLOAD_FILE_METHOD = "libcurl")
 
 
 # File locations ----------------------------------------------------------

@@ -24,6 +24,9 @@ jobs:
 #    container:
 #         image:  rocker/r-ver:latest
     steps:
+      - name: Set US Eastern timezone
+        run: sudo timedatectl set-timezone America/New_York
+
       - name: Check out this repository & branch
         uses: actions/checkout@v4
         with:
