@@ -58,6 +58,7 @@ jobs:
 
       - name: PR comment with file
         uses: thollander/actions-comment-pull-request@v3
+        id: PR_comment
         with:
           message: |
              I am a Pilot5 bot and noticed changes in \*.rds or
@@ -66,4 +67,9 @@ jobs:
              version for submission.
              :heavy_check_mark:
              _(event **${{ github.event_name }}** / attempt **${{ github.run_attempt }}**)_
+      - name: check outputs
+        run: |
+          echo "id : ${{ steps.PR_comment.outputs.id }}"
+          echo "body : ${{ steps.PR_comment.outputs.body }}"
+          echo "html-url : ${{ steps.PR_comment.outputs.html-url }}"
 
