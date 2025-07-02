@@ -1,4 +1,16 @@
-# Set up ------------------------------------------------------------------
+#************************************************************************
+# Purpose:     Generate ADTTE dataset
+# Input:       DS, ADSL, and ADAE datasets
+# Output:      adtte.rds
+#************************************************************************
+
+# Note to Reviewer
+# To rerun the code below, please refer ADRG appendix.
+# After required package are installed, the path variable needs to be defined
+# in the .Rprofile file
+
+# Setup -----------------
+## Load libraries -------
 library(dplyr)
 library(tidyr)
 library(admiral)
@@ -6,19 +18,32 @@ library(metacore)
 library(metatools)
 library(pilot5utils)
 
-# read source -------------------------------------------------------------
-ds <- convert_blanks_to_na(readRDS(file.path(path$sdtm, "ds.rds")))
-adsl <- convert_blanks_to_na(readRDS(file.path(path$adam, "adsl.rds")))
-adae <- convert_blanks_to_na(readRDS(file.path(path$adam, "adae.rds")))
+## Load datasets ------------
+dat_to_load <- list(
+  ds = file.path(path$sdtm, "ds.rds"),
+  adsl = file.path(path$adam, "adsl.rds"),
+  adae = file.path(path$adam, "adae.rds")
+)
 
-## placeholder for origin=predecessor, use metatool::build_from_derived()
-metacore <- spec_to_metacore(file.path(path$adam, "adam-pilot-5.xlsx"), where_sep_sheet = FALSE)
+datasets <- map(
+  dat_to_load,
+  ~ convert_blanks_to_na(readRDS(.x))
+)
 
-# Get the specifications for the dataset we are currently building
+list2env(datasets, envir = .GlobalEnv)
+
+## Load dataset specs -----------
+metacore <- spec_to_metacore(file.path(path$adam, "adam-pilot-5.xlsx"),
+  where_sep_sheet = FALSE
+)
+
+### Get the specifications for the dataset we are currently building
 adtte_spec <- metacore %>%
   select_dataset("ADTTE")
 
-# First dermatological event (ADAE.AOCC01FL = 'Y' and ADAE.CQ01NAM != '')
+# Create ADTTE dataset -----------------
+## Add supplemental information ----------
+### First dermatological event (ADAE.AOCC01FL = 'Y' and ADAE.CQ01NAM != '')
 event <- event_source(
   dataset_name = "adae",
   filter = AOCC01FL == "Y" & CQ01NAM == "DERMATOLOGIC EVENTS" & SAFFL == "Y",
@@ -31,8 +56,7 @@ event <- event_source(
   )
 )
 
-# Censor events ---------------------------------------------------------
-
+## Censor events ---------------------------------------------------------
 ## discontinuation, completed, death
 ds00 <- ds %>%
   select(STUDYID, USUBJID, DSCAT, DSDECOD, DSSTDTC) %>%
@@ -47,7 +71,9 @@ adsl <- adsl %>%
     dataset_add = ds00,
     by_vars = exprs(STUDYID, USUBJID),
     new_vars = exprs(EOSDT = DSSTDT),
-    filter_add = DSCAT == "DISPOSITION EVENT" & DSDECOD != "SCREEN FAILURE" & DSDECOD != "FINAL LAB VISIT"
+    filter_add = DSCAT == "DISPOSITION EVENT" &
+      DSDECOD != "SCREEN FAILURE" &
+      DSDECOD != "FINAL LAB VISIT"
   ) %>%
   mutate(EOS2DT = case_when(
     DCDECOD == "DEATH" ~ as.Date(RFENDTC),
@@ -93,20 +119,17 @@ adtte_pre <- derive_param_tte(
   ) %>%
   mutate(CNSR = as.numeric(CNSR))
 
-adtte_rds <- adtte_pre %>%
-  drop_unspec_vars(adtte_spec) %>% # only keep vars from define
-  order_cols(adtte_spec) %>% # order columns based on define
-  set_variable_labels(adtte_spec) # apply variable labels based on define
-
-## ADTTE Production data
-adtte <- adtte_rds %>%
-  drop_unspec_vars(adtte_spec) %>% # only keep vars from define
-  order_cols(adtte_spec) %>% # order columns based on define
+# Export to xpt ----------------
+adtte <- adtte_pre %>%
+  drop_unspec_vars(adtte_spec) %>%
+  check_ct_data(adtte_spec, na_acceptable = TRUE) %>%
+  order_cols(adtte_spec) %>%
+  sort_by_key(adtte_spec) %>%
   set_variable_labels(adtte_spec) %>%
   xportr_label(adtte_spec) %>%
   xportr_df_label(adtte_spec, domain = "adtte") %>%
   xportr_format(
-    adtte_spec$var_spec %>% mutate_at(c("format"), ~ replace_na(., "")),
+    atte_spec$var_spec %>% mutate_at(c("format"), ~ replace_na(., "")),
     "ADTTE"
   ) %>%
   convert_na_to_blanks()
