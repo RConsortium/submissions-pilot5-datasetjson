@@ -10,6 +10,8 @@ on:
 #      - '**/*.yml'
 #      - '**/*.yaml'
   workflow_dispatch:
+  pull_request:
+  push:
 
 run-name: 50_ Convert RDS to JSON (  @${{ github.actor }}, ${{ github.event }}, ${{ github.ref_name}})
 
