@@ -1,5 +1,5 @@
 
-name: TLF QC Check ✅
+name: QC TLF Check ✅
 
 on:
   pull_request:
