@@ -1,0 +1,103 @@
+#' Gather variable metadata in Dataset JSON compliant format
+#'
+#' @param n Variable name
+#' @param .data Dataset to gather attributes
+#'
+#' @returns Columns compliant data frame
+extract_xpt_meta <- function(n, .data) {
+  
+  attrs <- attributes(.data[[n]])
+  
+  out <- list()
+  
+  # Identify the variable type
+  if (inherits(.data[[n]],"Date")) {
+    out$dataType <- "date"
+    out$targetDataType <- "integer"
+  } else if (inherits(.data[[n]],"POSIXt")) {
+    out$dataType <- "datetime"
+    out$targetDataType <- "integer"
+  } else if (inherits(.data[[n]],"numeric")) {
+    if (any(is.double(.data[[n]]))) out$dataType <- "float"
+    else out$dataType <- "integer"
+  }  else if (inherits(.data[[n]],"hms")) {
+    out$dataType <- "time"
+    out$targetDataType <- "integer"
+  } else {
+    out$dataType <- "string"
+    out$length <- max(purrr::map_int(.data[[n]], nchar))
+  }
+  
+  out$itemOID <- n
+  out$name <- n
+  out$label <- attr(.data[[n]], 'label')
+  out$displayFormat <- attr(.data[[n]], 'format.sas')
+  tibble::as_tibble(out)
+  
+}
+
+#' Extract variable metadata from an XPT file in Dataset JSON format
+#'
+#' @param xpt_path Path to the XPT file
+#' @param item_oid Item OID (usually dataset name)
+#' @param dataset_name Name of dataset
+#' @param write_json Logical: write JSON to file?
+#' @param output_dir Directory to write output files (if write_json = TRUE)
+#' 
+#' @return A list with meta info and json content (and file path, if written)
+#' 
+#' @examples 
+#' \dontrun{
+#' process_xpt_to_json(
+#'  file.path(system.file(package='datasetjson'), "adsl.xpt"),
+#'  output_dir = file.path("pilot5-submission", "pilot5-input", "sdtmdata")
+#'  ) 
+#' }
+process_xpt_to_json <- function(xpt_path,
+                                item_oid = NULL,
+                                dataset_name = NULL,
+                                write_json = TRUE,
+                                output_dir = ".") {
+  adsl <- haven::read_xpt(xpt_path)
+  item_oid <- item_oid %||% tools::file_path_sans_ext(basename(xpt_path))
+  dataset_name <- dataset_name %||% item_oid
+  
+  adsl_meta <- purrr::map_df(names(adsl), extract_xpt_meta, .data=adsl)
+  
+  ds_json <- datasetjson::dataset_json(
+    adsl, 
+    item_oid = item_oid,
+    name = dataset_name,
+    dataset_label = attr(adsl, 'label'),
+    columns = adsl_meta
+  )
+  
+  json_file_content <- datasetjson::write_dataset_json(ds_json)
+  # schema_1_1_0 <- datasetjson::schema_1_1_0
+  # valid <- datasetjson::validate_dataset_json(json_file_content)
+  
+  results <- list(
+    meta = adsl_meta,
+    json_content = json_file_content
+    # valid = valid
+  )
+  
+  if (write_json) {
+    out_file <- file.path(output_dir, paste0(item_oid, ".json"))
+    writeLines(json_file_content, out_file)
+  }
+}
+
+xpt_files <- list.files(
+  "original-sdtmdata/",
+  pattern = "\\.xpt$",
+  full.names = TRUE
+)
+
+
+# Process all files and write JSON to output_dir
+purrr::walk(
+  xpt_files, 
+  process_xpt_to_json, 
+  output_dir = file.path("pilot5-submission", "pilot5-input", "sdtmdata")
+)
