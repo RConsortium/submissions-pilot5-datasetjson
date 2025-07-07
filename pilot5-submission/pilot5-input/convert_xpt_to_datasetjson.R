@@ -58,28 +58,28 @@ process_xpt_to_json <- function(xpt_path,
                                 dataset_name = NULL,
                                 write_json = TRUE,
                                 output_dir = ".") {
-  adsl <- haven::read_xpt(xpt_path)
-  item_oid <- item_oid %||% tools::file_path_sans_ext(basename(xpt_path))
+  dataset <- haven::read_xpt(xpt_path)
+  item_oid <- item_oid %||% toupper(tools::file_path_sans_ext(basename(xpt_path)))
   dataset_name <- dataset_name %||% item_oid
   
-  adsl_meta <- purrr::map_df(names(adsl), extract_xpt_meta, .data=adsl)
+  dataset_meta <- purrr::map_df(names(dataset), extract_xpt_meta, .data=dataset)
   
   ds_json <- datasetjson::dataset_json(
-    adsl, 
+    dataset, 
     item_oid = item_oid,
     name = dataset_name,
-    dataset_label = attr(adsl, 'label'),
-    columns = adsl_meta
+    dataset_label = attr(dataset, 'label'),
+    columns = dataset_meta
   )
   
   json_file_content <- datasetjson::write_dataset_json(ds_json)
-  # schema_1_1_0 <- datasetjson::schema_1_1_0
-  # valid <- datasetjson::validate_dataset_json(json_file_content)
+  
+  valid <- datasetjson::validate_dataset_json(json_file_content)
   
   results <- list(
-    meta = adsl_meta,
-    json_content = json_file_content
-    # valid = valid
+    meta = dataset_meta,
+    json_content = json_file_content,
+    valid = valid
   )
   
   if (write_json) {
@@ -97,7 +97,7 @@ xpt_files <- list.files(
 
 # Process all files and write JSON to output_dir
 purrr::walk(
-  xpt_files, 
+  xpt_files[1], 
   process_xpt_to_json, 
   output_dir = file.path("pilot5-submission", "pilot5-input", "sdtmdata")
 )
