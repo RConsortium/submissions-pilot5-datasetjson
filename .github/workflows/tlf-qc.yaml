@@ -55,11 +55,11 @@ jobs:
           file-path: qc-tlf.Rmd
           comment-tag: qc-tlf
           
-          
+
       - name: Fail Step if mismatches found
-        if: ${{ [ (grep 'No differences found between the objects' qc-tlf.Rmd | wc -l) -gt "0" ] }}
+        if: hashFiles('qc-tlf.fail') != ''
         uses: actions/github-script@v3
         with:
           script: |
-            core.setFailed('QC Check failed!')
+            core.setFailed('TLF QC Check failed!')
           

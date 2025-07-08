@@ -48,7 +48,7 @@ jobs:
           comment-tag: qc-dataset
 
       - name: Fail Step if no differences found
-        if: ${{ [ (grep 'No differences found between the objects' qc.Rmd | wc -l) -gt "0" ] }}
+        if: hashFiles('qc.fail') != ''
         uses: actions/github-script@v3
         with:
           script: |
