@@ -53,4 +53,13 @@ jobs:
         uses: thollander/actions-comment-pull-request@v3
         with:
           file-path: qc-tlf.Rmd
+          comment-tag: qc-tlf
+          
+          
+      - name: Fail Step if mismatches found
+         if: ${{ [ $(grep 'Differences found between the objects' .Rmd | wc -l) -gt "0" }}
+         uses: actions/github-script@v3
+         with:
+           script: |
+               core.setFailed('QC Check failed!')
           

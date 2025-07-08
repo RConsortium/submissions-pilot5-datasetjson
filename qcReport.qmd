@@ -19,7 +19,7 @@ comp_path <- "submissions-pilot3-adam/submission/adam"
 
 This is the QC report dated `r Sys.Date()`. The report compares the datasets in the `pilot5-submission/pilot5-input/adamdata` directory with the datasets in the `~/GitHub/submissions-pilot3-adam/submission/adam` directory. The datasets are compared using the `diffdf` package.
 
-This run was initiated by `r Sys.getenv("GITHUB_ACTOR")` on the `r Sys.getenv("GITHUB_REF")` Git ref. 
+This run was initiated by `r Sys.getenv("GITHUB_ACTOR")` on the `r Sys.getenv("GITHUB_REF")` Git ref.
 
 ```{r session_info}
 #| echo: false
@@ -54,8 +54,7 @@ for (i in seq_along(comp_dataset_names)) {
 
 ```
 
-`r length(input_dataset_names)` datasets were found in the `pilot5-submission/pilot5-input/adamdata` directory.
-The datasets are `r input_dataset_names`
+`r length(input_dataset_names)` datasets were found in the `pilot5-submission/pilot5-input/adamdata` directory. The datasets are `r input_dataset_names`
 
 ```{r data_html}
 #| echo: false

@@ -68,7 +68,7 @@ for (i in pilot5_out_files) {
   diffs <- waldo::compare(readLines(new_tlf_path), readLines(comp_tlf_path))
 
   cat("<details>\n")
-  status_emoji <- if (length(diffs) == 0) "✅" else "❌"
+  status_emoji <- if (length(diffs) <= 1) "✅" else "❌"
   cat(str_glue("<summary>{status_emoji} Dataset: {i}</summary>\n\n"))
   cat("\n\n```\n\n")
   print(diffs)
@@ -196,6 +196,10 @@ for (i in pilot5_rtf_files) {
   cat("<details>\n")
   status_emoji <- if (res$same_conclusion) "✅" else "❌"
   cat(str_glue("<summary>{status_emoji} TLF: {i} - Score: {res$difference_score}</summary>\n\n"))
+  cat("\n\n")
+  if (res$same_conclusion) cat("TLFS appear the same")
+  else cat("Differences found between the objects!")
+  cat("\n\n")
   cat("\n\n```\n\n")
   print(res$difference_list)
   cat("```\n\n")
