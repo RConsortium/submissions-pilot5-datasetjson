@@ -46,11 +46,10 @@ jobs:
         with:
           file-path: qc.Rmd
           comment-tag: qc-dataset
-          
-      - name: Fail Step if mismatches found
-        if: ${{ [ $(grep 'Differences found between the objects' .Rmd | wc -l) -gt "0" }}
+
+      - name: Fail Step if no differences found
+        if: ${{ [ (grep 'No differences found between the objects' qc.Rmd | wc -l) -gt "0" ] }}
         uses: actions/github-script@v3
         with:
           script: |
             core.setFailed('QC Check failed!')
-          
