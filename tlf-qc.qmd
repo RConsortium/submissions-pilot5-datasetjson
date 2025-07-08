@@ -201,12 +201,8 @@ for (i in pilot5_rtf_files) {
   cat("<details>\n")
   status_emoji <- if (res$same_conclusion) "✅" else "❌"
   cat(str_glue("<summary>{status_emoji} TLF: {i} - Score: {res$difference_score}</summary>\n\n"))
-  cat("\n\n")
-  if (res$same_conclusion) cat("TLFS appear the same")
-  else cat("Differences found between the objects!")
-  cat("\n\n")
   cat("\n\n```\n\n")
-  cat(res$difference_list)
+  print(res$difference_list)
   cat("```\n\n")
   cat("</details>")
    cat("\n\n")
