@@ -206,7 +206,7 @@ for (i in pilot5_rtf_files) {
   else cat("Differences found between the objects!")
   cat("\n\n")
   cat("\n\n```\n\n")
-  print(res$difference_list)
+  cat(res$difference_list)
   cat("```\n\n")
   cat("</details>")
    cat("\n\n")
