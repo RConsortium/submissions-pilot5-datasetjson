@@ -40,9 +40,17 @@ jobs:
         with:
           name: qcReport.html
           path: qcReport.html
-          
+
       - name: PR comment with file
         uses: thollander/actions-comment-pull-request@v3
         with:
           file-path: qc.Rmd
+          comment-tag: qc-dataset
+          
+       - name: Fail Step if mismatches found
+         if: ${{ [ $(grep 'Differences found between the objects' .Rmd | wc -l) -gt "0" }}
+         uses: actions/github-script@v3
+         with:
+           script: |
+               core.setFailed('QC Check failed!')
           
