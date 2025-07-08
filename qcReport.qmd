@@ -77,7 +77,7 @@ for (y in input_dataset_names) {
   status_emoji <- if (length(diffs) == 0) "✅" else "❌"
   cat(str_glue("<summary>{status_emoji} Dataset: {y}</summary>\n\n"))
   cat("\n\n```\n\n")
-  print(diffs)
+  cat(diffs)
   cat("```\n\n")
   cat("</details>")
    cat("\n\n")
