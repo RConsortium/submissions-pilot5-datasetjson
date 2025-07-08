@@ -67,6 +67,8 @@ for (i in pilot5_out_files) {
 
   diffs <- waldo::compare(readLines(new_tlf_path), readLines(comp_tlf_path))
 
+  if (diffs > 1) file.create("qc-tlf.fail", showWarnings = TRUE)
+
   cat("<details>\n")
   status_emoji <- if (length(diffs) <= 1) "✅" else "❌"
   cat(str_glue("<summary>{status_emoji} Dataset: {i}</summary>\n\n"))
@@ -117,6 +119,8 @@ comp_image <- content_image_file(comp_png_path)
     type = type_qc_diffs
   )
 
+  if (!res$same_conclusion) file.create("qc-tlf.fail", showWarnings = TRUE)
+    
   cat("<details>\n")
   status_emoji <- if (res$same_conclusion) "✅" else "❌"
   cat(str_glue("<summary>{status_emoji} TLF: {i} - Score: {res$difference_score}</summary>\n\n"))
@@ -193,6 +197,7 @@ for (i in pilot5_rtf_files) {
     type = type_qc_diffs
   )
 
+  if (!res$same_conclusion) file.create("qc-tlf.fail", showWarnings = TRUE)
   cat("<details>\n")
   status_emoji <- if (res$same_conclusion) "✅" else "❌"
   cat(str_glue("<summary>{status_emoji} TLF: {i} - Score: {res$difference_score}</summary>\n\n"))
