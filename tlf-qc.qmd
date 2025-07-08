@@ -67,7 +67,7 @@ for (i in pilot5_out_files) {
 
   diffs <- waldo::compare(readLines(new_tlf_path), readLines(comp_tlf_path))
 
-  if (diffs > 1) file.create("qc-tlf.fail", showWarnings = TRUE)
+  if (length(diffs) > 1) file.create("qc-tlf.fail", showWarnings = TRUE)
 
   cat("<details>\n")
   status_emoji <- if (length(diffs) <= 1) "✅" else "❌"
