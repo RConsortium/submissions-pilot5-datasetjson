@@ -53,6 +53,8 @@ cat("## TLF QC Check Complete!", "\n\n")
 cat("Date: ", format(Sys.Date()), "\n")
 cat("Run by: ", Sys.getenv('GITHUB_ACTOR'), "\n")
 cat("Git Ref: ", Sys.getenv("GITHUB_REF"), "\n")
+cat("BASE: ", "Pilot 5 Datasets", "\n")
+cat("COMPARE: ", "Pilot 3 Datasets", "\n")
 sink()
 
 ```
@@ -125,7 +127,7 @@ comp_image <- content_image_file(comp_png_path)
   status_emoji <- if (res$same_conclusion) "✅" else "❌"
   cat(str_glue("<summary>{status_emoji} TLF: {i} - Score: {res$difference_score}</summary>\n\n"))
   cat("\n\n```\n\n")
-  print(str_split_fixed(res$difference_list[1]), 80)
+  print(str_split_fixed(res$difference_list[[1]], 80))
   cat("```\n\n")
   cat("</details>")
    cat("\n\n")
@@ -202,7 +204,7 @@ for (i in pilot5_rtf_files) {
   status_emoji <- if (res$same_conclusion) "✅" else "❌"
   cat(str_glue("<summary>{status_emoji} TLF: {i} - Score: {res$difference_score}</summary>\n\n"))
   cat("\n\n```\n\n")
-  print(str_split_fixed(res$difference_list[1]), 80)
+  print(str_split_fixed(res$difference_list[[1]], 80))
   cat("```\n\n")
   cat("</details>")
    cat("\n\n")
