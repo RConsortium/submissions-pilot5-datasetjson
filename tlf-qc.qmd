@@ -127,7 +127,7 @@ comp_image <- content_image_file(comp_png_path)
   status_emoji <- if (res$same_conclusion) "✅" else "❌"
   cat(str_glue("<summary>{status_emoji} TLF: {i} - Score: {res$difference_score}</summary>\n\n"))
   cat("\n\n```\n\n")
-  print(res$difference_list[[1]])
+  cat(res$difference_list[[1]])
   cat("```\n\n")
   cat("</details>")
    cat("\n\n")
@@ -204,7 +204,7 @@ for (i in pilot5_rtf_files) {
   status_emoji <- if (res$same_conclusion) "✅" else "❌"
   cat(str_glue("<summary>{status_emoji} TLF: {i} - Score: {res$difference_score}</summary>\n\n"))
   cat("\n\n```\n\n")
-  print(res$difference_list[[1]])
+  cat(res$difference_list[[1]])
   cat("```\n\n")
   cat("</details>")
    cat("\n\n")
