@@ -57,10 +57,20 @@ process_xpt_to_json <- function(xpt_path,
                                 item_oid = NULL,
                                 dataset_name = NULL,
                                 write_json = TRUE,
+                                names_labels = extract_names_labels("original-sdtmdata/define.xml"),
                                 output_dir = ".") {
+  
   dataset <- haven::read_xpt(xpt_path)
   item_oid <- item_oid %||% toupper(tools::file_path_sans_ext(basename(xpt_path)))
   dataset_name <- dataset_name %||% item_oid
+  
+  # set dataset label if not already set
+  if (is.null(attr(dataset, 'label'))) {
+    label <- names_labels %>% 
+      dplyr::filter(OID == dataset_name) %>%
+      dplyr::pull(Label)
+    attr(dataset, 'label') <- label
+  }
   
   dataset_meta <- purrr::map_df(names(dataset), extract_xpt_meta, .data=dataset)
   
@@ -73,7 +83,6 @@ process_xpt_to_json <- function(xpt_path,
   )
   
   json_file_content <- datasetjson::write_dataset_json(ds_json)
-  
   valid <- datasetjson::validate_dataset_json(json_file_content)
   
   results <- list(
@@ -88,12 +97,41 @@ process_xpt_to_json <- function(xpt_path,
   }
 }
 
+
+#' Extract Name and def:Label from ItemGroupDef nodes in a define.xml file
+#'
+#' This function parses a CDISC SDTM define.xml file and extracts the OID and def:Label
+#' attributes from all ItemGroupDef nodes as a tidy tibble.
+#'
+#' @param xml_path Path to the define.xml file.
+#'
+#' @return A tibble with columns \code{OID} and \code{Label} for each ItemGroupDef.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' result <- extract_names_labels("original-sdtmdata/define.xml")
+#' print(result)
+#' }
+extract_names_labels <- function(xml_path) {
+  doc <- xml2::read_xml(xml_path)
+  ns <- xml2::xml_ns(doc)
+  itemgroup_nodes <- xml2::xml_find_all(doc, ".//d1:ItemGroupDef", ns)
+  purrr::map(
+    itemgroup_nodes,
+    ~ tibble::tibble(
+      OID = xml2::xml_attr(.x, "OID"),
+      Label = xml2::xml_attr(.x, "Label")
+    )
+  ) |>
+    purrr::list_rbind()
+}
+
 xpt_files <- list.files(
   "original-sdtmdata/",
   pattern = "\\.xpt$",
   full.names = TRUE
 )
-
 
 # Process all files and write JSON to output_dir
 purrr::walk(
