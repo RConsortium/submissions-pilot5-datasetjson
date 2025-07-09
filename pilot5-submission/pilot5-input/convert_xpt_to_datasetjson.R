@@ -127,15 +127,12 @@ extract_names_labels <- function(xml_path) {
     purrr::list_rbind()
 }
 
-xpt_files <- list.files(
-  "original-sdtmdata/",
-  pattern = "\\.xpt$",
-  full.names = TRUE
-)
-
-# Process all files and write JSON to output_dir
-purrr::walk(
-  xpt_files[1], 
-  process_xpt_to_json, 
-  output_dir = file.path("pilot5-submission", "pilot5-input", "sdtmdata")
-)
+xpt_files <- list.files("original-sdtmdata/",
+                        pattern = "\\.xpt$",
+                        full.names = TRUE) |>
+  purrr::pluck(1) |>
+  purrr::walk(
+    xpt_files[1],
+    process_xpt_to_json,
+    output_dir = file.path("pilot5-submission", "pilot5-input", "sdtmdata")
+  )
