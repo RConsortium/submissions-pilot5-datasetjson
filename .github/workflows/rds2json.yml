@@ -1,0 +1,75 @@
+name: 50_Convert RDS to JSON
+
+## use workflow_dispatch till fully DEBUGGED
+on:
+#  pull_request:
+#    branches:
+#      - main 
+#    paths:
+#      - '**/*.rds'
+#      - '**/*.yml'
+#      - '**/*.yaml'
+  workflow_dispatch:
+
+run-name: 50_ Convert RDS to JSON (  @${{ github.actor }}, ${{ github.event }}, ${{ github.ref_name}})
+
+concurrency:
+  group: lint-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  convert_rds:
+    runs-on: ubuntu-latest
+    env:
+         GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+#    container:
+#         image:  rocker/r-ver:latest
+    steps:
+      - name: Set US Eastern timezone
+        run: sudo timedatectl set-timezone America/New_York
+
+      - name: Check out this repository & branch
+        uses: actions/checkout@v4
+        with:
+          ref:  ${{ github.head_ref }}    # required for PR
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+
+      - name: Install R dependencies
+        run: |
+          Rscript -e 'install.packages(c("dplyr", "datasetjson", "metacore", "tidyr"), 
+          repos = "https://packagemanager.posit.co/cran/__linux__/noble/latest")'
+      - name: run code rds to json
+        run: |
+          Rscript -e 'source("pilot5-submission/pilot5-programs/convert_rds_to_json.r")'
+        shell: bash
+
+      - name: Commit
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Update json files" || \
+            echo "no changes; nothing to commit"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: PR comment with file
+        uses: thollander/actions-comment-pull-request@v3
+        id: PR_comment
+        with:
+          message: |
+             I am a Pilot5 bot and noticed changes in \*.rds or
+             \*.yml (used in github actions)
+             Therefore I updated the datasetjson (\*.json) files to very latest
+             version for submission.
+             :heavy_check_mark:
+             _(event **${{ github.event_name }}** / attempt **${{ github.run_attempt }}**)_
+      - name: check outputs
+        run: |
+          echo "id : ${{ steps.PR_comment.outputs.id }}"
+          echo "body : ${{ steps.PR_comment.outputs.body }}"
+          echo "html-url : ${{ steps.PR_comment.outputs.html-url }}"
+
