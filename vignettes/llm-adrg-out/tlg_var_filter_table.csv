@@ -1,0 +1,5 @@
+"script","output","Analysis Datasets & Variables","selection criteria"
+"tlf-demographic.r","tlf-demographic-pilot5.out","AGE.ADSL; AGEGR1.ADSL; RACE.ADSL; HEIGHTBL.ADSL; WEIGHTBL.ADSL; BMIBL.ADSL; MMSETOT.ADSL; STUDYID.ADSL; ITTFL.ADSL; TRT01P.ADSL","ADSL.STUDYID == ""CDISCPILOT01""; ADSL.ITTFL == ""Y"""
+"tlf-efficacy.r","tlf-efficacy-pilot5.rtf","ADSL.STUDYID; ADSL.USUBJID","ADSL.ITTFL == ""Y""; ADLB.TRTPN %in% c(0, 81); ADLB.PARAMCD == ""GLUC""; !is.na(ADLB.AVISITN); ADLB.AVISITN == 20; !is.na(ADLB.CHG); !is.na(ADLB.BASE); ADLB.AVISITN == 0"
+"tlf-kmplot.r","tlf-kmplot-pilot5.pdf","ADSL.STUDYID; ADSL.USUBJID; ADSL.TRT01A; ","ADSL.SAFFL == ""Y""; ADSL.STUDYID == ""CDISCPILOT01""; ADTTE.PARAMCD == ""TTDE""; ADTTE.STUDYID == ""CDISCPILOT01"""
+"tlf-primary.r","tlf-primary-pilot5.rtf","ADADAS.EFFFL; ADADAS.ITTFL; ADADAS.PARAMCD; ADADAS.ANL01FL; ADADAS.TRTP; ADADAS.AVAL; ADADAS.AVISITN; ADADAS.CHG; ADADAS.TRTPN","ADAS.EFFFL == ""Y""; ADAS.ITTFL == ""Y""; ADAS.PARAMCD == ""ACTOT""; ADAS.ANL01FL == ""Y""; ADSL.EFFFL == ""Y"" & ADSL.ITTFL == ""Y""; ADAS.AVISITN == 0; ADAS.AVISITN == 24"
