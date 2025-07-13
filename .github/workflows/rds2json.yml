@@ -6,11 +6,16 @@ on:
   pull_request:
 
 
-run-name: 50_ Convert RDS to JSON (  @${{ github.actor }}, ${{ github.event }}, ${{ github.ref_name}})
+
+#concurrency:
+#  group: lint-${{ github.event.pull_request.number || github.ref }}
+#  cancel-in-progress: true
 
 concurrency:
-  group: lint-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+
+run-name: _RDS_2 JSON (  @${{ github.actor }}, ${{ github.event }}, ${{ github.ref_name}})
 
 jobs:
   convert_rds:
