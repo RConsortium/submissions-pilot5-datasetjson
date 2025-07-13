@@ -17,6 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+         GITHUB_TOKEN: ${{ github.token }}
 #    container:
 #         image:  rocker/r-ver:latest
     steps:
