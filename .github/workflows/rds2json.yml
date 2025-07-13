@@ -45,7 +45,7 @@ jobs:
           for added_modified_file in "${added_modified_files[@]}"; do
             echo "Do something with this ${added_modified_file}."
           done
-          RESULT=0 ; failed intermediate result
+          RESULT=0 # failed intermediate result
           if [ "$RESULT" eq 0]; then
             echo "intermediate step failed; exit step and entire action"
             echo "continue=false" >> $GITHUB_OUTPUT
