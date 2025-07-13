@@ -35,7 +35,7 @@ jobs:
         with:
           ref:  ${{ github.head_ref }}    # required for PR
 
-      - name: change?
+#      - name: change?
         id: files
         uses: Ana06/get-changed-files@v2.3.0
         with:
