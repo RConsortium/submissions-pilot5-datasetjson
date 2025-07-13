@@ -1,18 +1,10 @@
 name: 50_Convert RDS to JSON
 
-## use workflow_dispatch till fully DEBUGGED
+## FAIL for workflow_dispatch (Ana06)
 on:
   push:
   pull_request:
 
-#  pull_request:
-#    branches:
-#      - main 
-#    paths:
-#      - '**/*.rds'
-#      - '**/*.yml'
-#      - '**/*.yaml'
-#  workflow_dispatch:
 
 run-name: 50_ Convert RDS to JSON (  @${{ github.actor }}, ${{ github.event }}, ${{ github.ref_name}})
 
@@ -29,6 +21,7 @@ jobs:
 #         image:  rocker/r-ver:latest
     steps:
       - name: Set US Eastern timezone
+        if:  ${{ !env.act }}
         run: sudo timedatectl set-timezone America/New_York
 
       - name: Check out this repository & branch
@@ -39,7 +32,7 @@ jobs:
       - id: files
         uses: Ana06/get-changed-files@v2.3.0
         with:
-          filter: '*.rds'
+          filter: '*.rds' || '*.yml'
       - run: |
           mapfile -d ',' -t added_modified_files < <(printf '%s,' '${{ steps.files.outputs.added_modified }}')
           for added_modified_file in "${added_modified_files[@]}"; do
@@ -49,6 +42,7 @@ jobs:
           if [ "$RESULT" -eq 0 ]; then
             echo "intermediate step failed; exit step and entire action"
             echo "continue=false" >> $GITHUB_OUTPUT
+            exit 1
           fi
 
       - name: Set up R
