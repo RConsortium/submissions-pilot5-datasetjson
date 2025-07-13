@@ -33,6 +33,17 @@ jobs:
         with:
           ref:  ${{ github.head_ref }}    # required for PR
 
+      - name: change?
+        id: files
+        uses: Ana06/get-changed-files@v2.3.0
+          with:
+            filter: '*.rds'
+        run: |
+	  mapfile -d ',' -t added_modified_files < <(printf '%s,' '${{ steps.files.outputs.added_modified }}')
+          for added_modified_file in "${added_modified_files[@]}"; do
+            echo "Do something with this ${added_modified_file}."
+          done
+
       - name: Set up R
         uses: r-lib/actions/setup-r@v2
 
