@@ -3,6 +3,7 @@ name: 50_Convert RDS to JSON
 ## use workflow_dispatch till fully DEBUGGED
 on:
   push:
+  pull_request:
 
 #  pull_request:
 #    branches:
