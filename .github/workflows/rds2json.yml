@@ -36,10 +36,10 @@ jobs:
       - name: change?
         id: files
         uses: Ana06/get-changed-files@v2.3.0
-          with:
-            filter: '*.rds'
+        with:
+          filter: '*.rds'
         run: |
-	  mapfile -d ',' -t added_modified_files < <(printf '%s,' '${{ steps.files.outputs.added_modified }}')
+          mapfile -d ',' -t added_modified_files < <(printf '%s,' '${{ steps.files.outputs.added_modified }}')
           for added_modified_file in "${added_modified_files[@]}"; do
             echo "Do something with this ${added_modified_file}."
           done
