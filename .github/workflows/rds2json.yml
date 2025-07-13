@@ -15,7 +15,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-run-name: _RDS_2 JSON (  @${{ github.actor }}, ${{ github.event }}, ${{ github.ref_name}})
+run-name: rds2json (  @${{ github.actor }}, ${{ github.event }}, ${{ github.ref_name}})
 
 jobs:
   convert_rds:
