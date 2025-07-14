@@ -69,7 +69,7 @@ km <- (surv_mod %>%
       expand = c(0.025, 0),
       limits = c(0, 1),
       breaks = seq(0, 1, by = 0.10),
-      label =  scales::label_number(accuracy = 0.01) 
+      label =  scales::label_number(accuracy = 0.01)
     )
   ) +
   ggsurvfit::add_legend_title(title = "TRT01A") +
