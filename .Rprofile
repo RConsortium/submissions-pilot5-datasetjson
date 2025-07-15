@@ -8,5 +8,6 @@ path <- list(
   sdtm = file.path(getwd(),"pilot5-submission/pilot5-input/sdtmdata"),
   adam = file.path(getwd(),"pilot5-submission/pilot5-input/adamdata"),
   output = file.path(getwd(),"pilot5-submission/pilot5-output//pilot5-tlfs"),
-  adam_json = file.path(getwd(),"pilot5-submission/pilot5-output/pilot5-datasetjson")
+  adam_json = file.path(getwd(),"pilot5-submission/pilot5-output/pilot5-datasetjson"),
+  programs = file.path(getwd(),"pilot5-submission/pilot5-programs")
 )
