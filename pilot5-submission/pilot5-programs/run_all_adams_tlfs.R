@@ -6,7 +6,8 @@
 
 # Run all adam scripts
 adam_files <- str_c(
-  path$programs, "/", c("adsl.r", "adae.r", "adlbc.r", "adtte.r", "adadas.r"))
+  path$programs, "/", c("adsl.r", "adae.r", "adlbc.r", "adtte.r", "adadas.r")
+)
 
 walk(adam_files, function(file) {
   tryCatch(
@@ -18,8 +19,11 @@ walk(adam_files, function(file) {
 })
 
 tlf_files <- str_c(
-  path$programs, "/", c("tlf-demographic.r", "tlf-efficacy.r", "tlf-kmplot.r", 
-                        "tlf-primary.r"))
+  path$programs, "/", c(
+    "tlf-demographic.r", "tlf-efficacy.r", "tlf-kmplot.r",
+    "tlf-primary.r"
+  )
+)
 
 walk(tlf_files, function(file) {
   tryCatch(
