@@ -53,4 +53,13 @@ jobs:
         uses: thollander/actions-comment-pull-request@v3
         with:
           file-path: qc-tlf.Rmd
+          comment-tag: qc-tlf
+          
+
+      - name: Fail Step if mismatches found
+        if: hashFiles('qc-tlf.fail') != ''
+        uses: actions/github-script@v3
+        with:
+          script: |
+            core.setFailed('TLF QC Check failed!')
           
