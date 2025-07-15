@@ -52,8 +52,8 @@ cat("## TLF QC Check Complete!", "\n\n")
 cat("Date: ", format(Sys.Date()), "\n")
 cat("Run by: ", Sys.getenv("GITHUB_ACTOR"), "\n")
 cat("Git Ref: ", Sys.getenv("GITHUB_REF"), "\n")
-cat("BASE: ", "Pilot 5 Datasets", "\n")
-cat("COMPARE: ", "Pilot 3 Datasets", "\n")
+cat("BASE: ", "Pilot 5 TLFs", "\n")
+cat("COMPARE: ", "Pilot 3 TLFs", "\n")
 sink()
 ```
 
@@ -70,7 +70,7 @@ for (i in pilot5_out_files) {
 
   cat("<details>\n")
   status_emoji <- if (length(diffs) <= 1) "✅" else "❌"
-  cat(str_glue("<summary>{status_emoji} Dataset: {i}</summary>\n\n"))
+  cat(str_glue("<summary>{status_emoji} TLF: {i}</summary>\n\n"))
   cat("\n\n```\n\n")
   print(diffs)
   cat("```\n\n")
