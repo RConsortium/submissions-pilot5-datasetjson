@@ -8,5 +8,4 @@ The objectives of the **R Consortium R Submission Pilot 5** Project are:
 
 **NOTE:** This is a FDA-industry collaboration through the non-profit organization [R Consortium](https://www.r-consortium.org/).
 
-test
 
