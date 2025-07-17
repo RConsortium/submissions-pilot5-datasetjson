@@ -4,6 +4,9 @@
 # Output:      5 ADaM rds files; TLFs: 1 pdf, 1 out, 2 rtf
 #************************************************************************
 
+library(purrr)
+library(stringr)
+
 # Run all adam scripts
 adam_files <- str_c(
   path$programs, "/", c("adsl.r", "adae.r", "adlbc.r", "adtte.r", "adadas.r")
