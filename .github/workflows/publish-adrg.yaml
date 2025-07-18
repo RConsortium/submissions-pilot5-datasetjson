@@ -1,0 +1,64 @@
+on:
+    workflow_dispatch:
+    push:
+      branches:
+        - main
+      paths:
+        - 'adrg/_adrg.qmd'
+  
+name: Quarto Publish ADRG
+  
+jobs:
+    build-deploy:
+      runs-on: ubuntu-latest
+      permissions:
+        contents: write
+      steps:
+        - name: Check out repository
+          uses: actions/checkout@v4
+  
+        - name: Set up Quarto
+          uses: quarto-dev/quarto-actions/setup@v2
+          with:
+            tinytex: true
+        - name: Install Nix
+          uses: DeterminateSystems/nix-installer-action@main
+          with:
+            logger: pretty
+            log-directives: nix_installer=trace
+            backtrace: full
+      
+        - name: Nix cache
+          uses: DeterminateSystems/magic-nix-cache-action@main
+    
+        - name: Build development environment
+          run: |
+            nix-build
+  
+        - name: Render ADRG PDF (custom)
+          env: 
+            QUARTO_PRINT_STACK: true
+          run: |
+            nix-shell --run "quarto render adrg/adrg-quarto-pdf.qmd --to pdf"
+          shell: bash
+  
+        - name: Publish ADRG HTML version to Quarto Pub (custom)
+          env:
+            QUARTO_PUB_AUTH_TOKEN: ${{ secrets.QUARTO_PUB_AUTH_TOKEN }}
+          run: |
+            nix-shell --run "quarto publish quarto-pub adrg/adrg-quarto-html.qmd --no-browser"
+          shell: bash
+            
+  
+        - name: Set up object storage s3cmd cli tool
+          uses: s3-actions/s3cmd@v1.6.1
+          with:
+            provider: linode
+            region: 'us-east-1'
+            access_key: ${{ secrets.S3_ACCESS_KEY }}
+            secret_key: ${{ secrets.S3_SECRET_KEY }}
+  
+        - name: Publish ADRG PDF version to Linode Object Storage (custom)
+          run: |
+            s3cmd put adrg/adrg-quarto-pdf.pdf --mime-type 'application/pdf' --acl-public s3://rsubmission-draft/pilot5-adrg-quarto-pdf.pdf
+          shell: bash
