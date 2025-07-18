@@ -1,0 +1,4 @@
+- source: adrg-quarto-html.qmd
+  quarto-pub:
+    - id: 91e55c70-e667-47c8-ae39-bd0284b68ca8
+      url: https://rpodcast.quarto.pub/pilot-5-aanalysis-data-reviewers-guide
