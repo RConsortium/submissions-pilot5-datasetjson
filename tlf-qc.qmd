@@ -23,7 +23,6 @@ sessionInfo()
 ```
 
 ```{r path_setup}
-
 pilot3_out_path <- "pilot5-submission/pilot5-output/pilot3-tlfs/out"
 pilot5_out_path <- "pilot5-submission/pilot5-output/pilot5-tlfs/out"
 pilot5_out_files <- list.files(pilot5_out_path, pattern = ".out")
@@ -36,36 +35,34 @@ pilot3_pdf_path <- "pilot5-submission/pilot5-output/pilot3-tlfs/pdf"
 pilot5_pdf_path <- "pilot5-submission/pilot5-output/pilot5-tlfs/pdf"
 pilot5_pdf_files <- list.files(pilot5_pdf_path, pattern = ".pdf")
 
-  chat <- chat_anthropic()
-  prompt <- "compare these two images and provide a detailed list of any differences found between them? Also, please provide an overall assessment of whether these images appear to be similar enough where a human reviewer would draw the same general conclusion. Finally, give a score from 0-100 of how similar the images are, where 100 is an exact pixel-perfect match and 0 is they are completely different."
+chat <- chat_anthropic()
+prompt <- "compare these two images and provide a detailed list of any differences found between them? Also, please provide an overall assessment of whether these images appear to be similar enough where a human reviewer would draw the same general conclusion. Finally, give a score from 0-100 of how similar the images are, where 100 is an exact pixel-perfect match and 0 is they are completely different."
 
-  type_qc_diff <- type_object(
-    difference_list = type_string(),
-    same_conclusion = type_boolean(),
-    difference_score = type_integer()
-  )
-  type_qc_diffs <- type_array(items = type_qc_diff)
+type_qc_diff <- type_object(
+  difference_list = type_string(),
+  same_conclusion = type_boolean(),
+  difference_score = type_integer()
+)
+type_qc_diffs <- type_array(items = type_qc_diff)
 ```
 
 ```{r sink_setup}
 sink("qc-tlf.Rmd", append = TRUE)
 cat("## TLF QC Check Complete!", "\n\n")
 cat("Date: ", format(Sys.Date()), "\n")
-cat("Run by: ", Sys.getenv('GITHUB_ACTOR'), "\n")
+cat("Run by: ", Sys.getenv("GITHUB_ACTOR"), "\n")
 cat("Git Ref: ", Sys.getenv("GITHUB_REF"), "\n")
 cat("BASE: ", "Pilot 5 Datasets", "\n")
 cat("COMPARE: ", "Pilot 3 Datasets", "\n")
 sink()
-
 ```
 
 ```{r out_compare}
 sink("qc-tlf.Rmd", append = TRUE)
 
 for (i in pilot5_out_files) {
-
-    new_tlf_path <- file.path(pilot5_out_path, i)
-    comp_tlf_path <- file.path(pilot3_out_path, sub("pilot5", "pilot3", i))
+  new_tlf_path <- file.path(pilot5_out_path, i)
+  comp_tlf_path <- file.path(pilot3_out_path, sub("pilot5", "pilot3", i))
 
   diffs <- waldo::compare(readLines(new_tlf_path), readLines(comp_tlf_path))
 
@@ -78,43 +75,40 @@ for (i in pilot5_out_files) {
   print(diffs)
   cat("```\n\n")
   cat("</details>")
-   cat("\n\n")
-
+  cat("\n\n")
 }
 sink()
-
 ```
 
 ```{r pdf_compare}
 sink("qc-tlf.Rmd", append = TRUE)
 
 for (i in pilot5_pdf_files) {
+  new_tlf_path <- file.path(pilot5_pdf_path, i)
+  new_png_path <- sub(".pdf", ".png", new_tlf_path, fixed = TRUE)
 
-    new_tlf_path <- file.path(pilot5_pdf_path, i)
-    new_png_path <- sub(".pdf", ".png", new_tlf_path, fixed = TRUE)
+  comp_tlf_path <- file.path(pilot3_pdf_path, sub("pilot5", "pilot3", i))
+  comp_png_path <- sub(".pdf", ".png", comp_tlf_path, fixed = TRUE)
 
-    comp_tlf_path <- file.path(pilot3_pdf_path, sub("pilot5", "pilot3", i))
-    comp_png_path <- sub(".pdf", ".png", comp_tlf_path, fixed = TRUE)
-    
-    system(
+  system(
     paste0("convert -adjoin ", new_tlf_path, " ", new_png_path),
     intern = TRUE,
     ignore.stdout = TRUE,
     ignore.stderr = TRUE,
     wait = TRUE
-    )
-    system(
+  )
+  system(
     paste0("convert -adjoin ", comp_tlf_path, " ", comp_png_path),
     intern = TRUE,
     ignore.stdout = TRUE,
     ignore.stderr = TRUE,
     wait = TRUE
-    )
+  )
 
-new_image <- content_image_file(new_png_path)
-comp_image <- content_image_file(comp_png_path)
+  new_image <- content_image_file(new_png_path)
+  comp_image <- content_image_file(comp_png_path)
 
-    res <- chat$chat_structured(
+  res <- chat$chat_structured(
     prompt,
     new_image,
     comp_image,
@@ -122,18 +116,17 @@ comp_image <- content_image_file(comp_png_path)
   )
 
   if (!res$same_conclusion) file.create("qc-tlf.fail", showWarnings = TRUE)
-    
+
   cat("<details>\n")
   status_emoji <- if (res$same_conclusion) "✅" else "❌"
   cat(str_glue("<summary>{status_emoji} TLF: {i} - Score: {res$difference_score}</summary>\n\n"))
-  #cat("\n\n```\n\n")
+  # cat("\n\n```\n\n")
   cat("\n\n")
   print(res$difference_list[[1]])
   cat("\n\n")
-  #cat("```\n\n")
+  # cat("```\n\n")
   cat("</details>")
-   cat("\n\n")
-
+  cat("\n\n")
 }
 
 sink()
@@ -143,21 +136,20 @@ sink()
 sink("qc-tlf.Rmd", append = TRUE)
 
 for (i in pilot5_rtf_files) {
+  new_tlf_path <- file.path(pilot5_rtf_path, i)
+  new_png_path <- sub(".rtf", ".png", new_tlf_path, fixed = TRUE)
+  new_pdf_path <- sub(".rtf", ".pdf", new_tlf_path, fixed = TRUE)
 
-    new_tlf_path <- file.path(pilot5_rtf_path, i)
-    new_png_path <- sub(".rtf", ".png", new_tlf_path, fixed = TRUE)
-    new_pdf_path <- sub(".rtf", ".pdf", new_tlf_path, fixed = TRUE)
-    
-    comp_tlf_path <- file.path(pilot3_rtf_path, sub("pilot5", "pilot3", i))
-    comp_png_path <- sub(".rtf", ".png", comp_tlf_path, fixed = TRUE)
-    comp_pdf_path <- sub(".rtf", ".pdf", comp_tlf_path, fixed = TRUE)
-   
+  comp_tlf_path <- file.path(pilot3_rtf_path, sub("pilot5", "pilot3", i))
+  comp_png_path <- sub(".rtf", ".png", comp_tlf_path, fixed = TRUE)
+  comp_pdf_path <- sub(".rtf", ".pdf", comp_tlf_path, fixed = TRUE)
+
 
   Sys.setenv("LD_LIBRARY_PATH" = paste0("/usr/lib/libreoffice/program:", Sys.getenv("LD_LIBRARY_PATH")))
-   system(
+  system(
     paste0(
-        "libreoffice --headless --convert-to pdf --outdir ",
-        pilot5_rtf_path, " ", new_tlf_path
+      "libreoffice --headless --convert-to pdf --outdir ",
+      pilot5_rtf_path, " ", new_tlf_path
     ),
     intern = TRUE,
     ignore.stdout = FALSE,
@@ -165,36 +157,36 @@ for (i in pilot5_rtf_files) {
     wait = TRUE
   )
 
-       system(
+  system(
     paste0(
-        "libreoffice --headless --convert-to pdf --outdir ",
-        pilot3_rtf_path, " ", comp_tlf_path
+      "libreoffice --headless --convert-to pdf --outdir ",
+      pilot3_rtf_path, " ", comp_tlf_path
     ),
     intern = TRUE,
     ignore.stdout = FALSE,
     ignore.stderr = FALSE,
     wait = TRUE
   )
-    
-    system(
+
+  system(
     paste0("convert -adjoin -append ", new_pdf_path, " ", new_png_path),
     intern = TRUE,
     ignore.stdout = FALSE,
     ignore.stderr = FALSE,
     wait = TRUE
-    )
-    system(
+  )
+  system(
     paste0("convert -adjoin -append ", comp_pdf_path, " ", comp_png_path),
     intern = TRUE,
     ignore.stdout = TRUE,
     ignore.stderr = TRUE,
     wait = TRUE
-    )
+  )
 
-    new_image <- content_image_file(new_png_path)
-    comp_image <- content_image_file(comp_png_path)
+  new_image <- content_image_file(new_png_path)
+  comp_image <- content_image_file(comp_png_path)
 
-    res <- chat$chat_structured(
+  res <- chat$chat_structured(
     prompt,
     new_image,
     comp_image,
@@ -205,16 +197,14 @@ for (i in pilot5_rtf_files) {
   cat("<details>\n")
   status_emoji <- if (res$same_conclusion) "✅" else "❌"
   cat(str_glue("<summary>{status_emoji} TLF: {i} - Score: {res$difference_score}</summary>\n\n"))
-  #cat("\n\n```\n\n")
+  # cat("\n\n```\n\n")
   cat("\n\n")
   print(res$difference_list[[1]])
-  #cat("```\n\n")
-    cat("\n\n")
+  # cat("```\n\n")
+  cat("\n\n")
   cat("</details>")
-   cat("\n\n")
-
+  cat("\n\n")
 }
 
 sink()
-
 ```

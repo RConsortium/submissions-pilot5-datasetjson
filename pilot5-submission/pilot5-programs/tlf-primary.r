@@ -153,4 +153,4 @@ doc <- rtf_doc(ht) %>%
   )
 # nolint end
 # Write out the RTF
-pharmaRTF::write_rtf(doc, file = file.path(path$output, "tlf-primary-pilot5.rtf"))
+pharmaRTF::write_rtf(doc, file = file.path(path$output, "rtf/tlf-primary-pilot5.rtf"))
