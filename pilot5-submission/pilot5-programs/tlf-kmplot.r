@@ -99,6 +99,6 @@ file <- cowplot::plot_grid(
   rel_heights = c(0.1, 0.75, 0.1)
 )
 
-ggsave(file, filename = file.path(path$output, "tlf-kmplot-pilot5.pdf"))
+ggsave(file, filename = file.path(path$output, "pdf/tlf-kmplot-pilot5.pdf"))
 
 while (!is.null(dev.list())) dev.off()
