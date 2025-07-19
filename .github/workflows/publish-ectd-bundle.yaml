@@ -88,6 +88,11 @@ jobs:
         - name: Create ECTD bundle
           run: bash ./.github/scripts/create-ectd-bundle.sh
   
+        - name: Archive ECTD bundle
+          uses: actions/upload-artifact@v4
+          with:
+            name: ectd-bundle-archive
+            path: submissions-pilot5-datasetjson-to-fda
         - name: Push ECTD bundle repository
           run: bash ./.github/scripts/push-ectd-bundle.sh
   
