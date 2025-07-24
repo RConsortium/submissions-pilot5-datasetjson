@@ -30,7 +30,10 @@ convert_json_to_rds <- function(files, output_dir = NULL) {
   if (!is.null(output_dir)) {
     # Ensure the output directory exists
     if (!dir.exists(output_dir)) dir.create(output_dir, recursive = TRUE)
-    rds_files <- file.path(output_dir, sub("\\.json$", ".rds", basename(files)))
+    rds_files <- file.path(
+      output_dir,
+      sub("\\.json$", ".rds", tolower(basename(files)))
+    )
   } else {
     rds_files <- sub("\\.json$", ".rds", files)
   }
