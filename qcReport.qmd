@@ -68,7 +68,7 @@ for (y in input_dataset_names) {
   new_dataset <- paste0("new_", y)
   comp_dataset <- paste0("comp_", y)
   
-  if ("adadas" %in% input_dataset_names) {
+  if ("adadas" == y) {
     diffs <- tryCatch({
       diffdf(get(new_dataset), get(comp_dataset),
              keys = c("USUBJID", "PARAMCD", "AVISIT", "ADT"), tolerance = .01)
