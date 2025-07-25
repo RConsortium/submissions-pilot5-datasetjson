@@ -26,10 +26,10 @@ num_cores <- 4
 # Load environment variables from project root .Renviron
 readRenviron(here::here(".Renviron"))
 
-source(here::here("vignettes/llm-adrg-utils/llm_api.R"))
-source(here::here("vignettes/llm-adrg-utils/llm_prompts.R"))
-source(here::here("vignettes/llm-adrg-utils/util.R"))
-source(here::here("vignettes/llm-adrg-utils/logging.R"))
+source(here::here("adrg/llm-adrg-utils/llm_api.R"))
+source(here::here("adrg/llm-adrg-utils/llm_prompts.R"))
+source(here::here("adrg/llm-adrg-utils/util.R"))
+source(here::here("adrg/llm-adrg-utils/logging.R"))
 
 MODEL_NAME <- "claude-3-5-haiku-latest"  # See or add to available models in llm_api.R
 #MODEL_NAME <- "gpt-4o"
@@ -74,7 +74,7 @@ colnames(tab_out) <- c("script","output","Analysis Datasets & Variables","select
 rownames(tab_out) <- NULL
 knitr::kable(tab_out)
 
-write.csv(tab_out, file=here::here("vignettes/llm-adrg-out/tlg_var_filter_table.csv"), row.names = FALSE)
+write.csv(tab_out, file=here::here("adrg/llm-adrg-out/tlg_var_filter_table.csv"), row.names = FALSE)
 ```
 
 ## read in variable descirptions
@@ -103,7 +103,7 @@ tab_var_label <- all_var |> left_join(all_name_label, by = c("Variable" = "name"
 ```{r}
 knitr::kable(tab_var_label)
 
-write.csv(tab_var_label, file=here::here("vignettes/llm-adrg-out/adam_var_label_table.csv"), row.names = FALSE)
+write.csv(tab_var_label, file=here::here("adrg/llm-adrg-out/adam_var_label_table.csv"), row.names = FALSE)
 ```
 
 
@@ -136,7 +136,7 @@ print(pkgdesc |> select(c("Description")))
 
 use btw to generate more reader friendly descriptions
 ```{r}
-tab_pkgs <- read.csv(here::here("vignettes/llm-adrg-out/R_Packages_And_Versions.csv"))
+tab_pkgs <- read.csv(here::here("adrg/llm-adrg-out/R_Packages_And_Versions.csv"))
 pkgs <- tab_pkgs$Package
 pkgdesc <- sapply(pkgs, function(pkg)utils::packageDescription(pkg)$Description)
 
@@ -150,7 +150,7 @@ colnames(pkgdesc)[3] <- "Description"
 knitr::kable(pkgdesc)
 
 
-write.csv(pkgdesc, file=here::here("vignettes/llm-adrg-out/pkg_descriptions.csv"), row.names = FALSE)
+write.csv(pkgdesc, file=here::here("adrg/llm-adrg-out/pkg_descriptions.csv"), row.names = FALSE)
 ```
 
 # Automation block 3: ADaM generation informtion proprocessing
