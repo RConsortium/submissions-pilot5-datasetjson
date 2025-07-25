@@ -67,20 +67,19 @@ cat("COMPARE: ", "Pilot 3 Datasets", "\n")
 for (y in input_dataset_names) {
   new_dataset <- paste0("new_", y)
   comp_dataset <- paste0("comp_", y)
-  
+
   if ("adadas" %in% input_dataset_names) {
-    diffs <- tryCatch({
-      diffdf(get(new_dataset), get(comp_dataset),
-             keys = c("USUBJID", "PARAMCD", "AVISIT", "ADT"), tolerance = .01)
-    }, error = function(e) {
-      message("Error in diffdf with keys: ", e$message)
-      message("Column names in new_dataset:")
-      print(names(get(new_dataset)))
-      message("Column names in comp_dataset:")
-      print(names(get(comp_dataset)))
-      # Return an empty list to avoid breaking the loop further
-      list()
-    })
+    diffs <- tryCatch(
+      {
+        diffdf(get(new_dataset), get(comp_dataset),
+          keys = c("USUBJID", "PARAMCD", "AVISIT", "ADT"), tolerance = .01
+        )
+      },
+      error = function(e) {
+        message("Error in diffdf with keys: ", e$message)
+        list()
+      }
+    )
   }
 
   if (length(diffs) != 0) file.create("qc.fail")

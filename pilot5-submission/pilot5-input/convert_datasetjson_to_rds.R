@@ -44,8 +44,10 @@ convert_json_to_rds <- function(files, output_dir = NULL) {
   return(rds_files)
 }
 
-sdtm_files <- list.files(path = "pilot5-submission/pilot5-input/sdtmdata/datasetjson",
-                         pattern = "\\.json$",
-                         full.names = TRUE)
+sdtm_files <- list.files(
+  path = "pilot5-submission/pilot5-input/sdtmdata/datasetjson",
+  pattern = "\\.json$",
+  full.names = TRUE
+)
 
 convert_json_to_rds(sdtm_files, output_dir = "pilot5-submission/pilot5-input/sdtmdata/datasetjson")

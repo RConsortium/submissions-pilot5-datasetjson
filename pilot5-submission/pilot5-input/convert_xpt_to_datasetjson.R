@@ -6,9 +6,9 @@
 #' @returns Columns compliant data frame
 extract_xpt_meta <- function(n, .data) {
   attrs <- attributes(.data[[n]])
-  
+
   out <- list()
-  
+
   # Identify the variable type
   if (inherits(.data[[n]], "Date")) {
     out$dataType <- "date"
@@ -17,22 +17,23 @@ extract_xpt_meta <- function(n, .data) {
     out$dataType <- "datetime"
     out$targetDataType <- "integer"
   } else if (inherits(.data[[n]], "numeric")) {
-    if (any(is.double(.data[[n]])))
+    if (any(is.double(.data[[n]]))) {
       out$dataType <- "float"
-    else
+    } else {
       out$dataType <- "integer"
-  }  else if (inherits(.data[[n]], "hms")) {
+    }
+  } else if (inherits(.data[[n]], "hms")) {
     out$dataType <- "time"
     out$targetDataType <- "integer"
   } else {
     out$dataType <- "string"
     out$length <- max(purrr::map_int(.data[[n]], nchar), 1L)
   }
-  
+
   out$itemOID <- n
   out$name <- n
-  out$label <- attr(.data[[n]], 'label')
-  out$displayFormat <- attr(.data[[n]], 'format.sas')
+  out$label <- attr(.data[[n]], "label")
+  out$displayFormat <- attr(.data[[n]], "format.sas")
   tibble::as_tibble(out)
 }
 
@@ -49,9 +50,9 @@ extract_xpt_meta <- function(n, .data) {
 #' @examples
 #' \dontrun{
 #' process_xpt_to_json(
-#'  file.path(system.file(package='datasetjson'), "adsl.xpt"),
-#'  output_dir = file.path("pilot5-submission", "pilot5-input", "sdtmdata")
-#'  )
+#'   file.path(system.file(package = "datasetjson"), "adsl.xpt"),
+#'   output_dir = file.path("pilot5-submission", "pilot5-input", "sdtmdata")
+#' )
 #' }
 process_xpt_to_json <- function(xpt_path,
                                 item_oid = NULL,
@@ -64,26 +65,28 @@ process_xpt_to_json <- function(xpt_path,
   item_oid <- item_oid %||% tolower(tools::file_path_sans_ext(basename(xpt_path)))
   dataset_name <- dataset_name %||% item_oid
   # set dataset label if not already set
-  if (is.null(attr(dataset, 'label'))) {
+  if (is.null(attr(dataset, "label"))) {
     label <- names_labels |>
       dplyr::filter(OID == dataset_name) |>
       dplyr::pull(Label)
-    attr(dataset, 'label') <- label
+    attr(dataset, "label") <- label
   }
-  
-  dataset_meta <- purrr::map_df(names(dataset), extract_xpt_meta, .data =
-                                  dataset)
+
+  dataset_meta <- purrr::map_df(names(dataset), extract_xpt_meta,
+    .data =
+      dataset
+  )
   ds_json <- datasetjson::dataset_json(
     dataset,
     item_oid = item_oid,
     name = dataset_name,
-    dataset_label = attr(dataset, 'label'),
+    dataset_label = attr(dataset, "label"),
     columns = dataset_meta
   )
   json_file_content <- datasetjson::write_dataset_json(ds_json)
-  
+
   results <- list(meta = dataset_meta, json_content = json_file_content)
-  
+
   if (write_json) {
     out_file <- file.path(output_dir, paste0(item_oid, ".json"))
     writeLines(json_file_content, out_file)
@@ -110,17 +113,20 @@ extract_names_labels <- function(xml_path) {
   doc <- xml2::read_xml(xml_path)
   ns <- xml2::xml_ns(doc)
   itemgroup_nodes <- xml2::xml_find_all(doc, ".//d1:ItemGroupDef", ns)
-  purrr::map(itemgroup_nodes,
-             ~ tibble::tibble(
-               OID = xml2::xml_attr(.x, "OID"),
-               Label = xml2::xml_attr(.x, "Label")
-             )) |>
+  purrr::map(
+    itemgroup_nodes,
+    ~ tibble::tibble(
+      OID = xml2::xml_attr(.x, "OID"),
+      Label = xml2::xml_attr(.x, "Label")
+    )
+  ) |>
     purrr::list_rbind()
 }
 
 list.files("original-sdtmdata/",
-           pattern = "\\.xpt$",
-           full.names = TRUE) |>
+  pattern = "\\.xpt$",
+  full.names = TRUE
+) |>
   purrr::discard(~ stringr::str_detect(.x, "(ts)\\.xpt$")) |>
   purrr::walk(
     process_xpt_to_json,

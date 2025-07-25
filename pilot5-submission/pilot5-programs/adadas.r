@@ -176,19 +176,19 @@ adas5 <- adas_locf2 %>%
   restrict_derivation(
     derivation = derive_var_pchg,
     filter = is.na(ABLFL)
-  ) %>% 
+  ) %>%
   ungroup()
 
 # Export to xpt ---------------
 adas <- adas5 %>%
-  convert_na_to_blanks() %>% 
+  convert_na_to_blanks() %>%
   drop_unspec_vars(adadas_spec) %>%
-  sort_by_key(adadas_spec) %>% 
+  sort_by_key(adadas_spec) %>%
   check_ct_data(adadas_spec, na_acceptable = TRUE) %>%
   xportr_label(adadas_spec) %>%
-  xportr_order(adadas_spec) %>% 
+  xportr_order(adadas_spec) %>%
   xportr_format(adadas_spec) %>%
-  xportr_df_label(adadas_spec, domain = "adadas") 
+  xportr_df_label(adadas_spec, domain = "adadas")
 
 
 # FIX: attribute issues where sas.format attributes set to DATE9. are changed to DATE9,
