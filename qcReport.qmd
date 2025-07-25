@@ -72,8 +72,7 @@ for (y in input_dataset_names) {
     diffs <- tryCatch(
       {
         diffdf(get(new_dataset), get(comp_dataset),
-          keys = c("USUBJID", "PARAMCD", "AVISIT", "ADT"), tolerance = .01
-        )
+          keys = c("USUBJID", "PARAMCD", "AVISIT", "ADT"))
       },
       error = function(e) {
         message("Error in diffdf with keys: ", e$message)
