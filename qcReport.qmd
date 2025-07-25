@@ -67,7 +67,8 @@ cat("COMPARE: ", "Pilot 3 Datasets", "\n")
 for (y in input_dataset_names) {
   new_dataset <- paste0("new_", y)
   comp_dataset <- paste0("comp_", y)
-  if (input_dataset_names == "adadas"){
+  
+  if (any(input_dataset_names) == "adadas"){
   diffs <- diffdf(get(new_dataset), get(comp_dataset),
                    keys = c("USUBJID", "PARAMCD", "AVISIT", "ADT"), tolerance = .01)  
   } else{
