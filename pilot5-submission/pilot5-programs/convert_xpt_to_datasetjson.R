@@ -83,9 +83,9 @@ process_xpt_to_json <- function(xpt_path,
     dataset_label = attr(dataset, "label"),
     columns = dataset_meta
   )
-  json_file_content <- datasetjson::write_dataset_json(ds_json, 
-                                                       float_as_decimals = TRUE
-                                                       )
+  json_file_content <- datasetjson::write_dataset_json(ds_json,
+    float_as_decimals = TRUE
+  )
 
   results <- list(meta = dataset_meta, json_content = json_file_content)
 
