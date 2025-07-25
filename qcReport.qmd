@@ -68,11 +68,11 @@ for (y in input_dataset_names) {
   new_dataset <- paste0("new_", y)
   comp_dataset <- paste0("comp_", y)
   
-  if (any(input_dataset_names) == "adadas"){
-  diffs <- diffdf(get(new_dataset), get(comp_dataset),
-                   keys = c("USUBJID", "PARAMCD", "AVISIT", "ADT"), tolerance = .01)  
-  } else{
-  diffs <- diffdf(get(new_dataset), get(comp_dataset))
+  if ("adadas" %in% input_dataset_names) {
+    diffs <- diffdf(get(new_dataset), get(comp_dataset),
+                     keys = c("USUBJID", "PARAMCD", "AVISIT", "ADT"), tolerance = .01)  
+  } else {
+    diffs <- diffdf(get(new_dataset), get(comp_dataset))
   }
 
   if (length(diffs) != 0) file.create("qc.fail")
