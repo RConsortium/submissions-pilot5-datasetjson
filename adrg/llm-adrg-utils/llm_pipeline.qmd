@@ -31,8 +31,8 @@ source(here::here("vignettes/llm-adrg-utils/llm_prompts.R"))
 source(here::here("vignettes/llm-adrg-utils/util.R"))
 source(here::here("vignettes/llm-adrg-utils/logging.R"))
 
-#MODEL_NAME <- "claude-3-5-haiku-latest"  # See or add to available models in llm_api.R
-MODEL_NAME <- "gpt-4o"
+MODEL_NAME <- "claude-3-5-haiku-latest"  # See or add to available models in llm_api.R
+#MODEL_NAME <- "gpt-4o"
 # initial comparison between gpt-4o, deepseek-reasoner, claude. gpt-4o & claude gave more consistent result with cleaner formatting
 
 # Print current working directory and model info
