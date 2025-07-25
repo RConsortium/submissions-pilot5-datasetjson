@@ -38,7 +38,7 @@ convert_json_to_rds <- function(files, output_dir = NULL) {
     rds_files <- sub("\\.json$", ".rds", files)
   }
   purrr::walk2(files, rds_files, function(json, rds) {
-    datasetjson::read_dataset_json(json, decimals_as_floats = FALSE) |>
+    datasetjson::read_dataset_json(json, decimals_as_floats = TRUE) |>
       saveRDS(file = rds)
   })
   return(rds_files)

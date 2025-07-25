@@ -129,7 +129,7 @@ adtte <- adtte_pre %>%
   xportr_label(adtte_spec) %>%
   xportr_df_label(adtte_spec, domain = "adtte") %>%
   xportr_format(
-    atte_spec$var_spec %>% mutate_at(c("format"), ~ replace_na(., "")),
+    adtte_spec$var_spec %>% mutate_at(c("format"), ~ replace_na(., "")),
     "ADTTE"
   ) %>%
   convert_na_to_blanks()
