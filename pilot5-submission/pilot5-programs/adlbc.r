@@ -17,6 +17,7 @@ library(admiral)
 library(metacore)
 library(metatools)
 library(stringr)
+library(purrr)
 
 ## Load datasets ------------
 dat_to_load <- list(
