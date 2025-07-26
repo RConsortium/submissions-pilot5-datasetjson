@@ -20,7 +20,6 @@ library(dplyr)
 library(haven)
 library(r2rtf)
 library(emmeans)
-library(pilot5utils)
 
 ## -----------------------------------------------------------------------------
 adsl <- readRDS(file.path(path$adam, "adsl.rds"))
@@ -71,12 +70,12 @@ apr0ancova1 <- merge(t10, t11) %>%
   mutate(
     Trt = c("Xanomeline High Dose", "Placebo"),
     N1 = N,
-    Mean1 = pilot5utils::fmt_est(mean_bl, sd_bl),
+    Mean1 = fmt_est(mean_bl, sd_bl),
     N2 = N_20,
-    Mean2 = pilot5utils::fmt_est(mean, sd),
+    Mean2 = fmt_est(mean, sd),
     N3 = N_20,
-    Mean3 = pilot5utils::fmt_est(mean_chg, sd_chg),
-    CI = pilot5utils::fmt_ci(emmean, lower.CL, upper.CL)
+    Mean3 = fmt_est(mean_chg, sd_chg),
+    CI = fmt_ci(emmean, lower.CL, upper.CL)
   ) %>%
   select(Trt:CI)
 
@@ -94,8 +93,8 @@ apr0ancova2 <- t2 %>%
   ) %>%
   mutate(
     comp = "Xanomeline High Dose vs. Placebo",
-    mean = pilot5utils::fmt_ci(estimate, lower, upper),
-    p = pilot5utils::fmt_pval(p.value)
+    mean = fmt_ci(estimate, lower, upper),
+    p = fmt_pval(p.value)
   ) %>%
   select(comp:p)
 

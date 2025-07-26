@@ -22,7 +22,6 @@ library(dplyr)
 library(ggplot2)
 library(cowplot)
 library(ggsurvfit)
-library(pilot5utils)
 
 ## -----------------------------------------------------------------------------
 adsl <- readRDS(file.path(path$adam, "adsl.rds"))

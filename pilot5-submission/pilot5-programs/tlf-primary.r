@@ -8,7 +8,6 @@ library(tidyr)
 library(dplyr)
 library(Tplyr)
 library(pharmaRTF)
-library(pilot5utils)
 
 ## -----------------------------------------------------------------------------
 options(huxtable.add_colnames = FALSE)
@@ -62,7 +61,7 @@ hdr_fin <- str_replace_all(hdr_fin, "\\|Xanomeline ", "|Xanomeline\\\\line ")
 
 sum_data <- t %>%
   Tplyr::build() %>%
-  pilot5utils::nest_rowlabels() %>%
+  nest_rowlabels() %>%
   select(
     row_label, var1_Placebo, `var1_Xanomeline Low Dose`,
     `var1_Xanomeline High Dose`

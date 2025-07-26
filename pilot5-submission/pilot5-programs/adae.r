@@ -19,6 +19,7 @@ library(xportr)
 library(metacore)
 library(metatools)
 library(haven)
+library(purrr)
 
 ## Load datasets ------------
 dat_to_load <- list(
