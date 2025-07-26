@@ -36,7 +36,9 @@ pilot5_pdf_path <- "pilot5-submission/pilot5-output/pilot5-tlfs/pdf"
 pilot5_pdf_files <- list.files(pilot5_pdf_path, pattern = ".pdf")
 
 chat <- chat_anthropic()
+# nolint start: line_length_linter
 prompt <- "compare these two images and provide a detailed list of any differences found between them? Also, please provide an overall assessment of whether these images appear to be similar enough where a human reviewer would draw the same general conclusion. Finally, give a score from 0-100 of how similar the images are, where 100 is an exact pixel-perfect match and 0 is they are completely different."
+# nolint end
 
 type_qc_diff <- type_object(
   difference_list = type_string(),
