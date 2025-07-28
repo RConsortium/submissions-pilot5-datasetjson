@@ -5,7 +5,7 @@
 #'
 #' @returns Columns compliant data frame
 extract_xpt_meta <- function(n, .data) {
-  attrs <- attributes(.data[[n]])
+  attrs <- attributes(.data[[n]]) # nolint
 
   out <- list()
 
@@ -67,8 +67,8 @@ process_xpt_to_json <- function(xpt_path,
   # set dataset label if not already set
   if (is.null(attr(dataset, "label"))) {
     label <- names_labels |>
-      dplyr::filter(OID == dataset_name) |>
-      dplyr::pull(Label)
+      dplyr::filter(OID == dataset_name) |> # nolint
+      dplyr::pull(Label) # nolint
     attr(dataset, "label") <- label
   }
 
@@ -87,7 +87,7 @@ process_xpt_to_json <- function(xpt_path,
     float_as_decimals = TRUE
   )
 
-  results <- list(meta = dataset_meta, json_content = json_file_content)
+  results <- list(meta = dataset_meta, json_content = json_file_content) # nolint
 
   if (write_json) {
     out_file <- file.path(output_dir, paste0(item_oid, ".json"))
