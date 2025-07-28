@@ -62,8 +62,8 @@ process_xpt_to_json <- function(xpt_path,
                                 output_dir = ".") {
   print(xpt_path)
   dataset <- haven::read_xpt(xpt_path)
-  item_oid <- item_oid %||% tolower(tools::file_path_sans_ext(basename(xpt_path)))
-  dataset_name <- dataset_name %||% item_oid
+  item_oid <- item_oid %||% tolower(tools::file_path_sans_ext(basename(xpt_path))) # nolint
+  dataset_name <- dataset_name %||% item_oid # nolint
   # set dataset label if not already set
   if (is.null(attr(dataset, "label"))) {
     label <- names_labels |>
