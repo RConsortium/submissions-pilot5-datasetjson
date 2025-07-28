@@ -115,7 +115,11 @@ rix(
     "yyjsonr"
   ),
   system_pkgs = c("dejavu_fonts", "quarto"),
-  tex_pkgs = c("amsmath", "framed", "multirow", "wrapfig", "tabu", "threeparttable", "threeparttablex", "environ", "makecell", "tcolorbox", "tikzfill", "pdfcol", "fontawesome5"),
+  tex_pkgs = c(
+    "amsmath", "framed", "multirow", "wrapfig", "tabu", "threeparttable",
+    "threeparttablex", "environ", "makecell", "tcolorbox", "tikzfill", "pdfcol",
+    "fontawesome5"
+  ),
   ide = "none",
   project_path = ".",
   overwrite = TRUE,
