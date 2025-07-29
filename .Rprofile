@@ -11,5 +11,3 @@ path <- list(
   adam_json = file.path(getwd(), "pilot5-submission/pilot5-output/pilot5-datasetjson"),
   programs = file.path(getwd(), "pilot5-submission/pilot5-programs")
 )
-
-source(file.path(getwd(), "pilot5-helper-fcns.R"))
