@@ -16,7 +16,6 @@ library(tidyr)
 library(admiral)
 library(metacore)
 library(metatools)
-library(pilot5utils)
 
 ## Load datasets ------------
 dat_to_load <- list(
