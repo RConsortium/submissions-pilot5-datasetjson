@@ -568,22 +568,24 @@ Sys.setenv(RENV_DOWNLOAD_FILE_METHOD = "libcurl")
 # File locations
 
 path <- list(
-  sdtm = file.path(getwd(), "pilot5-submission/pilot5-input/sdtmdata/datasetjson"),
-  adam = file.path(getwd(), "pilot5-submission/pilot5-input/adamdata"),
-  output = file.path(getwd(), "pilot5-submission/pilot5-output/pilot5-tlfs"),
-  adam_json = file.path(getwd(), "pilot5-submission/pilot5-output/pilot5-datasetjson"),
-  programs = file.path(getwd(), "pilot5-submission/pilot5-programs")
+  sdtm = file.path(getwd(), "m5/datasets/rconsortiumpilot5/tabulations/sdtm"),
+  adam = file.path(getwd(), "m5/datasets/rconsortiumpilot5/analysis/adam/datasets"),
+  output = file.path(getwd(), "m5/datasets/rconsortiumpilot5/analysis/adam/programs"),
+  adam_json = file.path(getwd(), "m5/datasets/rconsortiumpilot5/analysis/adam/datasets"),
+  programs = file.path(getwd(), "m5/datasets/rconsortiumpilot5/analysis/adam/programs")
 )
 ```
 
 ## Execute R Programs
 
-To reproduce analysis results, re-run the following programs in the order below:
+To reproduce JSON datasets and analysis results, re-run the following programs in the order below:
 
-::: {.callout-warning}
-
-## TO DO
-
-Finish the program list and add here in place of this box.
-:::
-
+* `adadas.r`
+* `adae.r`
+* `adlbc.r`
+* `adsl.r`
+* `adtte.r`
+* `tlf-demographic.r`
+* `tlf-efficacy.r`
+* `tlf-kmplot.r`
+* `tlf-primary.r`
