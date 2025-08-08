@@ -488,7 +488,10 @@ renv::init()
 
 The function will prompt you to make a choice due to the lockfile being present. Enter `1` in the console to choose **Restore the project from the lockfile**.
 
-::: {.call-warning}
+::: {.callout-warning}
+
+## TO DO
+
 The Pilot 3 ADRG has a large note about handling an error downloading `PACKAGES.rds` from the Posit Package Manager. If this issue arises during testing, copy the contents of that note here.
 :::
 
@@ -504,7 +507,10 @@ Due to certain R packages requiring compilation from their source versions, the 
 
 5. Edit the `.Rprofile` file created in the working directory to match the following contents:
 
-::: {.call-warning}
+::: {.callout-warning}
+
+## TO DO
+
 Ensure that the paths defined in the snippet below reflect the eCTD bundle structure
 :::
 
@@ -528,7 +534,10 @@ path <- list(
 
 To reproduce analysis results, re-run the following programs in the order below:
 
-::: {.call-warning}
+::: {.callout-warning}
+
+## TO DO
+
 Finish the program list and add here in place of this box.
 :::
 
