@@ -368,13 +368,59 @@ kable_styling(df_kbl, latex_options = c("scale_down", "HOLD_position", "repeat_h
 
 # Directory Structure
 
-::: {.callout-warning}
+Study datasets and the R programs are organized in accordance to Study Data Technical Conformance Guide.
 
-## TO DO
 
-Add output from `tree` command on the local clone of the ectd repo structure
+    ├── m1
+    │   └── us
+    │       └── cover-letter.pdf
+    └── m5
+        └── datasets
+            └── rconsortiumpilot5
+                ├── analysis
+                │   └── adam
+                │       ├── datasets
+                │       │   ├── adadas.json
+                │       │   ├── adae.json
+                │       │   ├── adlbc.json
+                │       │   ├── adrg.pdf
+                │       │   ├── adsl.json
+                │       │   └── adtte.json
+                │       └── programs
+                │           ├── adadas.r
+                │           ├── adae.r
+                │           ├── adlbc.r
+                │           ├── adsl.r
+                │           ├── adtte.r
+                │           ├── renv-lock.txt
+                │           ├── tlf-demographic.r
+                │           ├── tlf-efficacy.r
+                │           ├── tlf-kmplot.r
+                │           └── tlf-primary.r
+                └── tabulations
+                    └── sdtm
+                        ├── ae.json
+                        ├── cm.json
+                        ├── dm.json
+                        ├── ds.json
+                        ├── ex.json
+                        ├── lb.json
+                        ├── mh.json
+                        ├── qs.json
+                        ├── relrec.json
+                        ├── sc.json
+                        ├── se.json
+                        ├── suppae.json
+                        ├── suppdm.json
+                        ├── suppds.json
+                        ├── supplb.json
+                        ├── sv.json
+                        ├── ta.json
+                        ├── te.json
+                        ├── ti.json
+                        ├── tv.json
+                        └── vs.json
 
-:::
 
 # Appendix 1: Pilot 5 R Environment Installation and Usage {#sec-a1}
 
