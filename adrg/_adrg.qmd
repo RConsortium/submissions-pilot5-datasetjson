@@ -289,12 +289,12 @@ The following table contains a list of programs that generate outputs used in th
 #| label: table-output-programs
 #| echo: false
 
-df <- read.csv("llm-adrg-out/adam_var_label_table.csv", stringsAsFactors = FALSE)
+df <- read.csv("llm-adrg-out/tlg_var_filter_table.csv", stringsAsFactors = FALSE)
 
 df_kbl <- kbl(
   df,
-  col.names = c("Variable", "Dataset", "Label"),
-  align = "c",
+  col.names = c("Script", "Output", "Analysis Dataset & Variables", "Selection Criteria"),
+  align = "l",
   booktabs = FALSE
 )
 ```
@@ -315,10 +315,220 @@ kable_styling(df_kbl, font_size = 10)
 kable_styling(df_kbl, latex_options = c("scale_down", "hold_position")) |>
   column_spec(1, border_left = TRUE, border_right = TRUE, latex_valign = "m") |>
   column_spec(2, width = "10em", border_left = TRUE, border_right = TRUE, latex_valign = "m") |>
-  column_spec(3, width = "10em", border_left = TRUE, border_right = TRUE, latex_valign = "m")
+  column_spec(3, width = "10em", border_left = TRUE, border_right = TRUE, latex_valign = "m") |>
+  column_spec(4, width = "10em", border_left = TRUE, border_right = TRUE, latex_valign = "m")
 ```
+:::
+
+For reference, below is a description of the analysis programs utilized and outputs generated in Pilot 1.
+
+| **Program Name**  | **Output Table Number** | **Title**                                                                         |
+|-------------------|-------------------------|-----------------------------------------------------------------------------------|
+| tlf-demographic.r | Table 14-2.01           | Summary of Demographic and Baseline Characteristics                               |
+| tlf-primary.r     | Table 14-3.01           | Primary Endpoint Analysis: ADAS Cog (11) - Change from Baseline to Week 24 - LOCF |
+| tlf-efficacy.r    | Table 14-3.02           | ANCOVA of Change from Baseline at Week 20                                         |
+| tlf-kmplot.r      | Figure 14-1             | KM plot for Time to First Dermatologic Event: Safety population                   |
+
+## Open-source R Packages
+
+```{r}
+#| label: table-packages
+#| echo: false
+
+df <- read.csv("llm-adrg-out/pkg_descriptions.csv", stringsAsFactors = FALSE)
+
+df_kbl <- kbl(
+  df,
+  col.names = c("Package", "Version", "Description"),
+  align = "l",
+  booktabs = FALSE,
+  longtable = TRUE
+)
+```
+
+::: {.content-visible when-format="html"}
+```{r}
+#| label: table-packages-html
+#| echo: false
+
+kable_styling(df_kbl, font_size = 10)
+```
+:::
+
+::: {.content-visible when-format="pdf"}
+```{r}
+#| label: table-packages-pdf
+#| echo: false
+kable_styling(df_kbl, latex_options = c("scale_down", "HOLD_position", "repeat_header")) |>
+  column_spec(1, width = "7em", border_left = TRUE, border_right = TRUE, latex_valign = "m") |>
+  column_spec(2, width = "7em", border_left = TRUE, border_right = TRUE, latex_valign = "m") |>
+  column_spec(3, width = "30em", border_left = TRUE, border_right = TRUE, latex_valign = "m")
+```
+:::
+
+# Directory Structure
+
+::: {.callout-warning}
+
+## TO DO
+
+Add output from `tree` command on the local clone of the ectd repo structure
+
 :::
 
 # Appendix 1: Pilot 5 R Environment Installation and Usage {#sec-a1}
 
-More to come!
+To execute the R programs included in this Pilot, follow all of the procedures below. Ensure that you note the location of where you downloaded the Pilot 5 eCTD submission files. For demonstration purposes, the procedures below assume the transfer has been saved to this location: `C:\pilot5`.
+
+In addition, create a new directory to hold the unpacked Pilot 5 data files and associated programs. For demonstration purposes, the procedures below assume the new directory is this location: `C:\pilot5-files`.
+
+## Installation of R and RStudio
+
+Download and install R 4.4.1 for Windows from <https://cloud.r-project.org/bin/windows/base/old/4.4.1/R-4.4.1-win.exe>. While optional, it is also recommended to use RStudio IDE for executing R code to launch the application. You can download RStudio for Windows by visiting <https://posit.co/download/rstudio-desktop/#download>.
+
+## Installation of Rtools
+
+Due to certain R packages requiring compilation from source, it is also required that you install the **Rtools** Windows utility from CRAN. You can download Rtools built for R version `4.4.1` by visiting <https://cloud.r-project.org/bin/windows/Rtools/rtools44/files/rtools44-6459-6401.exe>. During the installation procedure, keep the default choices in the settings presented in the installation dialog.
+
+Once the installation is complete, launch a new R session (if you have an existing session open, close that session first) and in the console, run the following command that should give the location of your Rtools installation:
+
+``` r
+Sys.which("make")
+"C:\\rtools44\\usr\\bin\\make.exe" 
+```
+
+## Initialize R Program Execution Environment
+
+The dependencies for executing the R programs are managed by the `renv` R package management system. To bootstrap the customized R package library, launch a new R session in the directory where you unpacked the source files in the previous step. **Choose one of the following options** depending on your R computing environment and preference.
+
+### Option 1: RStudio {.unnumbered}
+
+Create a new RStudio project within the `pilot5-files` directory using the following procedure:
+
+* Launch RStudio
+* Select `File -> New Project`
+* In the **Create Project** dialog box, choose **Existing Directory**
+* In the **Create Project from Existing Directory** dialog box, click the **Browse** button and navigate to the `C:\pilot5-files` directory.
+* Once the location has been confirmed, click the **Create Project** button. A new directory called `.Rproj.user` and the project file `pilot5-files.Rproj` will appear in the directory.
+
+::: {.callout-note}
+It is possible that the `.Rproj.user` folder may not have generated for you or or may not be visible as it is a hidden folder. If so, this is fine as it will not be necessary in order to run the R programs below.
+:::
+
+### Option 2: R Console
+
+Launch a new R session in the `C:\pilot5-files` directory. By default, the R Gui interface on Windows will launch a new R session in your default Windows home directory (typically the **Documents** folder). Perform the following steps to ensure R is launched in the proper directory.
+
+::: {.callout-note}
+The procedure below assumes R 4.4.1 has been installed in a default location. If you are unsure of the full path to the R GUI executable on your system, you can find the location on your system by performing the following steps:
+
+1.  Open the Windows Start Menu and expand to show all applications.
+2.  Navigate to the R entry and expand the section such that all R program entries are visible.
+3.  Right-click the `R x64 4.4.1` entry and select `More -> Open file location`.
+4.  A new folder window will open with the shortcut `R x64 4.4.1` highlighted. Right-click this entry and select **Properties**
+5.  In the Properties window, copy the path specified in the **Target** text field. The portion of the text in quotations gives the full path to the `Rgui.exe` location on your system.
+:::
+
+1.  Open the Windows Powershell program by searching for Windows Powershell in the Windows Start menu.
+2.  Change the current directory to the `C:/pilot5-files` directory by running the following command (substitute the `C:/pilot5-files` location for your appropriate directory as needed):
+
+``` sh
+Set-Location -Path "C:\pilot5-files"
+```
+
+3.  Launch the Windows R GUI in this session by running the following command:
+
+``` sh
+C:\"Program Files"\R\R-4.4.1\bin\x64\Rgui.exe
+```
+
+## Installation of R Packages
+
+A minimum set of R packages are required to ensure the Pilot 5 R programs can be executed correctly. Use the following procedure to configure the Pilot 5 R package environment:
+
+1. Run the following commands in the R console to install the `remotes` and `renv` packages:
+
+``` r
+install.packages("remotes")
+
+# install version 1.0.7 of the renv package:
+remotes::install_version("renv", version = "1.1.4")
+```
+
+::: {.callout-note}
+-   *If you receive a warning showing “cannot open URL  <https://cran.rstudio.com/src/contrib/PACKAGES>'”, this is due to the default RStudio option ‘Use secure download method for HTTP’. In RStudio, go to Tools → Global Options → Packages, then uncheck the ‘Use secure download method for HTTP’ option, then retry the installation.*
+:::
+
+::: {.callout-note}
+If not already set, please verify that the working directory is already set to the project folder:
+
+* Run the following command in the R console: `getwd()`
+* If the output of this command does not match `C:\pilot5-files`, run the following command to set the working directory: `setwd("C:/pilot5-files")`
+:::
+
+2. Move the `renv-lock.txt` file to the root project directory and rename the file to `renv.lock` by typing the following command in the R console:
+
+```r
+file.copy(
+  "C:/pilot5-files/m5/datasets/rconsortiumpilot5/analysis/adam/programs/renv-lock.txt",
+  "C:/pilot5-files/renv.lock"
+)
+```
+
+3. Restart the R Session using either of the following methods depending on which option used to interact with R:
+
+* RStudio: Select `Session -> Restart R`
+* R GUI: Close the R GUI and re-open using the previous procedure.
+
+4. Within the new R session, run the following command in the R console:
+
+```r
+renv::init()
+```
+
+The function will prompt you to make a choice due to the lockfile being present. Enter `1` in the console to choose **Restore the project from the lockfile**.
+
+::: {.call-warning}
+The Pilot 3 ADRG has a large note about handling an error downloading `PACKAGES.rds` from the Posit Package Manager. If this issue arises during testing, copy the contents of that note here.
+:::
+
+4. To install the packages managed by `renv`, run the following command in the R console:
+
+```r
+renv::restore(prompt = FALSE)
+```
+
+::: {callout-note}
+Due to certain R packages requiring compilation from their source versions, the entire package restoration procedure may require at least ten minutes or longer to complete depending on internet bandwidth and your computer's hardware profile.
+:::
+
+5. Edit the `.Rprofile` file created in the working directory to match the following contents:
+
+::: {.call-warning}
+Ensure that the paths defined in the snippet below reflect the eCTD bundle structure
+:::
+
+```r
+source("renv/activate.R")
+Sys.setenv(RENV_DOWNLOAD_FILE_METHOD = "libcurl")
+
+
+# File locations
+
+path <- list(
+  sdtm = file.path(getwd(), "pilot5-submission/pilot5-input/sdtmdata/datasetjson"),
+  adam = file.path(getwd(), "pilot5-submission/pilot5-input/adamdata"),
+  output = file.path(getwd(), "pilot5-submission/pilot5-output/pilot5-tlfs"),
+  adam_json = file.path(getwd(), "pilot5-submission/pilot5-output/pilot5-datasetjson"),
+  programs = file.path(getwd(), "pilot5-submission/pilot5-programs")
+)
+```
+
+## Execute R Programs
+
+To reproduce analysis results, re-run the following programs in the order below:
+
+::: {.call-warning}
+Finish the program list and add here in place of this box.
+:::
+
