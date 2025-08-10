@@ -578,14 +578,27 @@ path <- list(
 
 ## Execute R Programs
 
-To reproduce JSON datasets and analysis results, re-run the following programs in the order below:
+To reproduce the JSON datasets and analysis results, re-run the following programs in the order below:
 
+* `pilot5-helper-fcns.r` - Loads all helper functions for datasets and displays
+* `adsl.r`
 * `adadas.r`
 * `adae.r`
 * `adlbc.r`
-* `adsl.r`
 * `adtte.r`
 * `tlf-demographic.r`
 * `tlf-efficacy.r`
 * `tlf-kmplot.r`
 * `tlf-primary.r`
+
+
+# Appendix 2
+
+::: {.callout-warning}
+
+## TO DO
+
+Cross-check if anything has changed form Pilot 3 to Pilot 5 for QC Findings
+https://github.com/RConsortium/submissions-pilot5-datasetjson/wiki/QC-Findings
+
+:::
