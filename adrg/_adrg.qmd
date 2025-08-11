@@ -497,7 +497,7 @@ A minimum set of R packages are required to ensure the Pilot 5 R programs can be
 ``` r
 install.packages("remotes")
 
-# install version 1.1.14 of the renv package:
+# install version 1.1.4 of the renv package:
 remotes::install_version("renv", version = "1.1.4")
 ```
 
