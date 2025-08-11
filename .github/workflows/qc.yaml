@@ -5,6 +5,7 @@ on:
   pull_request:
     branches:
       - main
+      - adrg-draft1
 
 jobs:
   qc-check:
