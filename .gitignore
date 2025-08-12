@@ -11,4 +11,5 @@ qcReport.html
 qcReport_files
 project.Rproj
 result
-.Renviron
+.Renviron/
+adrg/_adrg_files
