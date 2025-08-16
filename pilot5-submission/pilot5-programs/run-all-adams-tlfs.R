@@ -7,6 +7,10 @@
 library(purrr)
 library(stringr)
 
+source(str_c(
+  path$programs, "/", "pilot5-helper-fcns.r"
+  ))
+
 # Run all adam scripts
 adam_files <- str_c(
   path$programs, "/", c("adsl.r", "adae.r", "adlbc.r", "adtte.r", "adadas.r")

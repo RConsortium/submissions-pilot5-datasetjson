@@ -430,11 +430,11 @@ In addition, create a new directory to hold the unpacked Pilot 5 data files and 
 
 ## Installation of R and RStudio
 
-Download and install R 4.4.1 for Windows from <https://cloud.r-project.org/bin/windows/base/old/4.4.1/R-4.4.1-win.exe>. While optional, it is also recommended to use RStudio IDE for executing R code to launch the application. You can download RStudio for Windows by visiting <https://posit.co/download/rstudio-desktop/#download>.
+Download and install R 4.4.3 for Windows from <https://cloud.r-project.org/bin/windows/base/old/4.4.3/R-4.4.3-win.exe>. While optional, it is also recommended to use RStudio IDE for executing R code to launch the application. You can download RStudio for Windows by visiting <https://posit.co/download/rstudio-desktop/#download>.
 
 ## Installation of Rtools
 
-Due to certain R packages requiring compilation from source, it is also required that you install the **Rtools** Windows utility from CRAN. You can download Rtools built for R version `4.4.1` by visiting <https://cloud.r-project.org/bin/windows/Rtools/rtools44/files/rtools44-6459-6401.exe>. During the installation procedure, keep the default choices in the settings presented in the installation dialog.
+Due to certain R packages requiring compilation from source, it is also required that you install the **Rtools** Windows utility from CRAN. You can download Rtools built for R version `4.4.3` by visiting <https://cloud.r-project.org/bin/windows/Rtools/rtools44/files/rtools44-6459-6401.exe>. During the installation procedure, keep the default choices in the settings presented in the installation dialog.
 
 Once the installation is complete, launch a new R session (if you have an existing session open, close that session first) and in the console, run the following command that should give the location of your Rtools installation:
 
@@ -497,7 +497,7 @@ A minimum set of R packages are required to ensure the Pilot 5 R programs can be
 ``` r
 install.packages("remotes")
 
-# install version 1.0.7 of the renv package:
+# install version 1.1.4 of the renv package:
 remotes::install_version("renv", version = "1.1.4")
 ```
 
@@ -578,14 +578,27 @@ path <- list(
 
 ## Execute R Programs
 
-To reproduce JSON datasets and analysis results, re-run the following programs in the order below:
+To reproduce the JSON datasets and analysis results, re-run the following programs in the order below:
 
+* `pilot5-helper-fcns.r` - Loads all helper functions for datasets and displays
+* `adsl.r`
 * `adadas.r`
 * `adae.r`
 * `adlbc.r`
-* `adsl.r`
 * `adtte.r`
 * `tlf-demographic.r`
 * `tlf-efficacy.r`
 * `tlf-kmplot.r`
 * `tlf-primary.r`
+
+
+# Appendix 2
+
+::: {.callout-warning}
+
+## TO DO
+
+Cross-check if anything has changed form Pilot 3 to Pilot 5 for QC Findings
+https://github.com/RConsortium/submissions-pilot5-datasetjson/wiki/QC-Findings
+
+:::
