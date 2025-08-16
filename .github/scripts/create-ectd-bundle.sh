@@ -29,9 +29,9 @@ LETTER_DEST_FILE=cover-letter.pdf
 RENV_SOURCE_FILE=renv.lock
 RENV_DEST_FILE=renv-lock.txt
 RENV_DESTINATION_DIR=${ECTD_PROGRAMS_DIR}
-SDTM_DATASETS_SOURCE_DIR=pilot5-submission/pilot5-input/sdtmdata
+SDTM_DATASETS_SOURCE_DIR=pilot5-submission/pilot5-input/sdtmdata/datasetjson
 SDTM_DATASETS_DESTINATION_DIR=${ECTD_SDTM_DATASETS_DIR}
-ADAM_DATASETS_SOURCE_DIR=pilot5-submission/pilot5-input/adamdata
+ADAM_DATASETS_SOURCE_DIR=pilot5-submission/pilot5-output/pilot5-datasetjson
 ADAM_DATASETS_DESTINATION_DIR=${ECTD_ADAM_DATASETS_DIR}
 PROGRAMS_SOURCE_DIR=pilot5-submission/pilot5-programs
 PROGRAMS_DESTINATION_DIR=${ECTD_PROGRAMS_DIR}
@@ -95,35 +95,46 @@ fi
 
 # Copy input SDTM data sets in rds format to ECTD SDTM datasets directory
 if [ -d "$SDTM_DATASETS_SOURCE_DIR" ]; then
-  echo "Copying rds data files from ${SDTM_DATASETS_SOURCE_DIR}"
-  for file in "${SDTM_DATASETS_SOURCE_DIR}"/*.rds; do
+  echo "Copying json data files from ${SDTM_DATASETS_SOURCE_DIR}"
+  for file in "${SDTM_DATASETS_SOURCE_DIR}"/*.json; do
     if [ -f "${file}" ]; then
       cp "$file" "${SDTM_DATASETS_DESTINATION_DIR}/."
     fi
   done
 fi
 
-# Copy input ADAM data sets in rds format to ECTD ADAM datasets directory
+# Copy input ADAM data sets in json format to ECTD ADAM datasets directory
 if [ -d "$ADAM_DATASETS_SOURCE_DIR" ]; then
-  echo "Copying rds data files from ${ADAM_DATASETS_SOURCE_DIR}"
-  for file in "${ADAM_DATASETS_SOURCE_DIR}"/*.rds; do
+  echo "Copying json data files from ${ADAM_DATASETS_SOURCE_DIR}"
+  for file in "${ADAM_DATASETS_SOURCE_DIR}"/*.json; do
     if [ -f "${file}" ]; then
       cp "$file" "${ADAM_DATASETS_DESTINATION_DIR}/."
     fi
   done
 fi
 
-# Copy R scripts to ECTD programs directory
+# Copy R programs to ECTD programs directory
+# - Only dataset creation and tlf programs
 if [ -d "$PROGRAMS_SOURCE_DIR" ]; then
   echo "Copying R programs from ${PROGRAMS_SOURCE_DIR}"
   if [ ! -d "$PROGRAMS_DESTINATION_DIR" ]; then
     echo "Create new directory ${PROGRAMS_DESTINATION_DIR}"
     mkdir -p "${PROGRAMS_DESTINATION_DIR}"
   fi
-  for file in "${PROGRAMS_SOURCE_DIR}"/*.r; do
+
+  # dataset programs
+  for file in "${PROGRAMS_SOURCE_DIR}"/ad*.r; do
+    if [ -f "${file}" ]; then
+      cp "$file" "${PROGRAMS_DESTINATION_DIR}/."
+    fi
+  done
+
+  # tlf programs
+  for file in "${PROGRAMS_SOURCE_DIR}"/tlf*.r; do
     if [ -f "${file}" ]; then
       cp "$file" "${PROGRAMS_DESTINATION_DIR}/."
     fi
   done
 fi 
+
 
