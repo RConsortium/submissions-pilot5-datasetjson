@@ -175,8 +175,8 @@ efficacy_models <- function(data, var = NULL, wk = NULL) {
   # Bind and clean up
   bind_rows(sect1, pw_final) %>%
     select(row_label,
-           `var1_Xanomeline Low Dose` = `54`,
-           `var1_Xanomeline High Dose` = `81`
+      `var1_Xanomeline Low Dose` = `54`,
+      `var1_Xanomeline High Dose` = `81`
     )
 }
 
@@ -189,9 +189,9 @@ efficacy_models <- function(data, var = NULL, wk = NULL) {
 #' @export
 fmt_num <- function(x, digits, width = digits + 4) {
   formatC(x,
-          digits = digits,
-          format = "f",
-          width = width
+    digits = digits,
+    format = "f",
+    width = width
   )
 }
 
