@@ -60,6 +60,7 @@ rix(
     "jquerylib",
     "jsonlite",
     "jsonvalidate",
+    "kableExtra",
     "knitr",
     "labeling",
     "lattice",

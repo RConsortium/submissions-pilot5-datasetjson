@@ -135,6 +135,11 @@ if [ -d "$PROGRAMS_SOURCE_DIR" ]; then
       cp "$file" "${PROGRAMS_DESTINATION_DIR}/."
     fi
   done
+
+  # helper program
+  if [-f "${PROGRAMS_SOURCE_DIR}/pilot5-helper-fcns.r" ]; then
+    cp "${PROGRAMS_SOURCE_DIR}/pilot5-helper-fcns.r" "${PROGRAMS_DESTINATION_DIR}/."
+  fi
 fi 
 
 
