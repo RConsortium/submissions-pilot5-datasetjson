@@ -445,9 +445,9 @@ Sys.which("make")
 
 ## Initialize R Program Execution Environment
 
-The dependencies for executing the R programs are managed by the `renv` R package management system. To bootstrap the customized R package library, launch a new R session in the directory where you unpacked the source files in the previous step. **Choose one of the following options** depending on your R computing environment and preference.
+The dependencies for executing the R programs are managed by the `renv` R package management system. To bootstrap the customized R package library, launch a new R session in the directory where you unpacked the source files in the previous step. 
 
-### Option 1: RStudio {.unnumbered}
+### Launching RStudio {.unnumbered}
 
 Create a new RStudio project within the `pilot5-files` directory using the following procedure:
 
@@ -460,33 +460,6 @@ Create a new RStudio project within the `pilot5-files` directory using the follo
 ::: {.callout-note}
 It is possible that the `.Rproj.user` folder may not have generated for you or or may not be visible as it is a hidden folder. If so, this is fine as it will not be necessary in order to run the R programs below.
 :::
-
-### Option 2: R Console
-
-Launch a new R session in the `C:\pilot5-files` directory. By default, the R Gui interface on Windows will launch a new R session in your default Windows home directory (typically the **Documents** folder). Perform the following steps to ensure R is launched in the proper directory.
-
-::: {.callout-note}
-The procedure below assumes R 4.4.1 has been installed in a default location. If you are unsure of the full path to the R GUI executable on your system, you can find the location on your system by performing the following steps:
-
-1.  Open the Windows Start Menu and expand to show all applications.
-2.  Navigate to the R entry and expand the section such that all R program entries are visible.
-3.  Right-click the `R x64 4.4.1` entry and select `More -> Open file location`.
-4.  A new folder window will open with the shortcut `R x64 4.4.1` highlighted. Right-click this entry and select **Properties**
-5.  In the Properties window, copy the path specified in the **Target** text field. The portion of the text in quotations gives the full path to the `Rgui.exe` location on your system.
-:::
-
-1.  Open the Windows Powershell program by searching for Windows Powershell in the Windows Start menu.
-2.  Change the current directory to the `C:/pilot5-files` directory by running the following command (substitute the `C:/pilot5-files` location for your appropriate directory as needed):
-
-``` sh
-Set-Location -Path "C:\pilot5-files"
-```
-
-3.  Launch the Windows R GUI in this session by running the following command:
-
-``` sh
-C:\"Program Files"\R\R-4.4.1\bin\x64\Rgui.exe
-```
 
 ## Installation of R Packages
 
@@ -521,10 +494,9 @@ file.copy(
 )
 ```
 
-3. Restart the R Session using either of the following methods depending on which option used to interact with R:
+3. Restart the R Session in RStudio using the following methods:
 
-* RStudio: Select `Session -> Restart R`
-* R GUI: Close the R GUI and re-open using the previous procedure.
+* Select `Session -> Restart R`
 
 4. Within the new R session, run the following command in the R console:
 
@@ -534,12 +506,6 @@ renv::init()
 
 The function will prompt you to make a choice due to the lockfile being present. Enter `1` in the console to choose **Restore the project from the lockfile**.
 
-::: {.callout-warning}
-
-## TO DO
-
-The Pilot 3 ADRG has a large note about handling an error downloading `PACKAGES.rds` from the Posit Package Manager. If this issue arises during testing, copy the contents of that note here.
-:::
 
 4. To install the packages managed by `renv`, run the following command in the R console:
 
@@ -551,7 +517,14 @@ renv::restore(prompt = FALSE)
 Due to certain R packages requiring compilation from their source versions, the entire package restoration procedure may require at least ten minutes or longer to complete depending on internet bandwidth and your computer's hardware profile.
 :::
 
-5. Edit the `.Rprofile` file created in the working directory to match the following contents:
+## Execute R Programs
+
+To reproduce the analysis results from the JSON transport files, set up and run the following programs in the order below:
+
+
+1. Setting up .Rprofile
+
+Edit the `.Rprofile` file created in the working directory to match the following contents:
 
 ::: {.callout-warning}
 
@@ -564,7 +537,6 @@ Ensure that the paths defined in the snippet below reflect the eCTD bundle struc
 source("renv/activate.R")
 Sys.setenv(RENV_DOWNLOAD_FILE_METHOD = "libcurl")
 
-
 # File locations
 
 path <- list(
@@ -576,16 +548,37 @@ path <- list(
 )
 ```
 
-## Execute R Programs
+2. Restart R Session
 
-To reproduce the JSON datasets and analysis results, re-run the following programs in the order below:
+3. Using the source function, run the `pilot5-helper-fcns.r` program, 
+which will load all helper functions for datasets and displays into your global environment.
 
-* `pilot5-helper-fcns.r` - Loads all helper functions for datasets and displays
+```r
+source(file.path(path$programs, "pilot5-helper-fcns.r"))
+```
+
+4. Convert sdtm JSON files to rds files
+
+```r
+sdtm_files <- list.files(
+  path = file.path(path$sdtm),
+  pattern = "\\.json$",
+  full.names = TRUE
+)
+
+convert_json_to_rds(sdtm_files, output_dir = file.path(path$sdtm))
+```
+
+5. Execute ADaM programs as seen in the order below:
+
 * `adsl.r`
 * `adadas.r`
 * `adae.r`
 * `adlbc.r`
 * `adtte.r`
+
+6. Execute Display programs
+
 * `tlf-demographic.r`
 * `tlf-efficacy.r`
 * `tlf-kmplot.r`
