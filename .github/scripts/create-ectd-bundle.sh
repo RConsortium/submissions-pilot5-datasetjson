@@ -55,9 +55,8 @@ if [ -f "${ADRG_SOURCE_DIR}/${ADRG_SOURCE_FILE}" ]; then
     mkdir -p "${ADRG_DESTINATION_DIR}"
   fi
   cp "${ADRG_SOURCE_DIR}/${ADRG_SOURCE_FILE}" "${ADRG_DESTINATION_DIR}/${ADRG_DEST_FILE}"
+  echo "ADRG copied to ${ADRG_DESTINATION_DIR}/${ADRG_DEST_FILE}"
 fi
-
-echo "ADRG copied to ${ADRG_DESTINATION_DIR}/${ADRG_DEST_FILE}"
 
 # Copy README for ectd repository
 if [ -f "${README_SOURCE_DIR}/${README_SOURCE_FILE}" ]; then
@@ -67,9 +66,8 @@ if [ -f "${README_SOURCE_DIR}/${README_SOURCE_FILE}" ]; then
     mkdir -p "${README_DESTINATION_DIR}"
   fi
   cp "${README_SOURCE_DIR}/${README_SOURCE_FILE}" "${README_DESTINATION_DIR}/${README_DEST_FILE}"
+  echo "README copied to ${README_DESTINATION_DIR}/${README_DEST_FILE}"
 fi
-
-echo "README copied to ${README_DESTINATION_DIR}/${README_DEST_FILE}"
 
 # Copy cover letter (PDF version)
 if [ -f "${LETTER_SOURCE_DIR}/${LETTER_SOURCE_FILE}" ]; then
@@ -79,9 +77,8 @@ if [ -f "${LETTER_SOURCE_DIR}/${LETTER_SOURCE_FILE}" ]; then
     mkdir -p "${LETTER_DESTINATION_DIR}"
   fi
   cp "${LETTER_SOURCE_DIR}/${LETTER_SOURCE_FILE}" "${LETTER_DESTINATION_DIR}/${LETTER_DEST_FILE}"
+  echo "Cover letter copied to ${LETTER_DESTINATION_DIR}/${LETTER_DEST_FILE}"
 fi
-
-echo "Cover letter copied to ${LETTER_DESTINATION_DIR}/${LETTER_DEST_FILE}"
 
 # Rename renv.lock to renv-lock.txt and copy to ECTD
 if [ -f "${RENV_SOURCE_FILE}" ]; then
@@ -91,6 +88,7 @@ if [ -f "${RENV_SOURCE_FILE}" ]; then
     mkdir -p "${RENV_DESTINATION_DIR}"
   fi
   cp "${RENV_SOURCE_FILE}" "${RENV_DESTINATION_DIR}/${RENV_DEST_FILE}"
+  echo "${RENV_SOURCE_FILE} copied to ${RENV_DESTINATION_DIR}/${RENV_DEST_FILE}"
 fi
 
 # Copy input SDTM data sets in rds format to ECTD SDTM datasets directory
@@ -99,6 +97,7 @@ if [ -d "$SDTM_DATASETS_SOURCE_DIR" ]; then
   for file in "${SDTM_DATASETS_SOURCE_DIR}"/*.json; do
     if [ -f "${file}" ]; then
       cp "$file" "${SDTM_DATASETS_DESTINATION_DIR}/."
+      echo "${file} copied to ${SDTM_DATASETS_DESTINATION_DIR}/${file}"
     fi
   done
 fi
@@ -109,6 +108,7 @@ if [ -d "$ADAM_DATASETS_SOURCE_DIR" ]; then
   for file in "${ADAM_DATASETS_SOURCE_DIR}"/*.json; do
     if [ -f "${file}" ]; then
       cp "$file" "${ADAM_DATASETS_DESTINATION_DIR}/."
+      echo "${file} copied to ${ADAM_DATASETS_DESTINATION_DIR}/${file}"
     fi
   done
 fi
@@ -126,6 +126,7 @@ if [ -d "$PROGRAMS_SOURCE_DIR" ]; then
   for file in "${PROGRAMS_SOURCE_DIR}"/ad*.r; do
     if [ -f "${file}" ]; then
       cp "$file" "${PROGRAMS_DESTINATION_DIR}/."
+      echo "${file} copied to ${PROGRAMS_DESTINATION_DIR}/${file}"
     fi
   done
 
@@ -133,12 +134,14 @@ if [ -d "$PROGRAMS_SOURCE_DIR" ]; then
   for file in "${PROGRAMS_SOURCE_DIR}"/tlf*.r; do
     if [ -f "${file}" ]; then
       cp "$file" "${PROGRAMS_DESTINATION_DIR}/."
+      echo "${file} copied to ${PROGRAMS_DESTINATION_DIR}/${file}"
     fi
   done
 
   # helper program
-  if [-f "${PROGRAMS_SOURCE_DIR}/pilot5-helper-fcns.r" ]; then
+  if [ -f "${PROGRAMS_SOURCE_DIR}/pilot5-helper-fcns.r" ]; then
     cp "${PROGRAMS_SOURCE_DIR}/pilot5-helper-fcns.r" "${PROGRAMS_DESTINATION_DIR}/."
+    echo "pilot 5 helper script copied to ${PROGRAMS_DESTINATION_DIR}/pilot5-helper-fcns.r"
   fi
 fi 
 
