@@ -392,6 +392,7 @@ Study datasets and the R programs are organized in accordance to Study Data Tech
                 │           ├── adlbc.r
                 │           ├── adsl.r
                 │           ├── adtte.r
+                │           ├── pilot5-helper-fcns.r
                 │           ├── renv-lock.txt
                 │           ├── tlf-demographic.r
                 │           ├── tlf-efficacy.r

@@ -59,29 +59,29 @@ fi
 
 echo "ADRG copied to ${ADRG_DESTINATION_DIR}/${ADRG_DEST_FILE}"
 
-# TODO: Copy README for ectd repository
-# if [ -f "${README_SOURCE_DIR}/${README_SOURCE_FILE}" ]; then
-#   echo "Copying ${README_SOURCE_DIR}/${README_SOURCE_FILE}"
-#   if [ ! -d "$README_DESTINATION_DIR" ]; then
-#     echo "Create new directory ${README_DESTINATION_DIR}"
-#     mkdir -p "${README_DESTINATION_DIR}"
-#   fi
-#   cp "${README_SOURCE_DIR}/${README_SOURCE_FILE}" "${README_DESTINATION_DIR}/${README_DEST_FILE}"
-# fi
+# Copy README for ectd repository
+if [ -f "${README_SOURCE_DIR}/${README_SOURCE_FILE}" ]; then
+  echo "Copying ${README_SOURCE_DIR}/${README_SOURCE_FILE}"
+  if [ ! -d "$README_DESTINATION_DIR" ]; then
+    echo "Create new directory ${README_DESTINATION_DIR}"
+    mkdir -p "${README_DESTINATION_DIR}"
+  fi
+  cp "${README_SOURCE_DIR}/${README_SOURCE_FILE}" "${README_DESTINATION_DIR}/${README_DEST_FILE}"
+fi
 
-# echo "README copied to ${README_DESTINATION_DIR}/${README_DEST_FILE}"
+echo "README copied to ${README_DESTINATION_DIR}/${README_DEST_FILE}"
 
-# TODO: Copy cover letter (PDF version)
-# if [ -f "${LETTER_SOURCE_DIR}/${LETTER_SOURCE_FILE}" ]; then
-#   echo "Copying ${LETTER_SOURCE_DIR}/${LETTER_SOURCE_FILE}"
-#   if [ ! -d "$LETTER_DESTINATION_DIR" ]; then
-#     echo "Create new directory ${LETTER_DESTINATION_DIR}"
-#     mkdir -p "${LETTER_DESTINATION_DIR}"
-#   fi
-#   cp "${LETTER_SOURCE_DIR}/${LETTER_SOURCE_FILE}" "${LETTER_DESTINATION_DIR}/${LETTER_DEST_FILE}"
-# fi
+# Copy cover letter (PDF version)
+if [ -f "${LETTER_SOURCE_DIR}/${LETTER_SOURCE_FILE}" ]; then
+  echo "Copying ${LETTER_SOURCE_DIR}/${LETTER_SOURCE_FILE}"
+  if [ ! -d "$LETTER_DESTINATION_DIR" ]; then
+    echo "Create new directory ${LETTER_DESTINATION_DIR}"
+    mkdir -p "${LETTER_DESTINATION_DIR}"
+  fi
+  cp "${LETTER_SOURCE_DIR}/${LETTER_SOURCE_FILE}" "${LETTER_DESTINATION_DIR}/${LETTER_DEST_FILE}"
+fi
 
-# echo "Cover letter copied to ${LETTER_DESTINATION_DIR}/${LETTER_DEST_FILE}"
+echo "Cover letter copied to ${LETTER_DESTINATION_DIR}/${LETTER_DEST_FILE}"
 
 # Rename renv.lock to renv-lock.txt and copy to ECTD
 if [ -f "${RENV_SOURCE_FILE}" ]; then

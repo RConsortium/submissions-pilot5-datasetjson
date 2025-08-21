@@ -53,14 +53,12 @@ jobs:
             nix-shell --run "quarto publish --no-prompt --no-browser --id 91e55c70-e667-47c8-ae39-bd0284b68ca8 adrg/adrg-quarto-html.qmd"
   
         - name: Render ECTD README (custom)
-          if: ${{ false }}
           env:
             QUARTO_PRINT_STACK: true
           run: |
             nix-shell --run 'quarto render ectd_readme/README.qmd --to gfm'
   
         - name: Render cover letter (custom)
-          if: ${{ false }}
           env:
             QUARTO PRINT STACK: true
           run: |
