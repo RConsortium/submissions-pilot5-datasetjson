@@ -431,7 +431,9 @@ In addition, create a new directory to hold the unpacked Pilot 5 data files and 
 
 ## Installation of R and RStudio
 
-Download and install R 4.4.3 for Windows from <https://cloud.r-project.org/bin/windows/base/old/4.4.3/R-4.4.3-win.exe>. While optional, it is also recommended to use RStudio IDE for executing R code to launch the application. You can download RStudio for Windows by visiting <https://posit.co/download/rstudio-desktop/#download>.
+Download and install R 4.4.3 for Windows from <https://cloud.r-project.org/bin/windows/base/old/4.4.3/R-4.4.3-win.exe>. 
+
+Download and install RStudio for Windows from <https://posit.co/download/rstudio-desktop/#download>.
 
 ## Installation of Rtools
 
@@ -443,6 +445,8 @@ Once the installation is complete, launch a new R session (if you have an existi
 Sys.which("make")
 "C:\\rtools44\\usr\\bin\\make.exe" 
 ```
+
+??? What does this do ???
 
 ## Initialize R Program Execution Environment
 
@@ -478,6 +482,8 @@ remotes::install_version("renv", version = "1.1.4")
 ::: {.callout-note}
 -   *If you receive a warning showing “cannot open URL  <https://cran.rstudio.com/src/contrib/PACKAGES>'”, this is due to the default RStudio option ‘Use secure download method for HTTP’. In RStudio, go to Tools → Global Options → Packages, then uncheck the ‘Use secure download method for HTTP’ option, then retry the installation.*
 :::
+
+???Should this come before Step 1???
 
 ::: {.callout-note}
 If not already set, please verify that the working directory is already set to the project folder:
@@ -518,6 +524,8 @@ renv::restore(prompt = FALSE)
 Due to certain R packages requiring compilation from their source versions, the entire package restoration procedure may require at least ten minutes or longer to complete depending on internet bandwidth and your computer's hardware profile.
 :::
 
+??? should we say something about restarting R and getting project is synced message ???
+
 ## Execute R Programs
 
 To reproduce the analysis results from the JSON transport files, set up and run the following programs in the order below:
@@ -549,7 +557,7 @@ path <- list(
 )
 ```
 
-2. Restart R Session
+2. Restart R Session - this will ppulate the list of paths in your Global Environment.  Double check that this object has been created.
 
 3. Using the source function, run the `pilot5-helper-fcns.r` program, 
 which will load all helper functions for datasets and displays into your global environment.
@@ -558,7 +566,7 @@ which will load all helper functions for datasets and displays into your global 
 source(file.path(path$programs, "pilot5-helper-fcns.r"))
 ```
 
-4. Convert sdtm JSON files to rds files
+4. Convert sdtm JSON files to rds files. The sdtm files are in json transport file format and need to be converted to rds files to run the ADaM programs.
 
 ```r
 sdtm_files <- list.files(
