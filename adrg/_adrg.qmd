@@ -431,17 +431,19 @@ In addition, create a new directory to hold the unpacked Pilot 5 data files and 
 
 ## Installation of R and RStudio
 
-Download and install R 4.4.3 for Windows from <https://cloud.r-project.org/bin/windows/base/old/4.4.3/R-4.4.3-win.exe>. While optional, it is also recommended to use RStudio IDE for executing R code to launch the application. You can download RStudio for Windows by visiting <https://posit.co/download/rstudio-desktop/#download>.
+Download and install R 4.4.3 for Windows from <https://cloud.r-project.org/bin/windows/base/old/4.4.3/R-4.4.3-win.exe>. 
+
+Download and install RStudio for Windows from <https://posit.co/download/rstudio-desktop/#download>.
 
 ## Installation of Rtools
 
 Due to certain R packages requiring compilation from source, it is also required that you install the **Rtools** Windows utility from CRAN. You can download Rtools built for R version `4.4.3` by visiting <https://cloud.r-project.org/bin/windows/Rtools/rtools44/files/rtools44-6459-6401.exe>. During the installation procedure, keep the default choices in the settings presented in the installation dialog.
 
-Once the installation is complete, launch a new R session (if you have an existing session open, close that session first) and in the console, run the following command that should give the location of your Rtools installation:
+Once the installation is complete, launch a new R session (if you have an existing session open, close that session first) and in the console, run the following command, `Sys.which("make")` to verify that the installation of Rtools was successful: 
 
 ``` r
-Sys.which("make")
-"C:\\rtools44\\usr\\bin\\make.exe" 
+> Sys.which("make")
+[1] "C:\\rtools44\\usr\\bin\\make.exe" 
 ```
 
 ## Initialize R Program Execution Environment
@@ -518,6 +520,18 @@ renv::restore(prompt = FALSE)
 Due to certain R packages requiring compilation from their source versions, the entire package restoration procedure may require at least ten minutes or longer to complete depending on internet bandwidth and your computer's hardware profile.
 :::
 
+After all packages have been installed, you should Restart your Session.
+
+* Select `Session -> Restart R`
+
+A similar message should appear in your console. This indicates that your R Session
+is synced to all Pilot 5 packages needed to reproduce the Pilot 5 analysis.
+
+```r
+Restarting R session...
+- Project 'C:/pilot5-files' loaded. [renv 1.1.4]
+```
+
 ## Execute R Programs
 
 To reproduce the analysis results from the JSON transport files, set up and run the following programs in the order below:
@@ -527,19 +541,12 @@ To reproduce the analysis results from the JSON transport files, set up and run 
 
 Edit the `.Rprofile` file created in the working directory to match the following contents:
 
-::: {.callout-warning}
-
-## TO DO
-
-Ensure that the paths defined in the snippet below reflect the eCTD bundle structure
-:::
 
 ```r
 source("renv/activate.R")
 Sys.setenv(RENV_DOWNLOAD_FILE_METHOD = "libcurl")
 
 # File locations
-
 path <- list(
   sdtm = file.path(getwd(), "m5/datasets/rconsortiumpilot5/tabulations/sdtm"),
   adam = file.path(getwd(), "m5/datasets/rconsortiumpilot5/analysis/adam/datasets"),
@@ -549,7 +556,20 @@ path <- list(
 )
 ```
 
-2. Restart R Session
+2. Restart R Session 
+
+* Select `Session -> Restart R`
+* This will ensure that the list of paths in your Global Environment is populated.  
+
+Double check that path object has been created in your Global Environment using
+the following code `exists("path")`.
+
+You should receive the following message in your console:
+
+```r
+> exists("path")
+[1] TRUE
+```
 
 3. Using the source function, run the `pilot5-helper-fcns.r` program, 
 which will load all helper functions for datasets and displays into your global environment.
@@ -558,7 +578,10 @@ which will load all helper functions for datasets and displays into your global 
 source(file.path(path$programs, "pilot5-helper-fcns.r"))
 ```
 
-4. Convert sdtm JSON files to rds files
+4. Convert sdtm JSON files to rds files. The sdtm files are in json transport file format 
+and need to be converted to rds files to run the ADaM programs.
+
+Run the following code:
 
 ```r
 sdtm_files <- list.files(
@@ -572,19 +595,22 @@ convert_json_to_rds(sdtm_files, output_dir = file.path(path$sdtm))
 
 5. Execute ADaM programs as seen in the order below:
 
-* `adsl.r`
-* `adadas.r`
-* `adae.r`
-* `adlbc.r`
-* `adtte.r`
+ - `adsl.r`
+ - `adadas.r`
+ - `adae.r`
+ - `adlbc.r`
+ - `adtte.r`
+ 
+The rds files will be created for each ADaM in the `adamdata` folder.
 
-6. Execute Display programs
+6. Execute Display programs as seen in the order below:
 
-* `tlf-demographic.r`
-* `tlf-efficacy.r`
-* `tlf-kmplot.r`
-* `tlf-primary.r`
+ - `tlf-demographic.r`
+ - `tlf-efficacy.r`
+ - `tlf-kmplot.r`
+ - `tlf-primary.r`
 
+The output files will be created for each display in the `output` folder.
 
 # Appendix 2
 
