@@ -70,5 +70,5 @@ for (rds_file in rds_files) {
     file_oid = file.path(path$adam, df_name),
     columns = oid_cols
   ) %>%
-    write_dataset_json(file = file.path(path$adam_json, paste0(df_name, ".json")))
+    write_dataset_json(file = file.path(path$adam_json, paste0(df_name, ".json")), float_as_decimals = TRUE)
 }
