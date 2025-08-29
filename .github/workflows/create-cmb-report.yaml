@@ -22,8 +22,19 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y unoconv libreoffice python3-venv python3-pip
 
+      - name: Ensure distutils is available
+        run: |
+          python -m pip install --upgrade pip
+          pip install setuptools
+          if ! python -c "import distutils"; then
+            sudo apt-get update
+            sudo apt-get install -y python3-distutils
+          fi
+
       - name: Start unoconv listener
-        run: unoconv --listener &
+        run: |
+          unoconv --listener &
+          sleep 5
 
       - name: Install Python Packages
         run: pip install fpdf PyPDF2 packaging
