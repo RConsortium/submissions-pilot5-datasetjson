@@ -20,26 +20,13 @@ jobs:
       - name: Install System Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y unoconv
+          sudo apt-get install -y unoconv libreoffice python3-distutils
 
       - name: Install Python Packages
         run: |
-          pip install fpdf PyPDF2
+          pip install setuptools fpdf PyPDF2
 
-      - name: Run Merge Script
+      - name: Check RTF Files Exist
         run: |
-            python .github/scripts/create-cmb-report.py \
-              pilot5-submission/pilot5-output/pilot5-tlfs/pdf/tlf-kmplot-pilot5.pdf \
-              pilot5-submission/pilot5-output/pilot5-tlfs/out/tlf-demographic-pilot5.out \
-              pilot5-submission/pilot5-output/pilot5-tlfs/rtf/tlf-efficacy-pilot5.rtf \
-              pilot5-submission/pilot5-output/pilot5-tlfs/rtf/tlf-primary-pilot5.rtf \
-              cmb_report_output.pdf
-
-      - name: List Generated Files
-        run: ls -l
-
-      - name: Upload Merged PDF
-        uses: actions/upload-artifact@v4
-        with:
-          name: merged-pdf
-          path: cmb_report_output.pdf
+          test -f pilot5-submission/pilot5-output](#)
+
