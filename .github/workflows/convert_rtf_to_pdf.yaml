@@ -1,0 +1,39 @@
+name: Auto Convert RTF to PDF and Commit
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '**/*.rtf'
+      - '.github/scripts/rtf_to_pdf_and_commit.py'
+      - '.github/workflows/rtf-to-pdf-auto.yaml'
+
+jobs:
+  convert-and-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libreoffice libreoffice-script-provider-python unoconv python3-uno
+
+      - name: Run script to convert and commit PDFs
+        run: |
+          pip install --upgrade pip
+          python .github/scripts/rtf_to_pdf_and_commit.py
+
+      # Optionally, upload PDFs as artifacts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: generated-pdfs
+          path: '**/*.pdf'
