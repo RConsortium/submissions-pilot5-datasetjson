@@ -28,7 +28,12 @@ jobs:
 
       - name: Run Merge Script
         run: |
-          python merge_to_pdf.py input.pdf file.out file.rtf merged_output.pdf
+          python create-cmb-report.py 
+                 pilot5-submission/pilot5-output/pilot5-tlfs/rtf/tlf-efficacy-pilot5.rtf
+                 pilot5-submission/pilot5-output/pilot5-tlfs/rtf/tlf-primary-pilot5.rtf
+                 pilot5-submission/pilot5-output/pilot5-tlfs/pdf/tlf-kmplot-pilot5.pdf
+                 pilot5-submission/pilot5-output/pilot5-tlfs/out/tlf-demographic-pilot5.out
+                 cmb_report_output.pdf
 
       - name: List Generated Files
         run: ls -l
@@ -37,4 +42,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: merged-pdf
-          path: merged_output.pdf
+          path: cmb_report_output.pdf
