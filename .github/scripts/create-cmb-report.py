@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-This script takes three files – a PDF file, a .out file (text), and an RTF file –
+This script takes four inputs – a PDF file, a text (.out) file, and two RTF files –
 converts the .out and RTF files into PDFs, and then merges them into a single output PDF.
 
 Usage:
-    python merge_to_pdf.py input.pdf file.out file.rtf output.pdf
+    python merge_to_pdf.py kmplot.pdf demographic.out efficacy.rtf primary.rtf merged_output.pdf
 """
 
 import sys
@@ -63,33 +63,47 @@ def merge_pdfs(pdf_files, output_pdf):
         sys.exit(1)
 
 def main():
-    # Check that there are exactly four arguments
-    if len(sys.argv) != 5:
-        print("Usage: {} input.pdf file.out file.rtf output.pdf".format(sys.argv[0]))
+    # Check for exactly five command-line arguments.
+    # argv: [script, kmplot.pdf, demographic.out, efficacy.rtf, primary.rtf, merged_output.pdf]
+    if len(sys.argv) != 6:
+        print("Usage: {} kmplot.pdf demographic.out efficacy.rtf primary.rtf merged_output.pdf".format(sys.argv[0]))
         sys.exit(1)
     
-    input_pdf = sys.argv[1]
-    text_file = sys.argv[2]
-    rtf_file = sys.argv[3]
-    output_pdf = sys.argv[4]
+    # Assign input file paths to variables.
+    kmplot_pdf = sys.argv[1]
+    demographic_out = sys.argv[2]
+    efficacy_rtf = sys.argv[3]
+    primary_rtf = sys.argv[4]
+    output_pdf = sys.argv[5]
 
-    # Temporary PDF files for the converted .out and RTF files.
-    temp_text_pdf = "temp_text.pdf"
-    temp_rtf_pdf = "temp_rtf.pdf"
+    # Temporary PDFs for the converted out and rtf files.
+    temp_demographic_pdf = "temp_demographic.pdf"
+    temp_efficacy_pdf = "temp_efficacy.pdf"
+    temp_primary_pdf = "temp_primary.pdf"
 
-    print("Converting text file to PDF...")
-    convert_text_to_pdf(text_file, temp_text_pdf)
+    print("Converting text (.out) file to PDF...")
+    convert_text_to_pdf(demographic_out, temp_demographic_pdf)
     
-    print("Converting RTF file to PDF...")
-    convert_rtf_to_pdf(rtf_file, temp_rtf_pdf)
+    print("Converting first RTF file to PDF...")
+    convert_rtf_to_pdf(efficacy_rtf, temp_efficacy_pdf)
+    
+    print("Converting second RTF file to PDF...")
+    convert_rtf_to_pdf(primary_rtf, temp_primary_pdf)
     
     print("Merging PDFs...")
-    pdf_list = [input_pdf, temp_text_pdf, temp_rtf_pdf]
+    # Merge in this order:
+    # 1. kmplot PDF file
+    # 2. demographic (.out) converted to PDF
+    # 3. efficacy RTF converted to PDF
+    # 4. primary RTF converted to PDF
+    pdf_list = [kmplot_pdf, temp_demographic_pdf, temp_efficacy_pdf, temp_primary_pdf]
+    
     merge_pdfs(pdf_list, output_pdf)
     
-    # Clean up temporary files.
-    os.remove(temp_text_pdf)
-    os.remove(temp_rtf_pdf)
+    # Remove temporary files.
+    os.remove(temp_demographic_pdf)
+    os.remove(temp_efficacy_pdf)
+    os.remove(temp_primary_pdf)
     
     print("Merging complete. Output file:", output_pdf)
 
