@@ -28,12 +28,12 @@ jobs:
 
       - name: Run Merge Script
         run: |
-          python .github/scripts/create-cmb-report.py
-                 pilot5-submission/pilot5-output/pilot5-tlfs/rtf/tlf-efficacy-pilot5.rtf
-                 pilot5-submission/pilot5-output/pilot5-tlfs/rtf/tlf-primary-pilot5.rtf
-                 pilot5-submission/pilot5-output/pilot5-tlfs/pdf/tlf-kmplot-pilot5.pdf
-                 pilot5-submission/pilot5-output/pilot5-tlfs/out/tlf-demographic-pilot5.out
-                 cmb_report_output.pdf
+            python .github/scripts/create-cmb-report.py \
+              pilot5-submission/pilot5-output/pilot5-tlfs/pdf/tlf-kmplot-pilot5.pdf \
+              pilot5-submission/pilot5-output/pilot5-tlfs/out/tlf-demographic-pilot5.out \
+              pilot5-submission/pilot5-output/pilot5-tlfs/rtf/tlf-efficacy-pilot5.rtf \
+              pilot5-submission/pilot5-output/pilot5-tlfs/rtf/tlf-primary-pilot5.rtf \
+              cmb_report_output.pdf
 
       - name: List Generated Files
         run: ls -l
