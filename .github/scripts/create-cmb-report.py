@@ -16,7 +16,7 @@ from fpdf import FPDF
 def convert_text_to_pdf(text_file, pdf_out_name):
     """Convert a plain text (.out) file into a PDF using fpdf."""
     try:
-        with open(text_file, "r") as f:
+        with open(text_file, "r", encoding="utf-8") as f:
             text = f.read()
     except Exception as e:
         print(f"Error reading {text_file}: {e}")
@@ -26,10 +26,12 @@ def convert_text_to_pdf(text_file, pdf_out_name):
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.set_font("Arial", size=12)
-    
+
     # Write each line of the text file into the PDF.
     for line in text.splitlines():
-        pdf.cell(0, 10, txt=line, ln=1)
+        # Remove or replace characters not supported by the font
+        safe_line = line.encode("latin-1", errors="replace").decode("latin-1")
+        pdf.cell(0, 10, txt=safe_line, ln=1)
     
     try:
         pdf.output(pdf_out_name)
