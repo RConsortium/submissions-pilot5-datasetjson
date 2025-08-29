@@ -20,15 +20,13 @@ jobs:
       - name: Install System Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y unoconv libreoffice python3-venv
-          sudo apt-get install -y python3-distutils || sudo apt-get install -y python3-distutils-extra
+          sudo apt-get install -y unoconv libreoffice python3-venv python3-pip
 
       - name: Start unoconv listener
         run: unoconv --listener &
 
       - name: Install Python Packages
-        run: |
-          pip install fpdf PyPDF2
+        run: pip install fpdf PyPDF2 packaging
 
       - name: Run Merge Script
         run: |
