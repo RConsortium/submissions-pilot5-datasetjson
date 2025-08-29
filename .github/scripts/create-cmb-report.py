@@ -10,8 +10,14 @@ Usage:
 import sys
 import os
 import subprocess
+import shutil
 from PyPDF2 import PdfMerger
 from fpdf import FPDF
+
+def check_unoconv_installed():
+    if shutil.which("unoconv") is None:
+        print("Error: 'unoconv' is not installed. Please install unoconv and LibreOffice.")
+        sys.exit(1)
 
 def convert_text_to_pdf(text_file, pdf_out_name):
     """Convert a plain text (.out) file into a PDF using fpdf."""
@@ -43,9 +49,9 @@ def convert_rtf_to_pdf(rtf_file, pdf_out_name):
     """Convert an RTF file to PDF using unoconv."""
     cmd = ["unoconv", "-f", "pdf", "-o", pdf_out_name, rtf_file]
     try:
-        subprocess.run(cmd, check=True)
+        subprocess.run(cmd, check=True, capture_output=True)
     except subprocess.CalledProcessError as e:
-        print(f"Error converting {rtf_file} to PDF with unoconv: {e}")
+        print(f"Error converting {rtf_file} to PDF with unoconv:\n{e.stderr.decode()}")
         sys.exit(1)
 
 def merge_pdfs(pdf_files, output_pdf):
@@ -65,6 +71,7 @@ def merge_pdfs(pdf_files, output_pdf):
         sys.exit(1)
 
 def main():
+    check_unoconv_installed()
     # Check for exactly five command-line arguments.
     # argv: [script, kmplot.pdf, demographic.out, efficacy.rtf, primary.rtf, merged_output.pdf]
     if len(sys.argv) != 6:
@@ -111,3 +118,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
