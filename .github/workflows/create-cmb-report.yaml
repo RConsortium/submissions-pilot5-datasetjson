@@ -28,7 +28,7 @@ jobs:
 
       - name: Run Merge Script
         run: |
-          python create-cmb-report.py 
+          python .github/scripts/create-cmb-report.py
                  pilot5-submission/pilot5-output/pilot5-tlfs/rtf/tlf-efficacy-pilot5.rtf
                  pilot5-submission/pilot5-output/pilot5-tlfs/rtf/tlf-primary-pilot5.rtf
                  pilot5-submission/pilot5-output/pilot5-tlfs/pdf/tlf-kmplot-pilot5.pdf
