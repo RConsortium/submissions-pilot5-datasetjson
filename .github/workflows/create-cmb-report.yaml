@@ -2,8 +2,8 @@ name: Create Combined Report
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:   # Allows manual triggering
-
+  pull_request:
+    branches: [ main ]
 jobs:
   merge:
     runs-on: ubuntu-latest
