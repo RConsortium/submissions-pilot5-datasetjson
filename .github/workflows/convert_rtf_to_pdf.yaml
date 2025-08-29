@@ -1,12 +1,10 @@
 name: Auto Convert RTF to PDF and Commit
 
 on:
-  workflow_dispatch:
   push:
-    paths:
-      - '**/*.rtf'
-      - '.github/scripts/rtf_to_pdf_and_commit.py'
-      - '.github/workflows/rtf-to-pdf-auto.yaml'
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   convert-and-commit:
