@@ -1,0 +1,40 @@
+name: Create Combined Report
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:   # Allows manual triggering
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y unoconv
+
+      - name: Install Python Packages
+        run: |
+          pip install fpdf PyPDF2
+
+      - name: Run Merge Script
+        run: |
+          python merge_to_pdf.py input.pdf file.out file.rtf merged_output.pdf
+
+      - name: List Generated Files
+        run: ls -l
+
+      - name: Upload Merged PDF
+        uses: actions/upload-artifact@v2
+        with:
+          name: merged-pdf
+          path: merged_output.pdf
