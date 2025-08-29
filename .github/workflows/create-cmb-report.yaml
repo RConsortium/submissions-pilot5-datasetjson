@@ -20,7 +20,10 @@ jobs:
       - name: Install System Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y unoconv libreoffice python3-venv
+          sudo apt-get install -y unoconv libreoffice python3-venv python3-distutils
+
+      - name: Start unoconv listener
+        run: unoconv --listener &
 
       - name: Install Python Packages
         run: |
