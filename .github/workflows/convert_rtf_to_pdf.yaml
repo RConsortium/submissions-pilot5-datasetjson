@@ -28,7 +28,7 @@ jobs:
       - name: Run script to convert and commit PDFs
         run: |
           pip install --upgrade pip
-          python .github/scripts/rtf_to_pdf_and_commit.py
+          /usr/bin/python3 .github/scripts/rtf_to_pdf_and_commit.py
 
       # Optionally, upload PDFs as artifacts
       - uses: actions/upload-artifact@v4
