@@ -17,10 +17,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libreoffice libreoffice-common libreoffice-script-provider-python unoconv python3-uno
 
-      - name: Ensure distutils is available
+      - name: Ensure distutils is available (not needed as of Ubuntu 24.04)
         run: |
           sudo apt-get update
-          sudo apt-get install -y python3-distutils
           sudo /usr/bin/python3 -m pip install --upgrade pip setuptools
 
       - name: Start unoconv listener
