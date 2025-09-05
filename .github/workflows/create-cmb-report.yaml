@@ -36,8 +36,10 @@ jobs:
           unoconv --listener &
           sleep 5
 
-      - name: Install Python Packages
-        run: pip install fpdf PyPDF2 packaging
+      - name: Install dependencies for system Python
+        run: |
+          sudo /usr/bin/python3 -m pip install --upgrade pip
+          sudo /usr/bin/python3 -m pip install PyPDF2 fpdf packaging
 
       - name: Run Merge Script
         run: |
