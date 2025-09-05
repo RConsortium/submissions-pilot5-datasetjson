@@ -20,7 +20,7 @@ jobs:
       - name: Ensure distutils is available (not needed as of Ubuntu 24.04)
         run: |
           sudo apt-get update
-          sudo /usr/bin/python3 -m pip install --upgrade pip setuptools
+          sudo /usr/bin/python3 -m pip install --upgrade setuptools
 
       - name: Start unoconv listener
         run: |
