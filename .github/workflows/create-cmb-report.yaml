@@ -12,24 +12,16 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-
       - name: Install LibreOffice and unoconv
         run: |
           sudo apt-get update
-          sudo apt-get install -y libreoffice libreoffice-script-provider-python unoconv python3-uno
+          sudo apt-get install -y libreoffice libreoffice-common libreoffice-script-provider-python unoconv python3-uno
 
       - name: Ensure distutils is available
         run: |
-          python -m pip install --upgrade pip
-          pip install setuptools
-          if ! python -c "import distutils"; then
-            sudo apt-get update
-            sudo apt-get install -y python3-distutils
-          fi
+          sudo apt-get update
+          sudo apt-get install -y python3-distutils
+          sudo /usr/bin/python3 -m pip install --upgrade pip setuptools
 
       - name: Start unoconv listener
         run: |
@@ -39,6 +31,14 @@ jobs:
       - name: Install dependencies for system Python
         run: |
           sudo /usr/bin/python3 -m pip install PyPDF2 fpdf packaging
+
+      - name: Debug system python and uno
+        run: |
+          echo "Python version: $(/usr/bin/python3 --version)"
+          echo "unoconv version: $(unoconv --version)"
+          /usr/bin/python3 -c "import uno; print('UNO successfully imported')"
+          which unoconv
+          which libreoffice
 
       - name: Run Merge Script
         run: |
