@@ -22,12 +22,10 @@ jobs:
 
       - name: Install system dependencies
         run: |
-          sudo apt-get update
           sudo apt-get install -y libreoffice libreoffice-script-provider-python unoconv python3-uno
 
       - name: Run script to convert and commit PDFs
         run: |
-          pip install --upgrade pip
           /usr/bin/python3 .github/scripts/rtf_to_pdf_and_commit.py
 
       # Optionally, upload PDFs as artifacts
