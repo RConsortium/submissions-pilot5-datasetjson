@@ -1,0 +1,92 @@
+---
+title: "R Consortium R Submission Pilot 5 - Summary Tables and Figures"
+author: "Pilot5 Team"
+date: "`r Sys.Date()`"
+format:
+  pdf:
+    latex-engine: xelatex
+    geometry: "margin=0.25in"
+    header-includes:
+      - \usepackage{pdfpages}
+      - \usepackage{graphicx}
+geometry: "margin=0.25in"
+header-includes:
+  - \usepackage{pdfpages}
+  - \usepackage{graphicx}
+---
+  
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(fig.width = 6, fig.height = 6)
+```
+
+Note : In Pilot 5, following the same approach as Pilot1, different open-source packages were used when generating each of the 4 analysis outputs to test wider use case scenarios. The outputs were formatted differently intentionally to cover different company specific formatting choices.
+
+\newpage
+
+#### Table 14-2.01
+#### Summary of Demographic and Baseline Characteristics
+
+```{r demog, echo=FALSE, message=FALSE, comment=NA}
+knitr::opts_chunk$set(fig.align = "center", out.width = "70%")
+
+library(here)
+
+source("pilot5-helper-fcns.r")
+path <- list(
+  sdtm = here("pilot5-submission", "pilot5-input", "sdtmdata", "datasetjson"),
+  adam = here("pilot5-submission", "pilot5-input", "adamdata"),
+  output = here("pilot5-submission", "pilot5-output", "pilot5-tlfs"),
+  adam_json = here("pilot5-submission", "pilot5-output", "pilot5-datasetjson"),
+  programs = here("pilot5-submission", "pilot5-programs")
+)
+
+source(file.path(path$programs, "tlf-demographic.r"))
+print(tbl)
+```
+
+```{r, echo = FALSE}
+# You need to manually produce the pdf for the tlf-primary-pilot5.rtf
+# Microsoft Office or Libre Office can do this.
+```
+
+
+\noindent\begin{minipage}[t]{\textwidth}
+  \vspace{4ex}
+  \begin{center}
+    \includegraphics[scale=0.80]{cmb-report-manual-files/tlf-primary-pilot5.pdf}
+  \end{center}
+\end{minipage}
+
+
+```{r, echo = FALSE}
+# You need to manually produce the pdf for the tlf-primary-pilot5.rtf
+# Microsoft Office or Libre Office can do this.
+```
+
+\noindent\begin{minipage}[t]{\textwidth}
+  \begin{flushleft}
+    {\large \textbf{Table 14-3.02}}\\[1ex] 
+    {\large \textbf{Primary Endpoint Analysis: Glucose (mmol/L) - Summary at Week 20 - LOCF}}
+  \end{flushleft}
+  \vspace{4ex}
+  \begin{center}
+    \includegraphics[scale=1]{cmb-report-manual-files/tlf-efficacy-pilot5.pdf}
+  \end{center}
+\end{minipage}
+
+\noindent\begin{minipage}[t]{\textwidth}
+  \begin{flushleft}
+    {\large \textbf{Figure 14-1}}\\[1ex] 
+    {\large \textbf{Time to Dermatologic Event by Treatment Group}}
+  \end{flushleft}
+  \vspace{4ex}
+  \begin{center}
+    \includegraphics[scale=1]{cmb-report-manual-files/tlf-kmplot-pilot5.pdf}
+  \end{center}
+\end{minipage}
+
+
+
+
+
+
