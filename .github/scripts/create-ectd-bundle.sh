@@ -145,6 +145,12 @@ if [ -d "$PROGRAMS_SOURCE_DIR" ]; then
     cp "${PROGRAMS_SOURCE_DIR}/pilot5-helper-fcns.r" "${PROGRAMS_DESTINATION_DIR}/."
     echo "pilot 5 helper script copied to ${PROGRAMS_DESTINATION_DIR}/pilot5-helper-fcns.r"
   fi
+  
+  # Combined Report
+  if [ -f "${PROGRAMS_SOURCE_DIR}/pilot5-cmb-report-manual.pdf" ]; then
+    cp "${PROGRAMS_SOURCE_DIR}/pilot5-cmb-report-manual.pdf" "${PROGRAMS_DESTINATION_DIR}/."
+    echo "pilot 5 Combined Report copied to ${PROGRAMS_DESTINATION_DIR}/pilot5-cmb-report-manual.pdf"
+  fi
 fi 
 
 SPECS_SOURCE_DIR=pilot5-submission/pilot5-input/adamdata
