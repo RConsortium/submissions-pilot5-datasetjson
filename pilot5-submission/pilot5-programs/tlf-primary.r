@@ -152,7 +152,7 @@ doc <- rtf_doc(ht) %>%
   )
 # nolint end
 
-if (!dir.exists(file.path(path$output, "rtf"))){
+if (!dir.exists(file.path(path$output, "rtf"))) {
   dir.create(file.path(path$output, "rtf"))
 }
 
