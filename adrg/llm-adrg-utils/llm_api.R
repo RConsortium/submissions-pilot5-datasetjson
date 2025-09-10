@@ -3,7 +3,7 @@
 library(ellmer)
 library(here)
 library(jsonlite)
-#source(here("pipeline", "utils", "logging.R"))
+# source(here("pipeline", "utils", "logging.R"))
 
 # Define default environment variables for various providers
 PROVIDER_ENV_VARS <- list(
@@ -210,14 +210,18 @@ retry_with_exponential_backoff <- function(expr, max_attempts = 5, initial_delay
     if (!inherits(result, "error")) {
       return(result)
     }
-    message(sprintf("Attempt %d failed: %s. Retrying in %d seconds...", 
-                    attempt, result$message, delay))
+    message(sprintf(
+      "Attempt %d failed: %s. Retrying in %d seconds...",
+      attempt, result$message, delay
+    ))
     Sys.sleep(delay)
     delay <- delay * multiplier
     attempt <- attempt + 1
   }
-  stop(sprintf("Failed after %d attempts. Last error: %s", 
-               max_attempts, result$message))
+  stop(sprintf(
+    "Failed after %d attempts. Last error: %s",
+    max_attempts, result$message
+  ))
 }
 
 
@@ -237,7 +241,7 @@ llm_call <- function(prompt, provider = NULL, model, system_prompt = NULL,
   if (missing(model) || is.null(model)) {
     stop("Model must be specified. `model` is now a required argument.")
   }
-  
+
   # Create chat object (handles provider inference if needed)
   chat <- create_chat_object(
     provider = provider,
@@ -247,15 +251,15 @@ llm_call <- function(prompt, provider = NULL, model, system_prompt = NULL,
     base_url = base_url,
     ...
   )
-  
+
   # Send prompt with retry
   response <- retry_with_exponential_backoff(function() chat$chat(prompt))
-  
+
   # Log the call
   effective_provider <- if (!is.null(provider)) provider else infer_provider_from_model(model)
   model_tag <- paste0(effective_provider, "-", model)
   log_llm_call(prompt, model_tag, response)
-  
+
   return(response)
 }
 
@@ -284,20 +288,20 @@ llm_extract_structured <- function(prompt, provider = NULL, type, model = NULL,
     base_url = base_url,
     ...
   )
-  
+
   # Extract structured data using retry logic
   result <- retry_with_exponential_backoff(function() chat$extract_data(prompt, type = type))
-  
+
   # Log the extraction
   inferred_provider <- ifelse(is.null(provider) && !is.null(model),
-                              infer_provider_from_model(model),
-                              provider
+    infer_provider_from_model(model),
+    provider
   )
   model_tag <- ifelse(is.null(model),
-                      paste0(inferred_provider, "-default"),
-                      paste0(inferred_provider, "-", model)
+    paste0(inferred_provider, "-default"),
+    paste0(inferred_provider, "-", model)
   )
-  
+
   log_extraction <- paste0(
     "STRUCTURED DATA EXTRACTION\n",
     "Provider: ", inferred_provider, "\n",
@@ -306,7 +310,7 @@ llm_extract_structured <- function(prompt, provider = NULL, type, model = NULL,
     "Result: ", jsonlite::toJSON(result, auto_unbox = TRUE, pretty = TRUE)
   )
   log_llm_call(prompt, model_tag, log_extraction)
-  
+
   return(result)
 }
 

@@ -10,7 +10,7 @@ function l { # Log a message to the terminal.
 # Define file and directory paths
 ECTD_BUNDLE_DIR=submissions-pilot5-datasetjson-to-fda
 ECTD_LETTER_DIR=${ECTD_BUNDLE_DIR}/m1/us
-ECTD_ROOT_DIR=${ECTD_BUNDLE_DIR}/m5/datasets/rconsortiumpilot4container/analysis/adam
+ECTD_ROOT_DIR=${ECTD_BUNDLE_DIR}/m5/datasets/rconsortiumpilot5/analysis/adam
 ECTD_ADAM_DATASETS_DIR=${ECTD_BUNDLE_DIR}/m5/datasets/rconsortiumpilot5/analysis/adam/datasets
 ECTD_SDTM_DATASETS_DIR=${ECTD_BUNDLE_DIR}/m5/datasets/rconsortiumpilot5/tabulations/sdtm
 ECTD_PROGRAMS_DIR=${ECTD_BUNDLE_DIR}/m5/datasets/rconsortiumpilot5/analysis/adam/programs
@@ -35,6 +35,8 @@ ADAM_DATASETS_SOURCE_DIR=pilot5-submission/pilot5-output/pilot5-datasetjson
 ADAM_DATASETS_DESTINATION_DIR=${ECTD_ADAM_DATASETS_DIR}
 PROGRAMS_SOURCE_DIR=pilot5-submission/pilot5-programs
 PROGRAMS_DESTINATION_DIR=${ECTD_PROGRAMS_DIR}
+SPECS_SOURCE_DIR=pilot5-submission/pilot5-input/adamdata
+SPECS_DESTINATION_DIR=${ECTD_ADAM_DATASETS_DIR}
 
 # TODO: Verify that the following outputs should be included
 OUTPUT_TLF_PDF_DIR=pilot5submission/pilot5-output/pilot5-tlfs/pdf
@@ -143,6 +145,24 @@ if [ -d "$PROGRAMS_SOURCE_DIR" ]; then
     cp "${PROGRAMS_SOURCE_DIR}/pilot5-helper-fcns.r" "${PROGRAMS_DESTINATION_DIR}/."
     echo "pilot 5 helper script copied to ${PROGRAMS_DESTINATION_DIR}/pilot5-helper-fcns.r"
   fi
+  
+  # Combined Report
+  if [ -f "${PROGRAMS_SOURCE_DIR}/pilot5-cmb-report-manual.pdf" ]; then
+    cp "${PROGRAMS_SOURCE_DIR}/pilot5-cmb-report-manual.pdf" "${PROGRAMS_DESTINATION_DIR}/."
+    echo "pilot 5 Combined Report copied to ${PROGRAMS_DESTINATION_DIR}/pilot5-cmb-report-manual.pdf"
+  fi
 fi 
 
+SPECS_SOURCE_DIR=pilot5-submission/pilot5-input/adamdata
+SPECS_DESTINATION_DIR=${ECTD_ADAM_DATASETS_DIR}
 
+# Copy input specs to ECTD ADAM datasets directory
+if [ -d "$ADAM_DATASETS_SOURCE_DIR" ]; then
+  echo "Copying ADaM Spec files from ${ADAM_DATASETS_SOURCE_DIR}"
+  for file in "${ADAM_DATASETS_SOURCE_DIR}"/*.xlsx; do
+    if [ -f "${file}" ]; then
+      cp "$file" "${ADAM_DATASETS_DESTINATION_DIR}/."
+      echo "${file} copied to ${ADAM_DATASETS_DESTINATION_DIR}/${file}"
+    fi
+  done
+fi

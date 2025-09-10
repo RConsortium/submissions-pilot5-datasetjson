@@ -15,7 +15,7 @@ format:
 
 Dear Sir/Madam:
 
-This letter serves as an introduction to the R Consortium R Submission Pilot 5, focusing on the submission of data submitted in the JavaScript Object Notation (JSON) format. The objective of this portion of the R Consortium R submission Pilot 5 Project is to test the concept that a R-language based submission package is aligned with FDA requirements and meets the expectations of the FDA staff, including assessing code review and analyses reproducibility. All submission materials and communications from this pilot will be shared publicly, with the aim of providing a working example for future R language based FDA submissions which include Shiny applications. This is an FDA-industry collaboration through the non-profit organization R Consortium.
+This letter serves as an introduction to the R Consortium R Submission Pilot 5, focusing on the submission of data submitted in the JavaScript Object Notation (JSON) format. The objective of this portion of the R Consortium R submission Pilot 5 Project is to test the concept that a R-language based submission package is aligned with FDA requirements and meets the expectations of the FDA staff, including assessing code review and analyses reproducibility. All submission materials and communications from this pilot will be shared publicly, with the aim of providing a working example for future R language based FDA submissions which include datasetjson as transport file . This is an FDA-industry collaboration through the non-profit organization R Consortium.
 
 The R Consortium R submission Pilot 5 submission package follows the eCTD folder structure and contains the following module 5 deliverables:
 
@@ -34,6 +34,6 @@ In this pilot, we aimed to provide a working example of R submission in eCTD for
 
 All data, code, material and communications from this pilot will be shared publicly.
 
-Different open-source packages were used to create the Shiny application. Evaluating FDA’s acceptance of system/software validation evidence is not in the scope of this pilot.
+Different open-source packages were used to create the submission package. Evaluating FDA’s acceptance of system/software validation evidence is not in the scope of this pilot.
 
 On behalf of the R Consortium R Submission Working Group, we hope the R submission Pilot 5 can establish a working example to guide the industry for future submission using the R language.

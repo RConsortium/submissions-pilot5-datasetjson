@@ -151,5 +151,10 @@ doc <- rtf_doc(ht) %>%
     )
   )
 # nolint end
+
+if (!dir.exists(file.path(path$output, "rtf"))) {
+  dir.create(file.path(path$output, "rtf"))
+}
+
 # Write out the RTF
 pharmaRTF::write_rtf(doc, file = file.path(path$output, "rtf/tlf-primary-pilot5.rtf"))

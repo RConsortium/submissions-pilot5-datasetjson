@@ -22,12 +22,12 @@ log_llm_call <- function(prompt, model, response) {
   date <- format(Sys.time(), "%Y%m%d")
   log_file <- file.path(logs_dir, sprintf("llm_calls_%s.log", date))
   timestamp <- format(Sys.time(), "%Y-%m-%d %H:%M:%S")
-  
+
   is_new_file <- !file.exists(log_file)
-  
+
   # Only create the file if it doesn't exist
   if (is_new_file) file.create(log_file)
-  
+
   # Add a run header if this is the first log today
   if (is_new_file) {
     run_header <- sprintf(
@@ -39,7 +39,7 @@ log_llm_call <- function(prompt, model, response) {
     write(run_header, log_file)
     cat(sprintf("Starting new llm log file at %s\n", log_file))
   }
-  
+
   # Add the LLM call log entry
   log_entry <- sprintf(
     "\n=== LLM Call Log === [%s] Model: %s\nPrompt:\n%s\n\nResponse:\n%s\n%s\n",
@@ -49,6 +49,6 @@ log_llm_call <- function(prompt, model, response) {
     response,
     paste(rep("=", 80), collapse = "")
   )
-  
+
   write(log_entry, log_file, append = TRUE)
 }

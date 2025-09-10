@@ -163,6 +163,9 @@ tbl_3 <- apr0ancova3 %>%
     text_justification = "l"
   )
 
+if (!dir.exists(file.path(path$output, "rtf"))) {
+  dir.create(file.path(path$output, "rtf"))
+}
 
 ## -----------------------------------------------------------------------------
 tbl <- list(tbl_1, tbl_2, tbl_3)

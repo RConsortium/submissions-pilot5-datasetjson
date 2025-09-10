@@ -75,6 +75,9 @@ tbl <- basic_table(
 
 tbl
 
+if (!dir.exists(file.path(path$output, "out"))) {
+  dir.create(file.path(path$output, "out"))
+}
 
 ## -----------------------------------------------------------------------------
 # Output .out file
