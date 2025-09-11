@@ -81,7 +81,7 @@ print(tbl)
   \end{flushleft}
   \vspace{4ex}
   \begin{center}
-    \includegraphics[scale=1]{cmb-report-manual-files/tlf-kmplot-pilot5.pdf}
+    \includegraphics[scale=0.55]{cmb-report-manual-files/tlf-kmplot-pilot5.pdf}
   \end{center}
 \end{minipage}
 
