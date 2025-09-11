@@ -157,12 +157,12 @@ SPECS_SOURCE_DIR=pilot5-submission/pilot5-input/adamdata
 SPECS_DESTINATION_DIR=${ECTD_ADAM_DATASETS_DIR}
 
 # Copy input specs to ECTD ADAM datasets directory
-if [ -d "$ADAM_DATASETS_SOURCE_DIR" ]; then
+if [ -d "$SPECS_SOURCE_DIR" ]; then
   echo "Copying ADaM Spec files from ${ADAM_DATASETS_SOURCE_DIR}"
-  for file in "${ADAM_DATASETS_SOURCE_DIR}"/*.xlsx; do
+  for file in "${SPECS_SOURCE_DIR}"/*.xlsx; do
     if [ -f "${file}" ]; then
       cp "$file" "${ADAM_DATASETS_DESTINATION_DIR}/."
-      echo "${file} copied to ${ADAM_DATASETS_DESTINATION_DIR}/${file}"
+      echo "${file} copied to ${ADAM_DATASETS_DESTINATION_DIR}"
     fi
   done
 fi
