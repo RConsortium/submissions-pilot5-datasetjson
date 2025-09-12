@@ -59,8 +59,11 @@ print(tbl)
 
 
 ```{r, echo = FALSE}
-# You need to manually produce the pdf for the tlf-primary-pilot5.rtf
+# You need to manually produce the pdf for the tlf-efficacy-pilot5.rtf
 # Microsoft Office or Libre Office can do this.
+
+# This brings over the latest copy of km plot
+file.copy(path$output, "tlf-kmplot-pilot5.pdf")
 ```
 
 \noindent\begin{minipage}[t]{\textwidth}
