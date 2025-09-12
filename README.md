@@ -9,3 +9,9 @@ The objectives of the **R Consortium R Submission Pilot 5** Project are:
 **NOTE:** This is a FDA-industry collaboration through the non-profit organization [R Consortium](https://www.r-consortium.org/).
 
 
+## Important Links
+
+* Repository with ECTD materials: <https://github.com/RConsortium/submissions-pilot5-datasetjson-to-fda>
+* Preview version of the Analysis Data Reviewer Guide (ADRG):
+    * HTML Format: <https://rpodcast.quarto.pub/pilot-5-aanalysis-data-reviewers-guide/>
+    * PDF Format: <https://rsubmission-draft.us-east-1.linodeobjects.com/pilot5-adrg-quarto-pdf.pdf>

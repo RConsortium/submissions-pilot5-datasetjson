@@ -359,11 +359,15 @@ kable_styling(df_kbl, font_size = 10)
 ```{r}
 #| label: table-packages-pdf
 #| echo: false
-kable_styling(df_kbl, latex_options = c("scale_down", "HOLD_position", "repeat_header")) |>
+kable_styling(df_kbl, font_size = 10, latex_options = c("scale_down", "HOLD_position", "repeat_header")) |>
   column_spec(1, width = "7em", border_left = TRUE, border_right = TRUE, latex_valign = "m") |>
   column_spec(2, width = "7em", border_left = TRUE, border_right = TRUE, latex_valign = "m") |>
   column_spec(3, width = "30em", border_left = TRUE, border_right = TRUE, latex_valign = "m")
 ```
+:::
+
+::: {.content-visible when-format="pdf"}
+\newpage
 :::
 
 # Directory Structure
