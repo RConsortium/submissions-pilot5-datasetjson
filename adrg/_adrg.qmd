@@ -366,6 +366,10 @@ kable_styling(df_kbl, font_size = 10, latex_options = c("scale_down", "HOLD_posi
 ```
 :::
 
+::: {.content-visible when-format="pdf"}
+\newpage
+:::
+
 # Directory Structure
 
 Study datasets and the R programs are organized in accordance to Study Data Technical Conformance Guide.
