@@ -56,7 +56,19 @@ km <- (surv_mod %>%
   ggsurvfit(linewidth = 1) +
   add_censor_mark() +
   add_confidence_interval() +
-  add_risktable(risktable_stats = c("n.risk")) +
+  add_risktable(
+    risktable_stats = c("n.risk"),
+    risktable_height = 0.15,
+    size = 3.5, # increase font size of risk table statistics
+    theme = # increase font size of risk table title and y-axis label
+      list(
+        theme_risktable_default(
+          axis.text.y.size = 11,
+          plot.title.size = 11
+        ),
+        theme(plot.title = element_text(face = "bold"))
+      )
+  ) +
   scale_ggsurvfit(
     x_scales = list(
       name = "Time to First Dermatologic Event (Days)",
@@ -72,7 +84,11 @@ km <- (surv_mod %>%
     )
   ) +
   ggsurvfit::add_legend_title(title = "TRT01A") +
-  ggplot2::theme(legend.position = "right") +
+  ggplot2::theme(
+    legend.position = "right",
+    legend.title = element_text(size = 10),
+    axis.title = element_text(size = 11)
+  ) +
   ggplot2::geom_hline(yintercept = 0.5, linetype = "dashed")) %>%
   ggsurvfit_build()
 
@@ -95,13 +111,16 @@ caption <- cowplot::ggdraw() +
 file <- cowplot::plot_grid(
   title, km, caption,
   ncol = 1,
-  rel_heights = c(0.1, 0.75, 0.1)
+  rel_heights = c(0.1, 0.8, 0.1)
 )
 
 if (!dir.exists(file.path(path$output, "pdf"))) {
   dir.create(file.path(path$output, "pdf"))
 }
 
-ggsave(file, filename = file.path(path$output, "pdf/tlf-kmplot-pilot5.pdf"))
+ggsave(file,
+  filename = file.path(path$output, "pdf/tlf-kmplot-pilot5.pdf"),
+  scale = 2
+)
 
 while (!is.null(dev.list())) dev.off()
