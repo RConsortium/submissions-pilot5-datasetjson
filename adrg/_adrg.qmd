@@ -29,6 +29,8 @@ This document provides context for the analysis datasets and terminology that be
 | Data Definitions            | Define-XML v2.0                               |
 |                             |                                               |
 | Medical Events Dictionary   | MedDRA version 8.0                            |
+|                             |                                               |
+| datasetjson                 | 1.1                                           |
 
 
 ## Source Data Used for Analysis Dataset Creation
@@ -511,10 +513,32 @@ file.copy(
 renv::init()
 ```
 
-The function will prompt you to make a choice due to the lockfile being present. Enter `1` in the console to choose **Restore the project from the lockfile**.
+A first time installation and use of `renv::init()` will prompt the following text
+in the console. Please type `Y` to proceed. 
+
+![renv init](figures/renv_init.png)
 
 
-5. To install the packages managed by `renv`, run the following command in the R console:
+A second prompt will appear similar to the text below for both new and old installations
+of `renv`:
+
+```r
+- "C:/Users/.../AppData/Local/R/cache/R/renv" has been created.
+This project already has a lockfile. What would you like to do? 
+
+1: Restore the project from the lockfile.
+2: Discard the lockfile and re-initialize the project.
+3: Activate the project without snapshotting or installing any packages.
+4: Abort project initialization.
+
+Selection: 1
+```
+
+
+Enter `1` in the console to choose **Restore the project from the lockfile**.  
+
+
+5. If packages are not installed from the **Restore the project from the lockfile** step, then run the following command in the R console:
 
 ```r
 renv::restore(prompt = FALSE)
@@ -529,12 +553,26 @@ After all packages have been installed, you should Restart your Session.
 * Select `Session -> Restart R`
 
 A similar message should appear in your console. This indicates that your R Session
-is synced to all Pilot 5 packages needed to reproduce the Pilot 5 analysis.
+is synced to all Pilot 5 packages needed to reproduce the Pilot 5 analysis and you
+should proceed to the next section.
 
 ```r
 Restarting R session...
 - Project 'C:/pilot5-files' loaded. [renv 1.1.4]
 ```
+
+If a message appears like below then the following guidance is recommended:
+
+```r
+Restarting R session...
+- Project '~/pilot5' loaded. [renv 1.1.4]
+- The project is out-of-sync -- use `renv::status()` for details.
+```
+
+* Run `renv::status()` to find what is out of sync.
+* Inspect the installation process for any packages that were not successfully installed.
+* Repeat the above steps again.
+
 
 ## Execute R Programs
 
@@ -544,7 +582,6 @@ To reproduce the analysis results from the JSON transport files, set up and run 
 1. Setting up .Rprofile
 
 Edit the `.Rprofile` file created in the working directory to match the following contents:
-
 
 ```r
 source("renv/activate.R")
@@ -559,6 +596,9 @@ path <- list(
   programs = file.path(getwd(), "m5/datasets/rconsortiumpilot5/analysis/adam/programs")
 )
 ```
+
+If the file is not present in your working directory, then in the files window click on
+`More > Show Hidden Files` and it should appear in the files window. 
 
 2. Restart R Session 
 

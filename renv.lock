@@ -1108,48 +1108,6 @@
       "Author": "Gábor Csárdi [aut, cre], Kirill Müller [aut], Jim Hester [aut], Maëlle Salmon [ctb] (<https://orcid.org/0000-0002-2815-0399>), Posit Software, PBC [cph, fnd]",
       "Repository": "CRAN"
     },
-    "diffdf": {
-      "Package": "diffdf",
-      "Version": "1.1.1",
-      "Source": "Repository",
-      "Type": "Package",
-      "Title": "Dataframe Difference Tool",
-      "Authors@R": "c(  person(\"Craig\" ,\"Gower-Page\" , email = \"craig.gower-page@roche.com\" , role = c(\"cre\",\"aut\")), person(\"Kieran\", \"Martin\" , email = \"kieran.martin@roche.com\" , role = \"aut\") )",
-      "Description": "Functions for comparing two data.frames against  each other. The core functionality is to provide a detailed breakdown of any differences  between two data.frames as well as providing utility functions to help narrow down the  source of problems and differences.",
-      "Encoding": "UTF-8",
-      "Language": "en-GB",
-      "Depends": [
-        "R (>= 3.1.2)"
-      ],
-      "Imports": [
-        "tibble",
-        "assertthat",
-        "methods"
-      ],
-      "Suggests": [
-        "testthat",
-        "lubridate",
-        "knitr",
-        "rmarkdown",
-        "purrr",
-        "dplyr",
-        "stringi",
-        "stringr",
-        "devtools",
-        "covr",
-        "bit64"
-      ],
-      "RoxygenNote": "7.3.2",
-      "VignetteBuilder": "knitr",
-      "License": "MIT + file LICENSE",
-      "URL": "https://gowerc.github.io/diffdf/, https://github.com/gowerc/diffdf/",
-      "Config/testthat/edition": "3",
-      "BugReports": "https://github.com/gowerc/diffdf/issues",
-      "NeedsCompilation": "no",
-      "Author": "Craig Gower-Page [cre, aut], Kieran Martin [aut]",
-      "Maintainer": "Craig Gower-Page <craig.gower-page@roche.com>",
-      "Repository": "CRAN"
-    },
     "digest": {
       "Package": "digest",
       "Version": "0.6.37",
