@@ -238,7 +238,8 @@ Were the analysis datasets evaluated for conformance with CDISC ADaM Validation 
 
 ```         
   Yes, Version of CDISC ADaM Validation Checks and software used: Pinnacle 21® 
-  Community 4.0.2
+  Community 4.1.0
+  
 ```
 
 Were the ADaM datasets evaluated in relation to define.xml?
@@ -255,15 +256,29 @@ Was define.xml evaluated?
 
 ## Issues Summary
 
+The datasetjson 1.1 standard is not availabe in Pinnacle 21®  Community (P21C) 4.1.0 or 
+Pinnacle 21® Enterprise (P21E). The standard available in both P21C and P21E is datasetjson 1.0, which is
+not fit for purpose. See Appendix X for more details on differences between 1.1 and 1.0. Both
+P21C and P21E will be updated to use 1.1, but the timeline is TBD.
+
+As a temporary workaround, FDA requested that Conformance Summaries should be generated for the following:
+
+* ADaM json files converted to xpts and validated with P21C
+* ADaM json files validated with datasetson 1.0 standard P21C
+
+### ADaM json files converted to xpts and validated with P21C
+
 | Check ID | Diagnostic Message                                                           | Dataset | Count (Issue Rate) | Explanation                                                                                                                                                                             |
 |----------|------------------------------------------------------------------------------|---------|--------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | AD1012   | Secondary custom variable is present but its primary variable is not present | ADSL    | 1 (50.00%)         | This is a Sponsor Extension to the ADaM Model. The VISNUMEN \[End of Trt Visit (Vis 12 or Early Term.)\] variable is a integer variable which is not related to any character variable. |
 
 : {tbl-colwidths="\[17,22,15,22,25\]"}
 
+## ADaM json files validated with datasetson 1.0 standard P21C
+
 ## QC Findings and Common Issues
 
-In this Pilot 3 study, our focus was to create a subset of ADaMs based on the CDSICPILOT data, using R. We compared our R generated ADaMs against the CDISCPILOT ADaMs, created in SAS, as a QC step. With these comparisons we listed the QC Findings with explanations as to why these findings exist. We also came across common issues throughout the ADaM generation process, which could be helpful for improvements utilising the CDISC Pilot data in the future. More details can be found in the appendix (Appendix 2 and Appendix 3).
+In this Pilot 5 study, our focus was to create SDTM and ADaM transport files as json rather than xpt file. We compared our R generated ADaMs against the CDISCPILOT ADaMs, created in SAS, as a QC step. With these comparisons we listed the QC Findings with explanations as to why these findings exist. We also came across common issues throughout the ADaM generation process, which could be helpful for improvements utilising the CDISC Pilot data in the future. More details can be found in the appendix (Appendix 2 and Appendix 3).
 
 # Submission of Programs
 
