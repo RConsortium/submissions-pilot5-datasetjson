@@ -29,6 +29,8 @@ This document provides context for the analysis datasets and terminology that be
 | Data Definitions            | Define-XML v2.0                               |
 |                             |                                               |
 | Medical Events Dictionary   | MedDRA version 8.0                            |
+|                             |                                               |
+| datasetjson                 | 1.1                                           |
 
 
 ## Source Data Used for Analysis Dataset Creation
@@ -236,7 +238,8 @@ Were the analysis datasets evaluated for conformance with CDISC ADaM Validation 
 
 ```         
   Yes, Version of CDISC ADaM Validation Checks and software used: Pinnacle 21® 
-  Community 4.0.2
+  Community 4.1.0
+  
 ```
 
 Were the ADaM datasets evaluated in relation to define.xml?
@@ -253,15 +256,66 @@ Was define.xml evaluated?
 
 ## Issues Summary
 
-| Check ID | Diagnostic Message                                                           | Dataset | Count (Issue Rate) | Explanation                                                                                                                                                                             |
+The datasetjson 1.1 standard is not availabe in Pinnacle 21®  Community (P21C) 4.1.0 or 
+Pinnacle 21® Enterprise (P21E). The standard available in both P21C and P21E is datasetjson 1.0, which is
+not fit for purpose. See Appendix 3 for more details on differences between 1.1 and 1.0. Both
+P21C and P21E will be updated to use 1.1, but the timeline is TBD.
+
+As a temporary workaround, FDA requested that Conformance Summaries should be generated for the following:
+
+* ADaM json files converted to xpts and validated with P21C
+* ADaM json files validated with datasetson 1.0 standard P21C
+
+### ADaM json files converted to xpts and validated with P21C
+
+The xpts were generated as follows:
+
+* ADaM programs read in sdtm `.json` files
+* ADaM programs wrote out `.rds` files
+* A program converted these `.rds` files to `.json` and then to `.xpt`
+* `.xpt` files were validated by P21C
+
+| Check ID | Diagnostic Message                                                           | Dataset | Count | Explanation                                                                                                                                                                             |
 |----------|------------------------------------------------------------------------------|---------|--------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| AD1012   | Secondary custom variable is present but its primary variable is not present | ADSL    | 1 (50.00%)         | This is a Sponsor Extension to the ADaM Model. The VISNUMEN \[End of Trt Visit (Vis 12 or Early Term.)\] variable is a integer variable which is not related to any character variable. |
+| No Issues were found   |   |      |          |    |
 
 : {tbl-colwidths="\[17,22,15,22,25\]"}
 
+## ADaM json files validated with datasetson 1.0 standard P21C
+
+The datasetson 1.0 `.json` files were generated as follows:
+
+* ADaM programs read in sdtm `.json` files
+  * `.json` files were created using datasetjson 1.1 standard
+* ADaM programs wrote out `.rds` files
+* A program converted these `.rds` files to `.json` and then to `.xpt`
+  * `.json` files were created using datasetjson 1.1 standard
+* `.xpt` files were converted to by P21C `.json` files using 1.0 standard
+* `.json` files were validated by P21C
+
+
+| Check ID | Diagnostic Message                                                | Dataset | Count | Explanation |
+|----------|-------------------------------------------------------------------|---------|-------|-------------|
+| AD0018   | Variable label mismatch between dataset and ADaM standard         | ADADAS  | 34    |             |
+| AD0041A  | *DT variable has missing SAS Date Format                          | ADADAS  | 3     |             |
+| AD0018   | Variable label mismatch between dataset and ADaM standard         | ADAE    | 40    |             |
+| AD0041A  | *DT variable has missing SAS Date Format                          | ADAE    | 4     |             |
+| SD0059   | Define.xml/dataset variable type mismatch                         | ADAE    | 5     |             |
+| AD0018   | Variable label mismatch between dataset and ADaM standard         | ADLBC   | 34    |             |
+| AD0041A  | *DT variable has missing SAS Date Format                          | ADLBC   | 3     |             |
+| AD0018   | Variable label mismatch between dataset and ADaM standard         | ADSL    | 23    |             |
+| AD0041A  | *DT variable has missing SAS Date Format                          | ADSL    | 5     |             |
+| AD0320   | Non-standard dataset label                                         | ADSL    | 1     |             |
+| AD0018   | Variable label mismatch between dataset and ADaM standard         | ADTTE   | 24    |             |
+| AD0041A  | *DT variable has missing SAS Date Format                          | ADTTE   | 4     |             |
+
+
+: {tbl-colwidths="\[17,22,15,22,25\]"}
+
+
 ## QC Findings and Common Issues
 
-In this Pilot 3 study, our focus was to create a subset of ADaMs based on the CDSICPILOT data, using R. We compared our R generated ADaMs against the CDISCPILOT ADaMs, created in SAS, as a QC step. With these comparisons we listed the QC Findings with explanations as to why these findings exist. We also came across common issues throughout the ADaM generation process, which could be helpful for improvements utilising the CDISC Pilot data in the future. More details can be found in the appendix (Appendix 2 and Appendix 3).
+In this Pilot 5 study, our focus was to create SDTM and ADaM transport files as json rather than xpt file. We compared our R generated ADaMs against the CDISCPILOT ADaMs, created in SAS, as a QC step. With these comparisons we listed the QC Findings with explanations as to why these findings exist. We also came across common issues throughout the ADaM generation process, which could be helpful for improvements utilising the CDISC Pilot data in the future. More details can be found in the appendix (Appendix 2 and Appendix 3).
 
 # Submission of Programs
 
@@ -511,10 +565,32 @@ file.copy(
 renv::init()
 ```
 
-The function will prompt you to make a choice due to the lockfile being present. Enter `1` in the console to choose **Restore the project from the lockfile**.
+A first time installation and use of `renv::init()` will prompt the following text
+in the console. Please type `Y` to proceed. 
+
+![renv init](figures/renv_init.png)
 
 
-5. To install the packages managed by `renv`, run the following command in the R console:
+A second prompt will appear similar to the text below for both new and old installations
+of `renv`:
+
+```r
+- "C:/Users/.../AppData/Local/R/cache/R/renv" has been created.
+This project already has a lockfile. What would you like to do? 
+
+1: Restore the project from the lockfile.
+2: Discard the lockfile and re-initialize the project.
+3: Activate the project without snapshotting or installing any packages.
+4: Abort project initialization.
+
+Selection: 1
+```
+
+
+Enter `1` in the console to choose **Restore the project from the lockfile**.  
+
+
+5. If packages are not installed from the **Restore the project from the lockfile** step, then run the following command in the R console:
 
 ```r
 renv::restore(prompt = FALSE)
@@ -529,12 +605,26 @@ After all packages have been installed, you should Restart your Session.
 * Select `Session -> Restart R`
 
 A similar message should appear in your console. This indicates that your R Session
-is synced to all Pilot 5 packages needed to reproduce the Pilot 5 analysis.
+is synced to all Pilot 5 packages needed to reproduce the Pilot 5 analysis and you
+should proceed to the next section.
 
 ```r
 Restarting R session...
 - Project 'C:/pilot5-files' loaded. [renv 1.1.4]
 ```
+
+If a message appears like below then the following guidance is recommended:
+
+```r
+Restarting R session...
+- Project '~/pilot5' loaded. [renv 1.1.4]
+- The project is out-of-sync -- use `renv::status()` for details.
+```
+
+* Run `renv::status()` to find what is out of sync.
+* Inspect the installation process for any packages that were not successfully installed.
+* Repeat the above steps again.
+
 
 ## Execute R Programs
 
@@ -544,7 +634,6 @@ To reproduce the analysis results from the JSON transport files, set up and run 
 1. Setting up .Rprofile
 
 Edit the `.Rprofile` file created in the working directory to match the following contents:
-
 
 ```r
 source("renv/activate.R")
@@ -559,6 +648,9 @@ path <- list(
   programs = file.path(getwd(), "m5/datasets/rconsortiumpilot5/analysis/adam/programs")
 )
 ```
+
+If the file is not present in your working directory, then in the files window click on
+`More > Show Hidden Files` and it should appear in the files window. 
 
 2. Restart R Session 
 
@@ -638,3 +730,358 @@ Cross-check if anything has changed from Pilot 3 to Pilot 5 for QC Findings
 https://github.com/RConsortium/submissions-pilot5-datasetjson/wiki/QC-Findings
 
 :::
+
+Please add any discrepencies you found between the original ADaM datasets from the CDISC Pilot and the ones we've programmed in R below.
+
+## ADSL
+The R-generated ADSL matches the original ADSL from [CDISC pilot data](https://github.com/phuse-org/TestDataFactory/tree/main/Updated/TDF_ADaM), besides the following mismatches:
+* Subject 01-702-1082 has a missing value for BMIBLGR1 in the R-generated ADSL, whilst BMIBLGR1 = "<25" in the original ADSL. This is an issue with the original ADSL, as this subject's BMI at baseline (BMIBL) is missing and therefore the subject shouldn't be assigned a BMI at baseline group.
+
+## ADAE
+The R-generated ADAE matches the original ADAE from [CDISC pilot data](https://github.com/phuse-org/TestDataFactory/tree/main/Updated/TDF_ADaM), besides the following mismatches:
+There is an issue with the original CDISC pilot dataset. ADURN is blank, where AESEQ is (5, 6, 7, 8) for the original CDISC dataset for Subject below:
+```r
+> adae_orig %>% 
+     filter(USUBJID=='01-716-1418') %>% 
+     select(USUBJID,TRTSDT,ASTDT,AENDT,ADURN,ADURU,AESEQ)
+
+# A tibble: 10 × 7
+   USUBJID     TRTSDT     ASTDT      AENDT      ADURN ADURU AESEQ
+   <chr>       <date>     <date>     <date>     <dbl> <chr> <dbl>
+ 1 01-716-1418 2013-05-05 2013-05-05 2013-05-07     3 DAY       1
+ 2 01-716-1418 2013-05-05 2013-05-05 NA            NA NA        2
+ 3 01-716-1418 2013-05-05 2013-05-05 2013-05-07     3 DAY       3
+ 4 01-716-1418 2013-05-05 2013-05-07 NA            NA NA        4
+ 5 01-716-1418 2013-05-05 2013-07-01 2013-09-26    NA NA        5
+ 6 01-716-1418 2013-05-05 2013-07-01 2013-10-04    NA NA        6
+ 7 01-716-1418 2013-05-05 2013-07-01 2013-09-26    NA NA        7
+ 8 01-716-1418 2013-05-05 2013-07-01 2013-10-04    NA NA        8
+ 9 01-716-1418 2013-05-05 2013-09-26 2013-11-11    47 DAY       9
+10 01-716-1418 2013-05-05 2013-09-26 2013-11-11    47 DAY      10
+```
+Because it seems the original SDTM.AE.AESTDTC was missing Day, where it seems the original ADAE derivation for ADURN was probably using this date instead of the imputed date. Because day is missing in AESTDTC, ADURN can't derive days.
+```r
+> ae %>% filter(USUBJID=='01-716-1418') %>% select(USUBJID,AESTDTC,AESEQ) %>% arrange(AESEQ)
+# A tibble: 10 × 3
+   USUBJID     AESTDTC    AESEQ
+   <chr>       <chr>      <dbl>
+ 1 01-716-1418 2013-05-05     1
+ 2 01-716-1418 2013-05-05     2
+ 3 01-716-1418 2013-05-05     3
+ 4 01-716-1418 2013-05-07     4
+ 5 01-716-1418 2013-07        5
+ 6 01-716-1418 2013-07        6
+ 7 01-716-1418 2013-07        7
+ 8 01-716-1418 2013-07        8
+ 9 01-716-1418 2013-09-26     9
+10 01-716-1418 2013-09-26    10
+```
+but the same records, derived in the Pilot 3 dataset do show a calculation since we are using the imputed ASTDT, per the define (ADURN=AENDT-ASTDT+1). 
+```r
+#AE.AESTDTC, converted to a numeric SAS date. Some events with partial dates are imputed in a conservative 
+#manner. If the day component is missing, a value of '01' is used. If both the month and day are missing 
+#no imputation is performed as these dates clearly indicate a start prior to the beginning of treatment. 
+#There are no events with completely missing start dates.
+
+> adae0 %>% filter(USUBJID=='01-716-1418') %>% select(USUBJID,TRTSDT,ASTDT,AESTDTC,AENDT,AEENDY,ADURN,ADURU,AESEQ)
+# A tibble: 10 × 9
+   USUBJID     TRTSDT     ASTDT      AESTDTC    AENDT      AEENDY ADURN ADURU AESEQ
+   <chr>       <date>     <date>     <chr>      <date>      <dbl> <dbl> <chr> <dbl>
+ 1 01-716-1418 2013-05-05 2013-05-05 2013-05-05 2013-05-07      3     3 DAY       1
+ 2 01-716-1418 2013-05-05 2013-05-05 2013-05-05 NA             NA    NA NA        2
+ 3 01-716-1418 2013-05-05 2013-05-05 2013-05-05 2013-05-07      3     3 DAY       3
+ 4 01-716-1418 2013-05-05 2013-05-07 2013-05-07 NA             NA    NA NA        4
+ 5 01-716-1418 2013-05-05 2013-07-01 2013-07    2013-10-04    153    96 DAY       6
+ 6 01-716-1418 2013-05-05 2013-07-01 2013-07    2013-10-04    153    96 DAY       8
+ 7 01-716-1418 2013-05-05 2013-07-01 2013-07    2013-09-26    145    88 DAY       5
+ 8 01-716-1418 2013-05-05 2013-07-01 2013-07    2013-09-26    145    88 DAY       7
+ 9 01-716-1418 2013-05-05 2013-09-26 2013-09-26 2013-11-11    191    47 DAY       9
+10 01-716-1418 2013-05-05 2013-09-26 2013-09-26 2013-11-11    191    47 DAY      10
+```
+This latter approach should be the correct approach. 
+
+Due to this, we have outlined the expected differences here :
+```r
+> diffdf(adae, adae_orig, keys = c("STUDYID", "USUBJID", "AESEQ"))
+Differences found between the objects!
+
+A summary is given below.
+
+There are columns in BASE and COMPARE with differing attributes !!
+All rows are shown in table below
+```
+1. ADURN values will be populated in Pilot 3 (i.e. under `BASE`), following the latter derivation approach (i.e. ADURN=AENDT-ASTDT+1) for Subject 01-716-1418 where AESEQ is (5, 6, 7, 8) specified in define.
+```r
+All rows are shown in table below
+
+  ===========================================================
+   VARIABLE    STUDYID       USUBJID    AESEQ  BASE  COMPARE 
+  -----------------------------------------------------------
+    ADURN    CDISCPILOT01  01-716-1418    5     88    <NA>   
+    ADURN    CDISCPILOT01  01-716-1418    6     96    <NA>   
+    ADURN    CDISCPILOT01  01-716-1418    7     88    <NA>   
+    ADURN    CDISCPILOT01  01-716-1418    8     96    <NA>   
+  -----------------------------------------------------------
+```
+2. ADURU should be set to 'DAYS' (i.e. under `BASE`) instead of 'DAY' when ADURN is not missing.  Updated in Pilot 3 define.
+```r
+First 10 of 718 rows are shown in table below
+
+  ===========================================================
+   VARIABLE    STUDYID       USUBJID    AESEQ  BASE  COMPARE 
+  -----------------------------------------------------------
+    ADURU    CDISCPILOT01  01-701-1015    3    DAYS    DAY   
+    ADURU    CDISCPILOT01  01-701-1023    1    DAYS    DAY   
+    ADURU    CDISCPILOT01  01-701-1023    4    DAYS    DAY   
+    ADURU    CDISCPILOT01  01-701-1047    1    DAYS    DAY   
+    ADURU    CDISCPILOT01  01-701-1047    2    DAYS    DAY   
+    ADURU    CDISCPILOT01  01-701-1097    2    DAYS    DAY   
+    ADURU    CDISCPILOT01  01-701-1097    3    DAYS    DAY   
+    ADURU    CDISCPILOT01  01-701-1097    5    DAYS    DAY   
+    ADURU    CDISCPILOT01  01-701-1097    6    DAYS    DAY   
+    ADURU    CDISCPILOT01  01-701-1097    7    DAYS    DAY   
+  -----------------------------------------------------------
+```
+
+
+## ADLBC
+The R-generated ADLBC matches the original ADLBC from [CDISC pilot data](https://github.com/phuse-org/TestDataFactory/tree/main/Updated/TDF_ADaM), besides the following mismatches:
+
+Three variables from R-generated ADLBC have class date while the same variables are numeric in the CDISC ADLBC. We opted to keep the date class in our R-generated ADLB.
+
+```r
+> diffdf(adlbc, qc_adlbc, keys = c("STUDYID", "USUBJID", "AVISIT", "LBSEQ"))
+Differences found between the objects!
+
+A summary is given below.
+
+There are columns in BASE and COMPARE with different classes !!
+All rows are shown in table below
+
+  ==================================
+   VARIABLE  CLASS.BASE  CLASS.COMP 
+  ----------------------------------
+     ADT        Date      numeric   
+    TRTEDT      Date      numeric   
+    TRTSDT      Date      numeric   
+  ----------------------------------
+```
+
+## ADADAS
+The R-generated ADADAS matches original ADADAS from [CDISC pilot data](https://github.com/phuse-org/TestDataFactory/tree/main/Updated/TDF_ADaM), except for the records where `PARAMCD=ACTOT, DTYPE=LOCF`. This is an issue from the CDISC ADADAS.
+
+- CDISC SDTM/QS: 818 records for `QSTESTCD=ACTOT`
+- CDISC ADaM/ADADAS: 1040 records for `PARAMCD=ACTOT`, 799 (directly from QS, **should be 818**) + 241 imputed records (`DTYPE=LOCF`) 
+- ADADAS generated by R: 1040 records for `PARAMCD=ACTOT`, 818 (directly from QS) + 222 imputed records (`DTYPE=LOCF`)
+
+Take a detailed example USUBJID="01-701-1294"
+
+CDISC QS:
+```r
+> qs %>% filter(QSTESTCD=="ACTOT") %>% 
++   select(USUBJID, QSSEQ, VISIT, QSTESTCD, QSTEST,QSSTRESN) %>% 
++   filter(USUBJID=="01-701-1294")
+# A tibble: 4 × 6
+  USUBJID     QSSEQ VISIT     QSTESTCD QSTEST                QSSTRESN
+  <chr>       <dbl> <chr>     <chr>    <chr>                    <dbl>
+1 01-701-1294  5015 BASELINE  ACTOT    ADAS-COG(11) Subscore        9
+2 01-701-1294  5030 WEEK 8    ACTOT    ADAS-COG(11) Subscore       14
+3 01-701-1294  5045 WEEK 12   ACTOT    ADAS-COG(11) Subscore        6
+4 01-701-1294  5060 RETRIEVAL ACTOT    ADAS-COG(11) Subscore        9
+```
+
+CDISC ADADAS:
+
+**For the record with `QSSEQ=5045` and `AVISIT=Week 8`, `DTYPE` is populated as `LOCF` , but this record is directly from `qs` dataset, not imputed.** 
+```r
+> qc_adadas %>% filter(PARAMCD=="ACTOT") %>% 
++   select(USUBJID, QSSEQ, PARAMCD, AVISITN, AVISIT, VISIT, AVAL, DTYPE, ANL01FL, ADT, ADY) %>% 
++   arrange(USUBJID, AVISITN) %>% filter(USUBJID=="01-701-1294")
+# A tibble: 5 × 11
+  USUBJID     QSSEQ PARAMCD AVISITN AVISIT   VISIT      AVAL DTYPE  ANL01FL ADT          ADY
+  <chr>       <dbl> <chr>     <dbl> <chr>    <chr>     <dbl> <chr>  <chr>   <date>     <dbl>
+1 01-701-1294  5015 ACTOT         0 Baseline BASELINE      9 ""     "Y"     2013-03-24     1
+2 01-701-1294  5030 ACTOT         8 Week 8   WEEK 8       14 ""     "Y"     2013-05-22    60
+3 01-701-1294  5045 ACTOT         8 Week 8   WEEK 12      14 "LOCF" ""      2013-06-14    83
+4 01-701-1294  5045 ACTOT        16 Week 16  WEEK 12      14 "LOCF" "Y"     2013-06-14    83
+5 01-701-1294  5060 ACTOT        24 Week 24  RETRIEVAL     9 ""     "Y"     2013-10-08   199
+```
+
+ADADAS generated by R:
+
+`DTYPE` is not `LOCF` for the record with `QSSEQ=5045` and `AVISIT=Week 8`, as this record is directly from `qs`.
+```r
+> adadas %>% filter(PARAMCD=="ACTOT") %>% 
++       select(USUBJID, QSSEQ, PARAMCD, AVISITN, AVISIT, VISIT, AVAL, DTYPE, ANL01FL, ADT, ADY) %>% 
++       arrange(USUBJID, AVISITN) %>% filter(USUBJID=="01-701-1294")
+# A tibble: 5 × 11
+  USUBJID     QSSEQ PARAMCD AVISITN AVISIT   VISIT      AVAL DTYPE  ANL01FL ADT          ADY
+  <chr>       <dbl> <chr>     <dbl> <chr>    <chr>     <dbl> <chr>  <chr>   <date>     <dbl>
+1 01-701-1294  5015 ACTOT         0 Baseline BASELINE      9 ""     "Y"     2013-03-24     1
+2 01-701-1294  5030 ACTOT         8 Week 8   WEEK 8       14 ""     "Y"     2013-05-22    60
+3 01-701-1294  5045 ACTOT         8 Week 8   WEEK 12       6 ""     ""      2013-06-14    83
+4 01-701-1294  5030 ACTOT        16 Week 16  WEEK 8       14 "LOCF" "Y"     2013-05-22    60
+5 01-701-1294  5060 ACTOT        24 Week 24  RETRIEVAL     9 ""     "Y"     2013-10-08   199
+```
+
+The same issue occurred for other subjects and resulted in the following discrepancies:
+```r
+There are rows in BASE that are not in COMPARE !!
+First 10 of 33 rows are shown in table below
+
+  ===========================================
+     USUBJID    PARAMCD  AVISIT      ADT     
+  -------------------------------------------
+   01-701-1294   ACTOT   Week 16  2013-05-22 
+   01-701-1302   ACTOT   Week 16  2013-10-22 
+   01-703-1076   ACTOT   Week 16  2013-12-17 
+   01-703-1076   ACTOT   Week 24  2013-12-17 
+   01-704-1010   ACTOT   Week 24  2014-06-13 
+   01-704-1065   ACTOT   Week 16  2013-12-20 
+   01-704-1065   ACTOT   Week 24  2013-12-20 
+   01-704-1120   ACTOT   Week 16  2014-01-27 
+   01-704-1120   ACTOT   Week 24  2014-01-27 
+   01-705-1310   ACTOT   Week 16  2013-12-26 
+  -------------------------------------------
+
+There are rows in COMPARE that are not in BASE !!
+First 10 of 33 rows are shown in table below
+
+  ===========================================
+     USUBJID    PARAMCD  AVISIT      ADT     
+  -------------------------------------------
+   01-701-1294   ACTOT   Week 16  2013-06-14 
+   01-701-1302   ACTOT   Week 16  2013-11-05 
+   01-703-1076   ACTOT   Week 16  2013-12-24 
+   01-703-1076   ACTOT   Week 24  2013-12-24 
+   01-704-1010   ACTOT   Week 24  2014-07-09 
+   01-704-1065   ACTOT   Week 16  2013-12-24 
+   01-704-1065   ACTOT   Week 24  2013-12-24 
+   01-704-1120   ACTOT   Week 16  2014-02-03 
+   01-704-1120   ACTOT   Week 24  2014-02-03 
+   01-705-1310   ACTOT   Week 16  2014-01-23 
+  -------------------------------------------
+
+Not all Values Compared Equal
+All rows are shown in table below
+
+  =============================
+   Variable  No of Differences 
+  -----------------------------
+     AVAL           19         
+     CHG            19         
+     PCHG           19         
+    DTYPE           19         
+  ----------------------------
+```
+
+
+In the CDISC ADADAS, there are 19 subjects whose records have the incorrect `DTYPE=LOCF` value instead of the expected missing `DTYPE`, resulting IN different `AVAL/CHG/PCHG` values for these subjects.
+```r
+> diff <- diffdf(adadas, qc_adadas, keys = c("USUBJID", "PARAMCD", "AVISIT", "ADT"))
+> count(diff$VarDiff_AVAL, USUBJID)
+# A tibble: 19 × 2
+   USUBJID         n
+   <chr>       <int>
+ 1 01-701-1294     1
+ 2 01-701-1302     1
+ 3 01-703-1076     1
+ 4 01-704-1065     1
+ 5 01-704-1120     1
+ 6 01-705-1292     1
+ 7 01-705-1310     1
+ 8 01-708-1347     1
+ 9 01-709-1102     1
+10 01-709-1259     1
+11 01-710-1045     1
+12 01-710-1278     1
+13 01-710-1300     1
+14 01-710-1315     1
+15 01-714-1068     1
+16 01-715-1107     1
+17 01-716-1373     1
+18 01-718-1172     1
+19 01-718-1250     1
+```
+
+## ADTTE
+The R-generated ADTTE matches original ADTTE from [CDISC pilot data](https://github.com/phuse-org/TestDataFactory/tree/main/Updated/TDF_ADaM) except for minor SAS format discrepancies. Since this adtte was generated in R compared to SAS formats, the columns Type & Length in the define should be sufficient enough to describe the attributes of these variables.  
+```r
+> diffdf(adtte, qc_adtte, keys = c("STUDYID", "USUBJID", "PARAMCD", "SRCDOM", "STARTDT"))
+Differences found between the objects!
+
+A summary is given below.
+
+There are columns in BASE and COMPARE with differing attributes !!
+First 10 of 20 rows are shown in table below
+
+  ================================================
+   VARIABLE  ATTR_NAME   VALUES.BASE  VALUES.COMP 
+  ------------------------------------------------
+     AGE     format.sas     NULL           3      
+    AGEGR1   format.sas     NULL          $5      
+   AGEGR1N   format.sas     NULL           3      
+   EVNTDESC  format.sas     NULL          $25     
+    PARAM    format.sas     NULL          $32     
+   PARAMCD   format.sas     NULL          $4      
+     RACE    format.sas     NULL          $32     
+    RACEN    format.sas     NULL           3      
+    SAFFL    format.sas     NULL          $1      
+     SEX     format.sas     NULL          $1      
+  ------------------------------------------------
+```
+
+## Label discrepancies 
+In pilot3, variable labels were updated per ADaM IG 1.1, which caused some discrepancies with original CDISC pilot data label.
+
+| Dataset | Variable | CDISC pilot data label|Pilot3 label |
+| :---   | :---         |     :---     |          :--- |
+| ADAE| ADURN | Analysis Duration (N) | AE Duration (N) |
+|     | ADURU | Analysis Duration Units | AE Duration Units  |
+|     |AOCCFL  |1st Occurrence of Any AE Flag  | 1st Occurrence within Subject Flag |
+| ADADAS| ANL01FL |  Analysis Record Flag 01  | Analysis Flag 01  |
+|       | ITTFL|  Intent-to-Treat Population Flag  | Intent-To-Treat Population Flag|
+| ADTTE            |SRCDOM      |Source Data | Source Domain |
+
+
+
+
+
+::: {=latex}
+\newpage
+:::
+
+# Appendix 3
+
+## Comparison of Dataset-JSON v1.0 vs v1.1
+
+| Aspect | v1.0 | v1.1 |
+|--------|------|------|
+| **Release Date** | 23 August 2023 | 5 December 2024 (See Citation 1) |
+| **Standard Context** | Part of ODM v2.0 | Independent standard (See Citation 2) |
+| **Structure** | Nested JSON | Flattened structure (See Citation 3) |
+| **Datatype Support** | Basic types | Expanded types (See Citation 4) |
+| **Target Data Type Conversion** | Not defined | Introduced `targetDataType`(See Citation 4) |
+| **Missing Value Representation** | Ambiguous | `null` and `""`(See Citation 4) |
+| **NDJSON Support** | Not supported | Supported (See Citation 4) |
+| **Compression Format** | None | DSJC format (See Citation 6) |
+| **OID Requirements** | Mostly required | Optional (See Citation 4) |
+| **ITEMGROUPDATASEQ** | Present | Removed (See Citation 5) |
+| **isReferenceData Attribute** | Included | Removed (See Citation 5) |
+| **Define-XML Linkage** | Supported | Enhanced (See Citation 2) |
+| **Tooling & Viewer Support** | Limited | Updated tools (See Citation 4) |
+| **User Guide** | Minimal | Comprehensive (See Citation 4) |
+| **API Specification** | Not available | Draft introduced (See Citation 6) |
+| **Public Review Feedback** | Not applicable | 58 issues reviewed (See Citation 5) |
+
+**Citation 1** : CDISC (2023). *Dataset-JSON v1.0*. Available at: https://www.cdisc.org/standards/data-exchange/dataset-json/dataset-json-v1-0 [Accessed 15 Sep. 2025].
+
+**Citation 2** : CDISC (2024). *Dataset-JSON v1.1*. Available at: https://www.cdisc.org/standards/data-exchange/dataset-json/dataset-json-v1-1 [Accessed 15 Sep. 2025].
+
+**Citation 3** : CDISC (2024). *Dataset-JSON v1.1 Public Review Presentation*. Dataset-JSON-v1-1-Public-Review.pptx [Accessed 15 Sep. 2025].
+
+**Citation 4** : CDISC (2024). *Dataset-JSON v1.1 GGG Final Presentation*. Dataset-JSON-v1-1-GGG-Final.pptx [Accessed 15 Sep. 2025].
+
+**Citation 5** : CDISC (2024). *Public Review Metrics and Issue Dispositions*. Dataset-JSON-v1-1-GGG-Final.pptx [Accessed 15 Sep. 2025].
+
+**Citation 6** : CDISC (2025). *Dataset-JSON v1.1 API v1.0 Standard and Compressed Dataset-JSON v1.1*. Available at: https://www.cdisc.org/public-review/dataset-json-v1-1-api-v1-0-standard-and-compressed-dataset-json-v1-1 [Accessed 15 Sep. 2025].

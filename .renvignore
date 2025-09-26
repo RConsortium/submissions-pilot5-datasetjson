@@ -3,3 +3,6 @@ tlf-qc.qmd
 build_nixconfig.R
 adrg/
 pilot5-cmb-report-manual.qmd
+build_nixconfig.R
+default.nix
+qc_check.R
