@@ -29,28 +29,27 @@ if (length(json_files) == 0) {
       data <- as.data.frame(data)
     }
     if ("VISITNUM" %in% names(data)) {
-      
       # Check if any VISITNUM values have more than two digits after the decimal point.
       # Here we convert the numbers to characters with full precision so we can check the pattern.
       has_extra_digits <- grepl("\\.[0-9]{3,}$", as.character(data$VISITNUM))
-      
+
       if (any(has_extra_digits)) {
         message("Some VISITNUM values have more than two digits after the decimal; cleaning those values.")
-        
+
         # Process those values: format them so that trailing zeros are removed.
         # The format() call with 'trim=TRUE' suppresses unnecessary trailing zeros.
         data <- data %>%
           mutate(VISITNUM = ifelse(has_extra_digits,
-                                   as.numeric(format(VISITNUM, trim = TRUE, scientific = FALSE)),
-                                   VISITNUM))
+            as.numeric(format(VISITNUM, trim = TRUE, scientific = FALSE)),
+            VISITNUM
+          ))
       } else {
         message("VISITNUM is present and does not have extra digits.")
       }
-      
     } else {
       message("VISITNUM column is not present in the dataset.")
     }
-    
+
     # Construct the output file name by replacing .json with .xpt
     out_file <- sub("\\.json$", ".xpt", file)
 

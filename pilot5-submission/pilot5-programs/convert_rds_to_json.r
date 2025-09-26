@@ -10,8 +10,10 @@ library(tidyr)
 spec_path <- list.files(path = path$adam, pattern = "adam-pilot-5.xlsx", full.names = TRUE)
 
 specs <- spec_path %>%
-  spec_to_metacore(where_sep_sheet = FALSE,
-                   quiet = TRUE)
+  spec_to_metacore(
+    where_sep_sheet = FALSE,
+    quiet = TRUE
+  )
 
 # Input Files -------------------------------------------------------------
 
