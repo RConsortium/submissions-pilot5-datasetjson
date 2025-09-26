@@ -258,7 +258,7 @@ Was define.xml evaluated?
 
 The datasetjson 1.1 standard is not availabe in Pinnacle 21®  Community (P21C) 4.1.0 or 
 Pinnacle 21® Enterprise (P21E). The standard available in both P21C and P21E is datasetjson 1.0, which is
-not fit for purpose. See Appendix X for more details on differences between 1.1 and 1.0. Both
+not fit for purpose. See Appendix 3 for more details on differences between 1.1 and 1.0. Both
 P21C and P21E will be updated to use 1.1, but the timeline is TBD.
 
 As a temporary workaround, FDA requested that Conformance Summaries should be generated for the following:
@@ -268,13 +268,50 @@ As a temporary workaround, FDA requested that Conformance Summaries should be ge
 
 ### ADaM json files converted to xpts and validated with P21C
 
-| Check ID | Diagnostic Message                                                           | Dataset | Count (Issue Rate) | Explanation                                                                                                                                                                             |
+The xpts were generated as follows:
+
+* ADaM programs read in sdtm `.json` files
+* ADaM programs wrote out `.rds` files
+* A program converted these `.rds` files to `.json` and then to `.xpt`
+* `.xpt` files were validated by P21C
+
+| Check ID | Diagnostic Message                                                           | Dataset | Count | Explanation                                                                                                                                                                             |
 |----------|------------------------------------------------------------------------------|---------|--------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| AD1012   | Secondary custom variable is present but its primary variable is not present | ADSL    | 1 (50.00%)         | This is a Sponsor Extension to the ADaM Model. The VISNUMEN \[End of Trt Visit (Vis 12 or Early Term.)\] variable is a integer variable which is not related to any character variable. |
+| No Issues were found   |   |      |          |    |
 
 : {tbl-colwidths="\[17,22,15,22,25\]"}
 
 ## ADaM json files validated with datasetson 1.0 standard P21C
+
+The datasetson 1.0 `.json` files were generated as follows:
+
+* ADaM programs read in sdtm `.json` files
+  * `.json` files were created using datasetjson 1.1 standard
+* ADaM programs wrote out `.rds` files
+* A program converted these `.rds` files to `.json` and then to `.xpt`
+  * `.json` files were created using datasetjson 1.1 standard
+* `.xpt` files were converted to by P21C `.json` files using 1.0 standard
+* `.json` files were validated by P21C
+
+
+| Check ID | Diagnostic Message                                                | Dataset | Count | Explanation |
+|----------|-------------------------------------------------------------------|---------|-------|-------------|
+| AD0018   | Variable label mismatch between dataset and ADaM standard         | ADADAS  | 34    |             |
+| AD0041A  | *DT variable has missing SAS Date Format                          | ADADAS  | 3     |             |
+| AD0018   | Variable label mismatch between dataset and ADaM standard         | ADAE    | 40    |             |
+| AD0041A  | *DT variable has missing SAS Date Format                          | ADAE    | 4     |             |
+| SD0059   | Define.xml/dataset variable type mismatch                         | ADAE    | 5     |             |
+| AD0018   | Variable label mismatch between dataset and ADaM standard         | ADLBC   | 34    |             |
+| AD0041A  | *DT variable has missing SAS Date Format                          | ADLBC   | 3     |             |
+| AD0018   | Variable label mismatch between dataset and ADaM standard         | ADSL    | 23    |             |
+| AD0041A  | *DT variable has missing SAS Date Format                          | ADSL    | 5     |             |
+| AD0320   | Non-standard dataset label                                         | ADSL    | 1     |             |
+| AD0018   | Variable label mismatch between dataset and ADaM standard         | ADTTE   | 24    |             |
+| AD0041A  | *DT variable has missing SAS Date Format                          | ADTTE   | 4     |             |
+
+
+: {tbl-colwidths="\[17,22,15,22,25\]"}
+
 
 ## QC Findings and Common Issues
 
@@ -693,3 +730,42 @@ Cross-check if anything has changed from Pilot 3 to Pilot 5 for QC Findings
 https://github.com/RConsortium/submissions-pilot5-datasetjson/wiki/QC-Findings
 
 :::
+
+::: {=latex}
+\newpage
+:::
+
+# Appendix 3
+
+## Comparison of Dataset-JSON v1.0 vs v1.1
+
+| Aspect | v1.0 | v1.1 |
+|--------|------|------|
+| **Release Date** | 23 August 2023 | 5 December 2024 (See Citation 1) |
+| **Standard Context** | Part of ODM v2.0 | Independent standard (See Citation 2) |
+| **Structure** | Nested JSON | Flattened structure (See Citation 3) |
+| **Datatype Support** | Basic types | Expanded types (See Citation 4) |
+| **Target Data Type Conversion** | Not defined | Introduced `targetDataType`(See Citation 4) |
+| **Missing Value Representation** | Ambiguous | `null` and `""`(See Citation 4) |
+| **NDJSON Support** | Not supported | Supported (See Citation 4) |
+| **Compression Format** | None | DSJC format (See Citation 6) |
+| **OID Requirements** | Mostly required | Optional (See Citation 4) |
+| **ITEMGROUPDATASEQ** | Present | Removed (See Citation 5) |
+| **isReferenceData Attribute** | Included | Removed (See Citation 5) |
+| **Define-XML Linkage** | Supported | Enhanced (See Citation 2) |
+| **Tooling & Viewer Support** | Limited | Updated tools (See Citation 4) |
+| **User Guide** | Minimal | Comprehensive (See Citation 4) |
+| **API Specification** | Not available | Draft introduced (See Citation 6) |
+| **Public Review Feedback** | Not applicable | 58 issues reviewed (See Citation 5) |
+
+**Citation 1** : CDISC (2023). *Dataset-JSON v1.0*. Available at: https://www.cdisc.org/standards/data-exchange/dataset-json/dataset-json-v1-0 [Accessed 15 Sep. 2025].
+
+**Citation 2** : CDISC (2024). *Dataset-JSON v1.1*. Available at: https://www.cdisc.org/standards/data-exchange/dataset-json/dataset-json-v1-1 [Accessed 15 Sep. 2025].
+
+**Citation 3** : CDISC (2024). *Dataset-JSON v1.1 Public Review Presentation*. Dataset-JSON-v1-1-Public-Review.pptx [Accessed 15 Sep. 2025].
+
+**Citation 4** : CDISC (2024). *Dataset-JSON v1.1 GGG Final Presentation*. Dataset-JSON-v1-1-GGG-Final.pptx [Accessed 15 Sep. 2025].
+
+**Citation 5** : CDISC (2024). *Public Review Metrics and Issue Dispositions*. Dataset-JSON-v1-1-GGG-Final.pptx [Accessed 15 Sep. 2025].
+
+**Citation 6** : CDISC (2025). *Dataset-JSON v1.1 API v1.0 Standard and Compressed Dataset-JSON v1.1*. Available at: https://www.cdisc.org/public-review/dataset-json-v1-1-api-v1-0-standard-and-compressed-dataset-json-v1-1 [Accessed 15 Sep. 2025].

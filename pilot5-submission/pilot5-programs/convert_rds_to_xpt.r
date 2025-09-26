@@ -14,7 +14,7 @@ for (file in rds_files) {
   out_file <- sub("\\.rds$", ".xpt", file)
 
   # Write the data as an xpt file
-  write_xpt(data, out_file)
+  write_xpt(data, out_file, version = 5)
 
   # Optionally, print a message indicating a successful conversion
   message("Converted: ", file, " -> ", out_file)

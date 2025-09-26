@@ -54,7 +54,7 @@ if (length(json_files) == 0) {
     out_file <- sub("\\.json$", ".xpt", file)
 
     # Write the data frame to an xpt file
-    write_xpt(data, out_file)
+    write_xpt(data, out_file, version = 5)
 
     # Print a message for successful conversion
     message("Converted: ", file, " -> ", out_file)
