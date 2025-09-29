@@ -315,7 +315,7 @@ The datasetson 1.0 `.json` files were generated as follows:
 
 ## QC Findings and Common Issues
 
-In this Pilot 5 study, our focus was to create SDTM and ADaM transport files as json rather than xpt file. We compared our R generated ADaMs against the CDISCPILOT ADaMs, created in SAS, as a QC step. With these comparisons we listed the QC Findings with explanations as to why these findings exist. We also came across common issues throughout the ADaM generation process, which could be helpful for improvements utilising the CDISC Pilot data in the future. More details can be found in the appendix (Appendix 2 and Appendix 3).
+In this Pilot 5 study, our focus was to create SDTM and ADaM transport files as json rather than xpt file. We compared our R generated ADaMs against the Pilot 3 ADaMs, created in R, as a QC step. With these comparisons we listed the QC Findings with explanations as to why these findings exist. We also came across common issues throughout the ADaM generation process, which could be helpful for improvements utilising the CDISC Pilot data in the future. More details can be found in Appendix 2.
 
 # Submission of Programs
 
@@ -1108,6 +1108,9 @@ In pilot3, variable labels were updated per ADaM IG 1.1, which caused some discr
 :::
 
 # Appendix 3
+
+Below is a brief comparison of the differences between the datasetjson 1.0 and 1.1
+standard.  Please see Citations for additional information on these differences. 
 
 ## Comparison of Dataset-JSON v1.0 vs v1.1
 
