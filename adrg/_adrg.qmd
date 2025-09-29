@@ -722,16 +722,72 @@ source(file.path(path$programs, "tlf-demographic.r"))
  
 # Appendix 2
 
-::: {.callout-warning}
+The programs from Pilot 3 were minimally changed for Pilot 5.  The biggest change
+was code for helping to produce the datasetjson transport files. The differences
+in the original CDISC pilot data and Pilot 3 are still present as well as a few
+additional issues that we will address.
 
-## TO DO
+## Pilot 3 and Pilot 5 differences.
 
-Cross-check if anything has changed from Pilot 3 to Pilot 5 for QC Findings
-https://github.com/RConsortium/submissions-pilot5-datasetjson/wiki/QC-Findings
+### Classes
+All datasets have an issue where there are differences in classes for numeric/integer variables.
+We will use the `ADTTE` dataset as an example, but these issues persist for all
+five datasets.
 
-:::
+```r
+There are columns in BASE = Pilot 5 and COMPARE = Pilot 3 with different classes !!
+  ==================================
+   VARIABLE  CLASS.BASE  CLASS.COMP 
+  ----------------------------------
+     AGE      integer     numeric   
+   AGEGR1N    integer     numeric   
+     AVAL     integer     numeric   
+     CNSR     integer     numeric   
+    RACEN     integer     numeric   
+    SRCSEQ    integer     numeric   
+    TRTAN     integer     numeric   
+    TRTDUR    integer     numeric   
+  ----------------------------------
+```
 
-Please add any discrepencies you found between the original ADaM datasets from the CDISC Pilot and the ones we've programmed in R below.
+Pilot 3 data was written out as numeric.  For Pilot 5, the datasetjson R package writes 
+out data use Type from spec for integers and writes out the data as integer.  We do not think this is
+an issue, but is being discussed with the datasetjson R package team.
+  
+### Formats
+
+All datasets have an issue where there are differences in attributes for SAS formats.
+
+```r
+There are columns in BASE = Pilot 5 and COMPARE = Pilot 3 with differing attributes !!
+  ================================================
+   VARIABLE  ATTR_NAME   VALUES.BASE  VALUES.COMP 
+  ------------------------------------------------
+     ADT     format.sas     NULL         DATE9    
+   STARTDT   format.sas     NULL         DATE9    
+    TRTEDT   format.sas     NULL         DATE9    
+    TRTSDT   format.sas     NULL         DATE9    
+  ------------------------------------------------
+```
+
+Pilot 3 data has the DATE9 format associated with it as an attribute.  For Pilot 5, 
+the datasetjson R package does not associate the format with the variable. 
+We do not think this is an issue, but is being discussed with the datasetjson R package team. 
+
+### NAs introduced by coercion.
+
+```r
+Warning messages:
+1: In lapply(d[dbl_cols], as.double) : NAs introduced by coercion
+2: In lapply(d[dbl_cols], as.double) : NAs introduced by coercion
+3: In lapply(d[dbl_cols], as.double) : NAs introduced by coercion
+4: In lapply(d[dbl_cols], as.double) : NAs introduced by coercion
+...
+```
+Using the datasetjson R package, a warning message is produced when the json files
+are read in.  We do not think this is an issue, but is being discussed with the datasetjson R package team. 
+  
+## Pilot 3 and CDISC Pilot differences.
 
 ## ADSL
 The R-generated ADSL matches the original ADSL from [CDISC pilot data](https://github.com/phuse-org/TestDataFactory/tree/main/Updated/TDF_ADaM), besides the following mismatches:

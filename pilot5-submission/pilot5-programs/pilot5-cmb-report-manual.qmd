@@ -58,7 +58,7 @@ print(tbl)
 \end{minipage}
 
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = 'hide'}
 # You need to manually produce the pdf for the tlf-efficacy-pilot5.rtf
 # Microsoft Office or Libre Office can do this.
 
