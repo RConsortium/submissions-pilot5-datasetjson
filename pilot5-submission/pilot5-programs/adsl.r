@@ -36,7 +36,8 @@ list2env(datasets, envir = .GlobalEnv)
 ## Load dataset specs -------------
 metacore <- spec_to_metacore(
   file.path(path$adam, "adam-pilot-5.xlsx"),
-  where_sep_sheet = FALSE
+  where_sep_sheet = FALSE,
+  quiet = TRUE
 )
 
 # Get the specifications for the dataset we are currently building

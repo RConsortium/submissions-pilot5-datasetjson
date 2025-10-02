@@ -704,8 +704,6 @@ the name of the dataset in the command. Rds files will be created for each ADaM 
 source(file.path(path$programs, "adsl.r"))
 ```
 
-
-
 6. Execute Display programs as seen in the order below:
 
  - `tlf-demographic.r`
@@ -714,11 +712,19 @@ source(file.path(path$programs, "adsl.r"))
  - `tlf-primary.r`
 
 Similarly to the ADaMs, you can run this command to quickly execute the display
-programs. The newly run display outputs will be available in the `pilot5-tlfs` folder.
- 
+programs. 
+
 ```r
 source(file.path(path$programs, "tlf-demographic.r"))
 ```
+
+The newly run display outputs will be available in sub-folders in the `programs` folder 
+called `out`, `pdf` and `rtf`. The programs `tlf-demographic.r` and `tlf-efficacy.r` will
+produce outputs in the `rtf` folder.  The program `tlf-kmplot.r` will produce the output
+in the `pdf` folder. The `tlf-demographic.r` will produce the output in the `out`
+folder.
+
+
  
 # Appendix 2
 
@@ -1137,10 +1143,10 @@ standard.  Please see Citations for additional information on these differences.
 
 **Citation 2** : CDISC (2024). *Dataset-JSON v1.1*. Available at: https://www.cdisc.org/standards/data-exchange/dataset-json/dataset-json-v1-1 [Accessed 15 Sep. 2025].
 
-**Citation 3** : CDISC (2024). *Dataset-JSON v1.1 Public Review Presentation*. Dataset-JSON-v1-1-Public-Review.pptx [Accessed 15 Sep. 2025].
+**Citation 3** : CDISC (2024). Dataset-JSON v1.1 Public Review Presentation. Available at: https://www.cdisc.org/sites/default/files/pdf/Dataset-JSON-v1-1-Public-Review.pdf [Accessed 15 Sep. 2025].
 
-**Citation 4** : CDISC (2024). *Dataset-JSON v1.1 GGG Final Presentation*. Dataset-JSON-v1-1-GGG-Final.pptx [Accessed 15 Sep. 2025].
+**Citation 4** : CDISC (2024). Dataset-JSON v1.1 GGG Final Presentation. Available at: https://github.com/user-attachments/files/22663348/Dataset-JSON-v1-1-GGG-Final.pptx [Accessed 15 Sep. 2025].
 
-**Citation 5** : CDISC (2024). *Public Review Metrics and Issue Dispositions*. Dataset-JSON-v1-1-GGG-Final.pptx [Accessed 15 Sep. 2025].
+**Citation 5** : CDISC (2024). Public Review Metrics and Issue Dispositions. Available at: https://github.com/user-attachments/files/22663348/Dataset-JSON-v1-1-GGG-Final.pptx [Accessed 15 Sep. 2025].
 
 **Citation 6** : CDISC (2025). *Dataset-JSON v1.1 API v1.0 Standard and Compressed Dataset-JSON v1.1*. Available at: https://www.cdisc.org/public-review/dataset-json-v1-1-api-v1-0-standard-and-compressed-dataset-json-v1-1 [Accessed 15 Sep. 2025].
