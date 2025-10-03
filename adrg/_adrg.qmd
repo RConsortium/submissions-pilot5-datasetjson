@@ -964,7 +964,8 @@ CDISC ADADAS:
 ```r
 > qc_adadas %>% filter(PARAMCD=="ACTOT") %>% 
 +   select(USUBJID, QSSEQ, PARAMCD, AVISITN, AVISIT, VISIT, AVAL, DTYPE, ANL01FL, ADT, ADY) %>% 
-+   arrange(USUBJID, AVISITN) %>% filter(USUBJID=="01-701-1294")
++   arrange(USUBJID, AVISITN) %>% 
++   filter(USUBJID=="01-701-1294")
 # A tibble: 5 × 11
   USUBJID     QSSEQ PARAMCD AVISITN AVISIT   VISIT      AVAL DTYPE  ANL01FL ADT          ADY
   <chr>       <dbl> <chr>     <dbl> <chr>    <chr>     <dbl> <chr>  <chr>   <date>     <dbl>
