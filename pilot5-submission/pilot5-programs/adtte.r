@@ -1,6 +1,6 @@
 #************************************************************************
 # Purpose:     Generate ADTTE dataset
-# Input:       DS, ADSL, and ADAE datasets
+# Input:       DS (from datasetjson), ADSL, and ADAE datasets
 # Output:      adtte.rds
 #************************************************************************
 
@@ -16,17 +16,24 @@ library(tidyr)
 library(admiral)
 library(metacore)
 library(metatools)
+library(datasetjson)
 
 ## Load datasets ------------
 dat_to_load <- list(
-  ds = file.path(path$sdtm, "ds.rds"),
+  ds = file.path(path$sdtm, "ds.json"),
   adsl = file.path(path$adam, "adsl.rds"),
   adae = file.path(path$adam, "adae.rds")
 )
 
 datasets <- map(
   dat_to_load,
-  ~ convert_blanks_to_na(readRDS(.x))
+  ~ {
+    if (grepl("\\.json$", .x)) {
+      convert_blanks_to_na(read_dataset_json(.x, decimals_as_floats = TRUE))
+    } else {
+      convert_blanks_to_na(readRDS(.x))
+    }
+  }
 )
 
 list2env(datasets, envir = .GlobalEnv)

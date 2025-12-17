@@ -1,6 +1,6 @@
 #************************************************************************
 # Purpose:     Generate ADSL dataset
-# Input:       DM, DS, EX, QS, SV, VS, SC, MH datasets
+# Input:       DM, DS, EX, QS, SV, VS, SC, MH datasets (from datasetjson)
 # Output:      adsl.rds
 #************************************************************************
 
@@ -21,13 +21,14 @@ library(xportr)
 library(janitor)
 library(purrr)
 library(glue)
+library(datasetjson)
 
 ## Load datasets ----------------------
 dat_to_load <- c("dm", "ds", "qs", "ex", "qs", "sv", "vs", "sc", "mh")
 
 datasets <- map(
   dat_to_load,
-  ~ convert_blanks_to_na(readRDS(file.path(path$sdtm, paste0(.x, ".rds"))))
+  ~ convert_blanks_to_na(read_dataset_json(file.path(path$sdtm, paste0(.x, ".json")), decimals_as_floats = TRUE))
 ) %>%
   setNames(dat_to_load)
 
