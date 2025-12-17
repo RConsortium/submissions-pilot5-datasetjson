@@ -270,8 +270,8 @@ As a temporary workaround, FDA requested that Conformance Summaries should be ge
 
 The xpts were generated as follows:
 
-* ADaM programs read in sdtm `.json` files
-* ADaM programs wrote out `.rds` files
+* ADaM programs read in sdtm `.json` files directly
+* ADaM programs wrote out `.rds` files (internal format)
 * A program converted these `.rds` files to `.json` and then to `.xpt`
 * `.xpt` files were validated by P21C
 
@@ -285,9 +285,9 @@ The xpts were generated as follows:
 
 The datasetson 1.0 `.json` files were generated as follows:
 
-* ADaM programs read in sdtm `.json` files
+* ADaM programs read in sdtm `.json` files directly
   * `.json` files were created using datasetjson 1.1 standard
-* ADaM programs wrote out `.rds` files
+* ADaM programs wrote out `.rds` files (internal format)
 * A program converted these `.rds` files to `.json` and then to `.xpt`
   * `.json` files were created using datasetjson 1.1 standard
 * `.xpt` files were converted to by P21C `.json` files using 1.0 standard
@@ -674,22 +674,7 @@ which will load all helper functions for datasets and displays into your global 
 source(file.path(path$programs, "pilot5-helper-fcns.r"))
 ```
 
-4. Convert sdtm JSON files to rds files. The sdtm files are in json transport file format 
-and need to be converted to rds files to run the ADaM programs.
-
-Run the following code:
-
-```r
-sdtm_files <- list.files(
-  path = file.path(path$sdtm),
-  pattern = "\\.json$",
-  full.names = TRUE
-)
-
-convert_json_to_rds(sdtm_files, output_dir = file.path(path$sdtm))
-```
-
-5. Execute ADaM programs as seen in the order below:
+4. Execute ADaM programs as seen in the order below:
 
  - `adsl.r`
  - `adadas.r`
@@ -698,13 +683,13 @@ convert_json_to_rds(sdtm_files, output_dir = file.path(path$sdtm))
  - `adtte.r`
  
 You can use the following command to quickly execute each ADaM dataset. Just change
-the name of the dataset in the command. Rds files will be created for each ADaM in the `adamdata` folder and in your global environment.
+the name of the dataset in the command. RDS files will be created for each ADaM in the `adamdata` folder and in your global environment.
 
 ```r
 source(file.path(path$programs, "adsl.r"))
 ```
 
-6. Execute Display programs as seen in the order below:
+5. Execute Display programs as seen in the order below:
 
  - `tlf-demographic.r`
  - `tlf-efficacy.r`

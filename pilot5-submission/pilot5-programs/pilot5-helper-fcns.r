@@ -305,6 +305,10 @@ num_fmt <- Vectorize(function(var, digits = 0, size = 10, int_len = 3) {
 
 #' Convert JSON Dataset Files to RDS and Return RDS File Names
 #'
+#' @description
+#' **DEPRECATED**: This function is deprecated. Programs should read directly from 
+#' JSON files using `datasetjson::read_dataset_json()` instead of converting to RDS first.
+#' 
 #' This function takes a character vector of `.json` file paths,
 #' reads each with `datasetjson::read_dataset_json()`, saves them as `.rds` files
 #' in the specified output directory (or the same location as the input files if not specified),
@@ -319,6 +323,11 @@ num_fmt <- Vectorize(function(var, digits = 0, size = 10, int_len = 3) {
 #'
 #' @examples
 #' \dontrun{
+#' # DEPRECATED - Do not use this approach
+#' # Instead, read JSON files directly:
+#' # data <- datasetjson::read_dataset_json("file.json", decimals_as_floats = TRUE)
+#' 
+#' # Old approach (deprecated):
 #' sdtm_files <- list.files(
 #'   path = "pilot5-submission/pilot5-input/sdtmdata",
 #'   pattern = "\\.json$",
@@ -332,6 +341,12 @@ num_fmt <- Vectorize(function(var, digits = 0, size = 10, int_len = 3) {
 #' rds_files <- convert_json_to_rds(c(sdtm_files, adam_files), output_dir = "pilot5-submission/pilot5-output")
 #' }
 convert_json_to_rds <- function(files, output_dir = NULL) {
+  .Deprecated(
+    msg = paste(
+      "convert_json_to_rds() is deprecated.",
+      "Please read JSON files directly using datasetjson::read_dataset_json() instead."
+    )
+  )
   if (!is.null(output_dir)) {
     # Ensure the output directory exists
     if (!dir.exists(output_dir)) dir.create(output_dir, recursive = TRUE)
