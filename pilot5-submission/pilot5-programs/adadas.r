@@ -25,18 +25,12 @@ library(purrr)
 dat_to_load <- list(
   dm = file.path(path$sdtm, "dm.json"),
   qs = file.path(path$sdtm, "qs.json"),
-  adsl = file.path(path$adam, "adsl.rds")
+  adsl = file.path(path$adam_json, "adsl.json")
 )
 
 datasets <- map(
   dat_to_load,
-  ~ {
-    if (grepl("\\.json$", .x)) {
-      convert_blanks_to_na(read_dataset_json(.x, decimals_as_floats = TRUE))
-    } else {
-      convert_blanks_to_na(readRDS(.x))
-    }
-  }
+  ~ convert_blanks_to_na(read_dataset_json(.x, decimals_as_floats = TRUE))
 )
 
 list2env(datasets, envir = .GlobalEnv)
