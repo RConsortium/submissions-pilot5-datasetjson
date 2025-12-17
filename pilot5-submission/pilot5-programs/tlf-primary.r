@@ -8,13 +8,14 @@ library(tidyr)
 library(dplyr)
 library(Tplyr)
 library(pharmaRTF)
+library(datasetjson)
 
 ## -----------------------------------------------------------------------------
 options(huxtable.add_colnames = FALSE)
 
 ## -----------------------------------------------------------------------------
-adas <- readRDS(file.path(path$adam, "adadas.rds"))
-adsl <- readRDS(file.path(path$adam, "adsl.rds"))
+adas <- read_dataset_json(file.path(path$adam_json, "adadas.json"), decimals_as_floats = TRUE)
+adsl <- read_dataset_json(file.path(path$adam_json, "adsl.json"), decimals_as_floats = TRUE)
 
 ## -----------------------------------------------------------------------------
 adas <- adas %>%
