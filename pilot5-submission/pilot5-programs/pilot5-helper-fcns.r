@@ -303,6 +303,82 @@ num_fmt <- Vectorize(function(var, digits = 0, size = 10, int_len = 3) {
   ))
 })
 
+#' Write ADaM Dataset to datasetjson Format
+#'
+#' This function takes an ADaM dataset and its metacore specification and writes
+#' it as a datasetjson file with proper metadata.
+#'
+#' @param df The ADaM dataset (data frame) to write
+#' @param df_spec The metacore specification object for the dataset (from select_dataset())
+#' @param dataset_name The name of the dataset (e.g., "adsl", "adae")
+#' @param output_path The output directory path where the JSON file should be written
+#'
+#' @return NULL (invisibly). The function writes a JSON file as a side effect.
+#' @importFrom datasetjson dataset_json write_dataset_json
+#' @importFrom dplyr select left_join rename mutate case_when
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Load metacore specs
+#' metacore <- spec_to_metacore("adam-pilot-5.xlsx", where_sep_sheet = FALSE, quiet = TRUE)
+#' adsl_spec <- metacore %>% select_dataset("ADSL")
+#' 
+#' # Write dataset to JSON
+#' write_dataset_json_with_metadata(adsl, adsl_spec, "adsl", path$adam_json)
+#' }
+write_dataset_json_with_metadata <- function(df, df_spec, dataset_name, output_path) {
+  # Prepare column metadata for JSON
+  oid_cols <- df_spec$ds_vars %>%
+    select(dataset, variable, key_seq) %>%
+    left_join(df_spec$var_spec, by = c("variable")) %>%
+    rename(name = variable, dataType = type, keySequence = key_seq, displayFormat = format) %>%
+    mutate(itemOID = paste0("IT.", dataset, ".", name)) %>%
+    select(itemOID, name, label, dataType, length, keySequence, displayFormat) %>%
+    mutate(
+      dataType =
+        case_when(
+          displayFormat == "DATE9." ~ "date",
+          displayFormat == "DATETIME20." ~ "datetime",
+          substr(name, nchar(name) - 3 + 1, nchar(name)) == "DTC" & length == "8" ~ "date",
+          substr(name, nchar(name) - 3 + 1, nchar(name)) == "DTC" & length == "20" ~ "datetime",
+          dataType == "text" ~ "string",
+          .default = as.character(dataType)
+        ),
+      targetDataType =
+        case_when(
+          displayFormat == "DATE9." ~ "integer",
+          displayFormat == "DATETIME20." ~ "integer",
+          .default = NA
+        ),
+      length = case_when(
+        dataType == "string" ~ length,
+        .default = NA
+      )
+    ) %>%
+    data.frame()
+
+  # Write as datasetjson
+  dataset_json(df,
+    last_modified = strftime(as.POSIXlt(Sys.time(), "UTC"), "%Y-%m-%dT%H:%M"),
+    originator = "R Submission Pilot 5",
+    sys = paste0("R on ", R.Version()$os, " ", unname(Sys.info())[[2]]),
+    sys_version = R.Version()$version.string,
+    version = "1.1.0",
+    study = "Pilot 5",
+    metadata_version = "MDV.TDF_ADaM.ADaM-IG.1.1",
+    metadata_ref = file.path(path$adam, "define.xml"),
+    item_oid = paste0("IG.", toupper(dataset_name)),
+    name = toupper(dataset_name),
+    dataset_label = df_spec$ds_spec[["label"]],
+    file_oid = file.path(path$adam, dataset_name),
+    columns = oid_cols
+  ) %>%
+    write_dataset_json(file = file.path(output_path, paste0(dataset_name, ".json")), float_as_decimals = TRUE)
+  
+  invisible(NULL)
+}
+
 #' Convert JSON Dataset Files to RDS and Return RDS File Names
 #'
 #' @description
