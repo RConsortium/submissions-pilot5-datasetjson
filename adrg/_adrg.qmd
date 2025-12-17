@@ -271,8 +271,8 @@ As a temporary workaround, FDA requested that Conformance Summaries should be ge
 The xpts were generated as follows:
 
 * ADaM programs read in sdtm `.json` files directly
-* ADaM programs wrote out `.rds` files (internal format)
-* A program converted these `.rds` files to `.json` and then to `.xpt`
+* ADaM programs wrote out `.json` files directly
+* A program converted these `.json` files to `.xpt`
 * `.xpt` files were validated by P21C
 
 | Check ID | Diagnostic Message                                                           | Dataset | Count | Explanation                                                                                                                                                                             |
@@ -287,9 +287,9 @@ The datasetson 1.0 `.json` files were generated as follows:
 
 * ADaM programs read in sdtm `.json` files directly
   * `.json` files were created using datasetjson 1.1 standard
-* ADaM programs wrote out `.rds` files (internal format)
-* A program converted these `.rds` files to `.json` and then to `.xpt`
+* ADaM programs wrote out `.json` files directly
   * `.json` files were created using datasetjson 1.1 standard
+* `.json` files were converted to `.xpt` files
 * `.xpt` files were converted to by P21C `.json` files using 1.0 standard
 * `.json` files were validated by P21C
 
@@ -683,7 +683,7 @@ source(file.path(path$programs, "pilot5-helper-fcns.r"))
  - `adtte.r`
  
 You can use the following command to quickly execute each ADaM dataset. Just change
-the name of the dataset in the command. RDS files will be created for each ADaM in the `adamdata` folder and in your global environment.
+the name of the dataset in the command. Datasetjson files will be created for each ADaM in the `pilot5-datasetjson` output folder and the dataset will be loaded in your global environment.
 
 ```r
 source(file.path(path$programs, "adsl.r"))

@@ -1,7 +1,7 @@
 #************************************************************************
 # Purpose:     Run all ADaMs and TLF programs
 # Input:       5 ADaM programs and 4 TLF Programs
-# Output:      5 ADaM rds files; TLFs: 1 pdf, 1 out, 2 rtf
+# Output:      5 ADaM datasetjson files; TLFs: 1 pdf, 1 out, 2 rtf
 #************************************************************************
 library(purrr)
 library(stringr)

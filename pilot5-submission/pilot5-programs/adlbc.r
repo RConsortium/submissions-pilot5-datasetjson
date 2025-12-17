@@ -1,7 +1,7 @@
 #************************************************************************
 # Purpose:     Generate ADLBC dataset
 # Input:       LB, SUPPLB (from datasetjson), and ADSL datasets
-# Output:      adlbc.rds
+# Output:      adlbc.json
 #************************************************************************
 
 # Note to Reviewer
@@ -266,5 +266,51 @@ for (col in colnames(adlbc)) {
   }
 }
 
-# Saving the dataset as rds format -------
-saveRDS(adlbc, file.path(path$adam, "adlbc.rds"))
+# Saving the dataset as datasetjson format --------------
+# Prepare column metadata for JSON
+oid_cols <- adlbc_spec$ds_vars %>%
+  select(dataset, variable, key_seq) %>%
+  left_join(adlbc_spec$var_spec, by = c("variable")) %>%
+  rename(name = variable, dataType = type, keySequence = key_seq, displayFormat = format) %>%
+  mutate(itemOID = paste0("IT.", dataset, ".", name)) %>%
+  select(itemOID, name, label, dataType, length, keySequence, displayFormat) %>%
+  mutate(
+    dataType =
+      case_when(
+        displayFormat == "DATE9." ~ "date",
+        displayFormat == "DATETIME20." ~ "datetime",
+        substr(name, nchar(name) - 3 + 1, nchar(name)) == "DTC" & length == "8" ~ "date",
+        substr(name, nchar(name) - 3 + 1, nchar(name)) == "DTC" & length == "20" ~ "datetime",
+        dataType == "text" ~ "string",
+        .default = as.character(dataType)
+      ),
+    targetDataType =
+      case_when(
+        displayFormat == "DATE9." ~ "integer",
+        displayFormat == "DATETIME20." ~ "integer",
+        .default = NA
+      ),
+    length = case_when(
+      dataType == "string" ~ length,
+      .default = NA
+    )
+  ) %>%
+  data.frame()
+
+# Write as datasetjson
+dataset_json(adlbc,
+  last_modified = strftime(as.POSIXlt(Sys.time(), "UTC"), "%Y-%m-%dT%H:%M"),
+  originator = "R Submission Pilot 5",
+  sys = paste0("R on ", R.Version()$os, " ", unname(Sys.info())[[2]]),
+  sys_version = R.Version()$version.string,
+  version = "1.1.0",
+  study = "Pilot 5",
+  metadata_version = "MDV.TDF_ADaM.ADaM-IG.1.1",
+  metadata_ref = file.path(path$adam, "define.xml"),
+  item_oid = paste0("IG.ADLBC"),
+  name = "ADLBC",
+  dataset_label = adlbc_spec$ds_spec[["label"]],
+  file_oid = file.path(path$adam, "adlbc"),
+  columns = oid_cols
+) %>%
+  write_dataset_json(file = file.path(path$adam_json, "adlbc.json"), float_as_decimals = TRUE)
