@@ -2,5 +2,9 @@ linters: linters_with_defaults(
     line_length_linter(120) 
   )
 exclusions: list(
-  "pilot5-submission/pilot5-programs/pilot5-helper-fcns.r"
+  "pilot5-submission/pilot5-programs/pilot5-helper-fcns.r",
+  "adrg/llm-adrg-utils/util.R",
+  "adrg/llm-adrg-utils/llm_prompts.R",
+  "adrg/llm-adrg-utils/llm_pipeline.qmd",
+  "adrg/llm-adrg-utils/llm_api.R"
   )
