@@ -63,7 +63,7 @@ print(tbl)
 # Microsoft Office or Libre Office can do this.
 
 # This brings over the latest copy of km plot
-file.copy(path$output, "tlf-kmplot-pilot5.pdf")
+file.copy(path$output, "/pdf/tlf-kmplot-pilot5.pdf")
 ```
 
 \noindent\begin{minipage}[t]{\textwidth}
