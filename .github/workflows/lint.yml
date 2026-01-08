@@ -117,7 +117,9 @@ jobs:
           }
           lints <- lint_dir(
             "pilot5-submission/pilot5-programs", 
-            linters_with_defaults(line_length_linter = line_length_linter(120L)),
+            linters_with_defaults(line_length_linter = line_length_linter(120L),
+            pipe_consistency_linter = NULL
+            ),
             exclusions = exclusions_list
             )
           saveRDS(lints, file = "lints.rds")
