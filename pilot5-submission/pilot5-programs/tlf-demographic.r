@@ -17,9 +17,10 @@ if (file.access(".", 2) != 0) {
 library(haven)
 library(dplyr)
 library(rtables)
+library(datasetjson)
 
 ## -----------------------------------------------------------------------------
-adsl <- readRDS(file.path(path$adam, "adsl.rds"))
+adsl <- read_dataset_json(file.path(path$adam_json, "adsl.json"), decimals_as_floats = TRUE)
 
 vars <- c("AGE", "AGEGR1", "RACE", "HEIGHTBL", "WEIGHTBL", "BMIBL", "MMSETOT")
 lbls <- c(

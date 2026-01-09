@@ -1,7 +1,7 @@
 #************************************************************************
 # Purpose:     Generate ADADAS dataset
-# Input:       DM, QS, and ADSL datasets
-# Output:      adadas.rds
+# Input:       DM, QS (from datasetjson), and ADSL datasets
+# Output:      adadas.json
 #************************************************************************
 
 # Note to Reviewer
@@ -23,14 +23,14 @@ library(purrr)
 
 ## Load datasets ------------
 dat_to_load <- list(
-  dm = file.path(path$sdtm, "dm.rds"),
-  qs = file.path(path$sdtm, "qs.rds"),
-  adsl = file.path(path$adam, "adsl.rds")
+  dm = file.path(path$sdtm, "dm.json"),
+  qs = file.path(path$sdtm, "qs.json"),
+  adsl = file.path(path$adam_json, "adsl.json")
 )
 
 datasets <- map(
   dat_to_load,
-  ~ convert_blanks_to_na(readRDS(.x))
+  ~ convert_blanks_to_na(read_dataset_json(.x, decimals_as_floats = TRUE))
 )
 
 list2env(datasets, envir = .GlobalEnv)
@@ -202,5 +202,5 @@ for (col in colnames(adas)) {
   }
 }
 
-# Saving the dataset as rds format --------------
-saveRDS(adas, file.path(path$adam, "adadas.rds"))
+# Saving the dataset as datasetjson format --------------
+write_dataset_json_with_metadata(adas, adadas_spec, "adadas", path$adam_json)

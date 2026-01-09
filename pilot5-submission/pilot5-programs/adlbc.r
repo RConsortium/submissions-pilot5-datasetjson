@@ -1,7 +1,7 @@
 #************************************************************************
 # Purpose:     Generate ADLBC dataset
-# Input:       LB, SUPPLB, and ADSL datasets
-# Output:      adlbc.rds
+# Input:       LB, SUPPLB (from datasetjson), and ADSL datasets
+# Output:      adlbc.json
 #************************************************************************
 
 # Note to Reviewer
@@ -18,17 +18,18 @@ library(metacore)
 library(metatools)
 library(stringr)
 library(purrr)
+library(datasetjson)
 
 ## Load datasets ------------
 dat_to_load <- list(
-  lb = file.path(path$sdtm, "lb.rds"),
-  supplb = file.path(path$sdtm, "supplb.rds"),
-  adsl = file.path(path$adam, "adsl.rds")
+  lb = file.path(path$sdtm, "lb.json"),
+  supplb = file.path(path$sdtm, "supplb.json"),
+  adsl = file.path(path$adam_json, "adsl.json")
 )
 
 datasets <- map(
   dat_to_load,
-  ~ convert_blanks_to_na(readRDS(.x))
+  ~ convert_blanks_to_na(read_dataset_json(.x, decimals_as_floats = TRUE))
 )
 
 list2env(datasets, envir = .GlobalEnv)
@@ -259,5 +260,5 @@ for (col in colnames(adlbc)) {
   }
 }
 
-# Saving the dataset as rds format -------
-saveRDS(adlbc, file.path(path$adam, "adlbc.rds"))
+# Saving the dataset as datasetjson format --------------
+write_dataset_json_with_metadata(adlbc, adlbc_spec, "adlbc", path$adam_json)

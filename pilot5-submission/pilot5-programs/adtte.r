@@ -1,7 +1,7 @@
 #************************************************************************
 # Purpose:     Generate ADTTE dataset
-# Input:       DS, ADSL, and ADAE datasets
-# Output:      adtte.rds
+# Input:       DS (from datasetjson), ADSL, and ADAE datasets
+# Output:      adtte.json
 #************************************************************************
 
 # Note to Reviewer
@@ -16,17 +16,18 @@ library(tidyr)
 library(admiral)
 library(metacore)
 library(metatools)
+library(datasetjson)
 
 ## Load datasets ------------
 dat_to_load <- list(
-  ds = file.path(path$sdtm, "ds.rds"),
-  adsl = file.path(path$adam, "adsl.rds"),
-  adae = file.path(path$adam, "adae.rds")
+  ds = file.path(path$sdtm, "ds.json"),
+  adsl = file.path(path$adam_json, "adsl.json"),
+  adae = file.path(path$adam_json, "adae.json")
 )
 
 datasets <- map(
   dat_to_load,
-  ~ convert_blanks_to_na(readRDS(.x))
+  ~ convert_blanks_to_na(read_dataset_json(.x, decimals_as_floats = TRUE))
 )
 
 list2env(datasets, envir = .GlobalEnv)
@@ -145,5 +146,5 @@ for (col in colnames(adtte)) {
   }
 }
 
-# saving the dataset as RDS format
-saveRDS(adtte, file.path(path$adam, "adtte.rds"))
+# Saving the dataset as datasetjson format --------------
+write_dataset_json_with_metadata(adtte, adtte_spec, "adtte", path$adam_json)

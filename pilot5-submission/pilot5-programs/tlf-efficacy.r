@@ -20,10 +20,11 @@ library(dplyr)
 library(haven)
 library(r2rtf)
 library(emmeans)
+library(datasetjson)
 
 ## -----------------------------------------------------------------------------
-adsl <- readRDS(file.path(path$adam, "adsl.rds"))
-adlb <- readRDS(file.path(path$adam, "adlbc.rds"))
+adsl <- read_dataset_json(file.path(path$adam_json, "adsl.json"), decimals_as_floats = TRUE)
+adlb <- read_dataset_json(file.path(path$adam_json, "adlbc.json"), decimals_as_floats = TRUE)
 
 ## -----------------------------------------------------------------------------
 

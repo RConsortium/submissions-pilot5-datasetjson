@@ -1,7 +1,7 @@
 #************************************************************************
 # Purpose:     Generate ADAE dataset
-# Input:       AE, SUPPAE, and ADSL datasets
-# Output:      adae.rds
+# Input:       AE, SUPPAE (from datasetjson), and ADSL datasets
+# Output:      adae.json
 #************************************************************************
 
 # Note to Reviewer
@@ -20,17 +20,18 @@ library(metacore)
 library(metatools)
 library(haven)
 library(purrr)
+library(datasetjson)
 
 ## Load datasets ------------
 dat_to_load <- list(
-  ae = file.path(path$sdtm, "ae.rds"),
-  suppae = file.path(path$sdtm, "suppae.rds"),
-  adsl = file.path(path$adam, "adsl.rds")
+  ae = file.path(path$sdtm, "ae.json"),
+  suppae = file.path(path$sdtm, "suppae.json"),
+  adsl = file.path(path$adam_json, "adsl.json")
 )
 
 datasets <- map(
   dat_to_load,
-  ~ convert_blanks_to_na(readRDS(.x))
+  ~ convert_blanks_to_na(read_dataset_json(.x, decimals_as_floats = TRUE))
 )
 
 list2env(datasets, envir = .GlobalEnv)
@@ -220,5 +221,5 @@ for (col in colnames(adae)) {
   }
 }
 
-# Saving the dataset as rds format -------
-saveRDS(adae, file.path(path$adam, "adae.rds"))
+# Saving the dataset as datasetjson format --------------
+write_dataset_json_with_metadata(adae, adae_spec, "adae", path$adam_json)

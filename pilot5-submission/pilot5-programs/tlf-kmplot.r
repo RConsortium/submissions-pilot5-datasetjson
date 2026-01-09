@@ -22,10 +22,11 @@ library(dplyr)
 library(ggplot2)
 library(cowplot)
 library(ggsurvfit)
+library(datasetjson)
 
 ## -----------------------------------------------------------------------------
-adsl <- readRDS(file.path(path$adam, "adsl.rds"))
-adtte <- readRDS(file.path(path$adam, "adtte.rds"))
+adsl <- read_dataset_json(file.path(path$adam_json, "adsl.json"), decimals_as_floats = TRUE)
+adtte <- read_dataset_json(file.path(path$adam_json, "adtte.json"), decimals_as_floats = TRUE)
 
 ## -----------------------------------------------------------------------------
 anl <- adsl %>%

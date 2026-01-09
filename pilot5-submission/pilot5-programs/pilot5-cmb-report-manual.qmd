@@ -26,7 +26,7 @@ Note : In Pilot 5, following the same approach as Pilot1, different open-source 
 #### Table 14-2.01
 #### Summary of Demographic and Baseline Characteristics
 
-```{r demog, echo=FALSE, message=FALSE, comment=NA}
+```{r demog, echo = FALSE, message = FALSE, comment = NA, warning = FALSE}
 knitr::opts_chunk$set(fig.align = "center", out.width = "70%")
 
 library(here)
@@ -63,7 +63,7 @@ print(tbl)
 # Microsoft Office or Libre Office can do this.
 
 # This brings over the latest copy of km plot
-file.copy(path$output, "tlf-kmplot-pilot5.pdf")
+file.copy(path$output, "/pdf/tlf-kmplot-pilot5.pdf")
 ```
 
 \noindent\begin{minipage}[t]{\textwidth}
