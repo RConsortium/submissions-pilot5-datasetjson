@@ -1,6 +1,6 @@
 linters: linters_with_defaults(
     line_length_linter(120),
-    pipe_consistency_linter = pipe_consistency_linter(pipe = "%>%")
+    pipe_consistency_linter = NULL
   )
 exclusions: list(
   "pilot5-submission/pilot5-programs/pilot5-helper-fcns.r",
