@@ -323,7 +323,7 @@ num_fmt <- Vectorize(function(var, digits = 0, size = 10, int_len = 3) {
 #' # Load metacore specs
 #' metacore <- spec_to_metacore("adam-pilot-5.xlsx", where_sep_sheet = FALSE, quiet = TRUE)
 #' adsl_spec <- metacore %>% select_dataset("ADSL")
-#' 
+#'
 #' # Write dataset to JSON
 #' write_dataset_json_with_metadata(adsl, adsl_spec, "adsl", path$adam_json)
 #' }
@@ -375,16 +375,16 @@ write_dataset_json_with_metadata <- function(df, df_spec, dataset_name, output_p
     columns = oid_cols
   ) %>%
     write_dataset_json(file = file.path(output_path, paste0(dataset_name, ".json")), float_as_decimals = TRUE)
-  
+
   invisible(NULL)
 }
 
 #' Convert JSON Dataset Files to RDS and Return RDS File Names
 #'
 #' @description
-#' **DEPRECATED**: This function is deprecated. Programs should read directly from 
+#' **DEPRECATED**: This function is deprecated. Programs should read directly from
 #' JSON files using `datasetjson::read_dataset_json()` instead of converting to RDS first.
-#' 
+#'
 #' This function takes a character vector of `.json` file paths,
 #' reads each with `datasetjson::read_dataset_json()`, saves them as `.rds` files
 #' in the specified output directory (or the same location as the input files if not specified),
@@ -402,7 +402,7 @@ write_dataset_json_with_metadata <- function(df, df_spec, dataset_name, output_p
 #' # DEPRECATED - Do not use this approach
 #' # Instead, read JSON files directly:
 #' # data <- datasetjson::read_dataset_json("file.json", decimals_as_floats = TRUE)
-#' 
+#'
 #' # Old approach (deprecated):
 #' sdtm_files <- list.files(
 #'   path = "pilot5-submission/pilot5-input/sdtmdata",

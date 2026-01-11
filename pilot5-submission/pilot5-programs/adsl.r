@@ -36,11 +36,11 @@ list2env(datasets, envir = .GlobalEnv)
 
 ## Load dataset specs -------------
 # Very noisy function - remove suppress if you want to see warnings
-metacore <- suppressWarnings(  
+metacore <- suppressWarnings(
   spec_to_metacore(
-  file.path(path$adam, "adam-pilot-5.xlsx"),
-  where_sep_sheet = FALSE,
-  quiet = TRUE
+    file.path(path$adam, "adam-pilot-5.xlsx"),
+    where_sep_sheet = FALSE,
+    quiet = TRUE
   )
 )
 
