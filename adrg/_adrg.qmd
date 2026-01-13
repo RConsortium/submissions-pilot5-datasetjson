@@ -777,6 +777,21 @@ Warning messages:
 ```
 Using the datasetjson R package, a warning message is produced when the json files
 are read in.  We do not think this is an issue, but is being discussed with the datasetjson R package team. 
+
+### X from the Y table only contains missing values.
+
+```r
+Warning messages:
+5: `core` from the `ds_vars` table only contains missing values. 
+6: `supp_flag` from the `ds_vars` table only contains missing values. 
+7: `dataset` from the `supp` table only contains missing values. 
+8: `variable` from the `supp` table only contains missing values. 
+9: `idvar` from the `supp` table only contains missing values. 
+10: `qeval` from the `supp` table only contains missing values. 
+...
+```
+Using the metacore R package, a warning message is produced when the dataset spec files
+are read in.  We do not think this is an issue, but is being discussed with the metacore R package team. 
   
 ## Pilot 3 and CDISC Pilot differences.
 
