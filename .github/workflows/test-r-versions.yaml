@@ -3,6 +3,9 @@ name: Test R Version Compatibility
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   test-r-version:
     name: Test R ${{ matrix.r-version }}
