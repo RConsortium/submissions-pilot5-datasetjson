@@ -49,7 +49,7 @@ adsl <- adsl %>%
 ## -----------------------------------------------------------------------------
 # Table layout
 
-tbl <- basic_table(
+tbl_demog <- basic_table(
   title = "Protocol: CDISCPILOT01",
   subtitles = "Population: Intent-to-Treat",
   main_footer = paste0("Program: tlf-demographic.r \n", Sys.time())
@@ -74,7 +74,7 @@ tbl <- basic_table(
   ) %>%
   build_table(df = adsl)
 
-tbl
+tbl_demog
 
 if (!dir.exists(file.path(path$output, "out"))) {
   dir.create(file.path(path$output, "out"))
@@ -82,6 +82,6 @@ if (!dir.exists(file.path(path$output, "out"))) {
 
 ## -----------------------------------------------------------------------------
 # Output .out file
-tbl %>%
+tbl_demog %>%
   toString() %>%
   writeLines(con = file.path(path$output, "out/tlf-demographic-pilot5.out"))

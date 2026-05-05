@@ -709,6 +709,13 @@ produce outputs in the `rtf` folder.  The program `tlf-kmplot.r` will produce th
 in the `pdf` folder. The `tlf-demographic.r` will produce the output in the `out`
 folder.
 
+6. Clean Global Environment
+
+## Keep only these objects in the Global Environment
+keep <- c("path", "adsl", "adae", "adadas", "adlbc", "adtte", tbl_demog, tbl_eff, file_km_plot, doc_primary)
+
+rm(list = setdiff(ls(envir = .GlobalEnv), keep), envir = .GlobalEnv)
+
 
  
 # Appendix 2
