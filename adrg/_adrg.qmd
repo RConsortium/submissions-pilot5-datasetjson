@@ -631,7 +631,7 @@ Restarting R session...
 To reproduce the analysis results from the JSON transport files, set up and run the following programs in the order below:
 
 
-1. Setting up .Rprofile
+**1. Setting up .Rprofile**
 
 Edit the `.Rprofile` file created in the working directory to match the following contents:
 
@@ -652,7 +652,7 @@ path <- list(
 If the file is not present in your working directory, then in the files window click on
 `More > Show Hidden Files` and it should appear in the files window. 
 
-2. Restart R Session 
+**2. Restart R Session**
 
 * Select `Session -> Restart R`
 * This will ensure that the list of paths in your Global Environment is populated.  
@@ -667,14 +667,36 @@ You should receive the following message in your console:
 [1] TRUE
 ```
 
-3. Using the source function, run the `pilot5-helper-fcns.r` program, 
-which will load all helper functions for datasets and displays into your global environment.
+**3. A quick preview of the datasetjson data**
+
+If you would like to inspect some of the available datasetjson files you can use the
+below code to read it into your Global Environment
+
+```r
+library(datasetjson)
+dm <- read_dataset_json(file.path(path$sdtm, "dm.json"))
+dplyr::glimpse(dm)
+```
+
+```r
+Rows: 306
+Columns: 25
+$ STUDYID  <chr> "CDISCPILOT01", "CDISCPILOT01", "CDISCPILOT01", "CDISCPILOT01", "CDISCPILOT01", "CDI…
+$ DOMAIN   <chr> "DM", "DM", "DM", "DM", "DM", "DM", "DM", "DM", "DM", "DM", "DM", "DM", "DM", "DM", …
+$ USUBJID  <chr> "01-701-1015", "01-701-1023", "01-701-1028", "01-701-1033", "01-701-1034", "01-701-1…
+$ SUBJID   <chr> "1015", "1023", "1028", "1033", "1034", "1047", "1057", "1097", "1111", "1115", "111…
+$ RFSTDTC  <chr> "2014-01-02", "2012-08-05", "2013-07-19", "2014-03-18", "2014-07-01", "2013-02-12", …
+...
+```
+
+**4. Using the source function, run the `pilot5-helper-fcns.r` program, 
+which will load all helper functions for datasets and displays into your global environment.**
 
 ```r
 source(file.path(path$programs, "pilot5-helper-fcns.r"))
 ```
 
-4. Execute ADaM programs as seen in the order below:
+**5. Execute ADaM programs as seen in the order below:**
 
  - `adsl.r`
  - `adadas.r`
@@ -689,7 +711,7 @@ the name of the dataset in the command. Datasetjson files will be created for ea
 source(file.path(path$programs, "adsl.r"))
 ```
 
-5. Execute Display programs as seen in the order below:
+**6. Execute Display programs as seen in the order below:**
 
  - `tlf-demographic.r`
  - `tlf-efficacy.r`
@@ -709,7 +731,7 @@ produce outputs in the `rtf` folder.  The program `tlf-kmplot.r` will produce th
 in the `pdf` folder. The `tlf-demographic.r` will produce the output in the `out`
 folder.
 
-6. Clean Global Environment
+**7. Clean Global Environment**
 
 Successfully running all the ADaM and TLF programs can create a lot of objects in
 the Global Environment. Below is a code snippet that you can run to clean up the
