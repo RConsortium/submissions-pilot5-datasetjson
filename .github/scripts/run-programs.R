@@ -7,6 +7,9 @@
 #'   summary.md       - per-program markdown table for this R version
 #'   status.txt       - "success" or "failure"
 
+# Always set a CRAN mirror so install.packages() works without user interaction
+options(repos = c(CRAN = "https://cloud.r-project.org"))
+
 # Activate renv library so packages restored by setup-renv are available
 # (CI=true in GitHub Actions prevents .Rprofile from doing this automatically)
 if (file.exists("renv/activate.R")) source("renv/activate.R")
