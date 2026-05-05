@@ -793,9 +793,19 @@ There are columns in BASE = Pilot 5 and COMPARE = Pilot 3 with different classes
 ```
 
 Pilot 3 data was written out as numeric.  For Pilot 5, the datasetjson R package writes 
-out data use Type from spec for integers and writes out the data as integer.  We do not think this is
-an issue, but is being discussed with the datasetjson R package team.
-  
+out data use Type from spec for integers and writes out the data as integer.  The issue was discussed with `datasetjson` R package team and is paraphrased below:
+
+> Using AGE as an example, the column metadata for AGE was set to 
+> integer, so datasetjson correctly wrote it out and read it back as an 
+> integer in Pilot 5. The Dataset-JSON v1.1 specification allows for 
+> integer, decimal, and float types, not a generic numeric type. Pilot
+> used XPT format, which stores all numeric values as 8-byte floating 
+> point, so there is no distinction between integer and numeric in XPT. 
+> This difference is simply a result of the format change and is not a 
+> meaningful issue. 
+
+The discussion is tracked in this GitHub Issue: https://github.com/RConsortium/submissions-pilot5-datasetjson/issues/143
+
 ### Formats
 
 All datasets have an issue where there are differences in attributes for SAS formats.
@@ -813,8 +823,15 @@ There are columns in BASE = Pilot 5 and COMPARE = Pilot 3 with differing attribu
 ```
 
 Pilot 3 data has the DATE9 format associated with it as an attribute.  For Pilot 5, 
-the datasetjson R package does not associate the format with the variable. 
-We do not think this is an issue, but is being discussed with the datasetjson R package team. 
+the datasetjson R package does not associate the format with the variable. The issue was discussed with `datasetjson` R package team and is paraphrased below:
+
+> The Dataset-JSON column metadata does include DATE9. in the 
+> displayFormat attribute for these date variables. However, when the 
+> datasetjson R package reads the data back into R, it does not assign 
+> this value to a format.sas attribute on the column. In contrast, 
+> haven::read_xpt() preserves the SAS format metadata from the XPT file.
+
+A proposed update to the datasetjson R package has been made. The discussion is tracked in this GitHub Issue: https://github.com/RConsortium/submissions-pilot5-datasetjson/issues/143
 
 ### NAs introduced by coercion.
 
