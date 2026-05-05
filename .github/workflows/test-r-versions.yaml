@@ -3,13 +3,15 @@ name: Test R Version Compatibility
 on:
   workflow_dispatch:
 
-permissions:
-  contents: read
+# Deny all permissions by default; each job grants only what it needs.
+permissions: {}
 
 jobs:
   test-r-version:
     name: Test R ${{ matrix.r-version }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: read  # required for actions/checkout
     strategy:
       fail-fast: false
       matrix:
@@ -73,6 +75,7 @@ jobs:
     needs: test-r-version
     if: always()
     runs-on: ubuntu-latest
+    permissions: {}  # no repository access required
 
     steps:
       - name: Download all run-log artifacts
