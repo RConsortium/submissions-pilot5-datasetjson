@@ -711,10 +711,32 @@ folder.
 
 6. Clean Global Environment
 
-## Keep only these objects in the Global Environment
-keep <- c("path", "adsl", "adae", "adadas", "adlbc", "adtte", tbl_demog, tbl_eff, file_km_plot, doc_primary)
+Successfully running all the ADaM and TLF programs can create a lot of objects in
+the Global Environment. Below is a code snippet that you can run to clean up the
+environment for easier viewing of the critical objects. The code emits a warning 
+if any objects are missing from the `keep` list.
 
+```r
+# Keep only these objects in the Global Environment
+keep <- c("path", "adsl", "adae", "adadas", "adlbc", "adtte", "tlf_demographic",
+          "tlf_efficacy", "tlf_kmplot", "tlf_primary")
+
+# Warn if anything in `keep` is missing from the Global Env
+missing <- setdiff(keep, ls(envir = .GlobalEnv))
+if (length(missing) > 0) {
+  warning("Missing objects in .GlobalEnv: ", paste(missing, collapse = ", "), call. = FALSE)
+}
+
+# Remove everything else
 rm(list = setdiff(ls(envir = .GlobalEnv), keep), envir = .GlobalEnv)
+```
+
+These are the critical objects that are used to write out the datasetjson, tables
+and figures:
+
+* `path` - A list that sets up directories
+* `adsl`, `adae`, `adadas`, `adlbc`, `adtte` - Final ADaM datasets pre-datasetjson conversion
+* `tlf_demographic`, `tlf_efficacy`, `tlf_kmplot`, `tlf_primary` - Table and Plot objects pre-rendering
 
 
  

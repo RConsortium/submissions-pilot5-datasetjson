@@ -169,7 +169,7 @@ if (!dir.exists(file.path(path$output, "rtf"))) {
 }
 
 ## -----------------------------------------------------------------------------
-tbl_eff <- list(tbl_1, tbl_2, tbl_3)
-tbl_eff %>%
+tlf_efficacy <- list(tbl_1, tbl_2, tbl_3)
+tlf_efficacy %>%
   r2rtf::rtf_encode() %>%
   r2rtf::write_rtf(file.path(path$output, "rtf/tlf-efficacy-pilot5.rtf"))

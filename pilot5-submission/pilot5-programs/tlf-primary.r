@@ -93,7 +93,7 @@ cat(huxtable::to_screen(ht))
 
 ## -----------------------------------------------------------------------------
 # nolint start
-doc_primary <- rtf_doc(ht) %>%
+tlf_primary <- rtf_doc(ht) %>%
   set_font_size(10) %>%
   set_ignore_cell_padding(TRUE) %>%
   set_column_header_buffer(top = 1) %>%
@@ -158,4 +158,4 @@ if (!dir.exists(file.path(path$output, "rtf"))) {
 }
 
 # Write out the RTF
-pharmaRTF::write_rtf(doc_primary, file = file.path(path$output, "rtf/tlf-primary-pilot5.rtf"))
+pharmaRTF::write_rtf(tlf_primary, file = file.path(path$output, "rtf/tlf-primary-pilot5.rtf"))

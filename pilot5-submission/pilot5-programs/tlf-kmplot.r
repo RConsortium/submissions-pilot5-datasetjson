@@ -109,7 +109,7 @@ caption <- cowplot::ggdraw() +
     size = 10
   )
 
-file_km_plot <- cowplot::plot_grid(
+tlf_kmplot <- cowplot::plot_grid(
   title, km, caption,
   ncol = 1,
   rel_heights = c(0.1, 0.8, 0.1)
@@ -119,7 +119,7 @@ if (!dir.exists(file.path(path$output, "pdf"))) {
   dir.create(file.path(path$output, "pdf"))
 }
 
-ggsave(file_km_plot,
+ggsave(tlf_kmplot,
   filename = file.path(path$output, "pdf/tlf-kmplot-pilot5.pdf"),
   scale = 2
 )
