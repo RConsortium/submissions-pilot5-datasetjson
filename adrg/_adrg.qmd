@@ -844,7 +844,7 @@ Warning messages:
 ...
 ```
 Using the datasetjson R package, a warning message is produced when the json files
-are read in.  We do not think this is an issue, but is being discussed with the datasetjson R package team. 
+are read in.  We do not think this is an issue. However, we have discussed with dataset R package team and fix is being discussed. See GitHub Issue: https://github.com/atorus-research/datasetjson/issues/76
 
 ### X from the Y table only contains missing values.
 
@@ -859,7 +859,7 @@ Warning messages:
 ...
 ```
 Using the metacore R package, a warning message is produced when the dataset spec files
-are read in.  We do not think this is an issue, but is being discussed with the metacore R package team. 
+are read in.  We do not think this is an issue. An updated version of metacore is available that allows users to "silence" these messages. See GitHub Issue: https://github.com/atorus-research/metacore/pull/138
   
 ## Pilot 3 and CDISC Pilot differences.
 
