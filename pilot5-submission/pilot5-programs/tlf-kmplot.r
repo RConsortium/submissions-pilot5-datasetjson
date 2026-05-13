@@ -119,12 +119,8 @@ if (!dir.exists(file.path(path$output, "pdf"))) {
   dir.create(file.path(path$output, "pdf"))
 }
 
-<<<<<<< resub_143_147_141_140
+# Width and height are specified to ensure consistent figure size across workstations
 ggsave(tlf_kmplot,
-=======
-# width and height are specified to ensure consistent figure size across workstations
-ggsave(file,
->>>>>>> main
   filename = file.path(path$output, "pdf/tlf-kmplot-pilot5.pdf"),
   width = 10,
   height = 8,
