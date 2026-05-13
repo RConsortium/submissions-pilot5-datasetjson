@@ -844,7 +844,19 @@ Warning messages:
 ...
 ```
 Using the datasetjson R package, a warning message is produced when the json files
+<<<<<<< HEAD
 are read in.  We do not think this is an issue. However, we have discussed with dataset R package team and fix is being discussed. See GitHub Issue: https://github.com/atorus-research/datasetjson/issues/76
+=======
+are read in. The issue was discussed with `datasetjson` R package team and is paraphrased below:
+
+> The warning is produced when `datasetjson::read_dataset_json()` applies
+> `as.double()` to numeric columns that contain missing values recorded as
+> character strings such as `"NA"`. R correctly converts those values to
+> missing (`NA`) but also emits the standard "NAs introduced by coercion"
+> warning during the conversion.
+
+The discussion is tracked in this GitHub Issue: https://github.com/atorus-research/datasetjson/issues/76
+>>>>>>> 6f8d656f2c9eab08337bac3308b540ee8e7fcd15
 
 ### X from the Y table only contains missing values.
 
