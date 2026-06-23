@@ -1,0 +1,119 @@
+name: Test R Version Compatibility
+
+on:
+  workflow_dispatch:
+
+# Deny all permissions by default; each job grants only what it needs.
+permissions: {}
+
+jobs:
+  test-r-version:
+    name: Test R ${{ matrix.r-version }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read  # required for actions/checkout
+    strategy:
+      fail-fast: false
+      matrix:
+        r-version: ['4.4.0', '4.4.1', '4.4.2', '4.4.3']
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up R ${{ matrix.r-version }}
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: ${{ matrix.r-version }}
+          use-public-rspm: true
+
+      - name: Restore renv packages
+        uses: r-lib/actions/setup-renv@v2
+        with:
+          cache-version: 1
+
+      - name: Create output directories
+        run: |
+          mkdir -p run-logs
+          mkdir -p pilot5-submission/pilot5-output/pilot5-tlfs
+          mkdir -p pilot5-submission/pilot5-output/pilot5-datasetjson
+
+      - name: Run all R programs
+        id: run_programs
+        # 2>&1 merges stderr into stdout so messages/warnings written to stderr
+        # are captured alongside regular output in the log file.
+        run: |
+          Rscript .github/scripts/run-programs.R "${{ matrix.r-version }}" \
+            2>&1 | tee run-logs/full-output.log
+        continue-on-error: true
+
+      - name: Write per-version step summary
+        if: always()
+        run: |
+          if [ -f "run-logs/summary.md" ]; then
+            cat run-logs/summary.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            {
+              echo "## R ${{ matrix.r-version }} Results"
+              echo ""
+              echo "**Status:** :warning: Run did not produce a summary — check the full log artifact."
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload run logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: run-logs-r${{ matrix.r-version }}
+          path: run-logs/
+          if-no-files-found: warn
+
+  # Runs after all matrix jobs (even if some fail) and generates a single
+  # consolidated compatibility table that links back to this workflow run.
+  generate-summary:
+    name: Generate Compatibility Summary
+    needs: test-r-version
+    if: always()
+    runs-on: ubuntu-latest
+    permissions: {}  # no repository access required
+
+    steps:
+      - name: Download all run-log artifacts
+        uses: actions/download-artifact@v4.1.3
+        with:
+          pattern: run-logs-r*
+          path: all-logs
+
+      - name: Generate consolidated markdown table
+        run: |
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+          {
+            echo "# R Version Compatibility Summary"
+            echo ""
+            echo "**Workflow run:** [Run \#${{ github.run_id }}]($RUN_URL)"
+            echo ""
+            echo "| R Version | Status | Logs |"
+            echo "|-----------|:------:|------|"
+
+            for version in 4.4.0 4.4.1 4.4.2 4.4.3; do
+              status_file="all-logs/run-logs-r${version}/status.txt"
+              if [ -f "$status_file" ]; then
+                status=$(head -1 "$status_file")
+                if [ "$status" = "success" ]; then
+                  icon="✅ Success"
+                else
+                  icon="❌ Failed"
+                fi
+              else
+                icon="⚠️ Unknown (CI error)"
+              fi
+              echo "| R ${version} | ${icon} | [View logs]($RUN_URL) |"
+            done
+          } | tee summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload consolidated summary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: r-version-compatibility-summary
+          path: summary.md
