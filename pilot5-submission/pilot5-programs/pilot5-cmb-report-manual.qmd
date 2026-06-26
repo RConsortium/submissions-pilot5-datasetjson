@@ -31,7 +31,7 @@ knitr::opts_chunk$set(fig.align = "center", out.width = "70%")
 
 library(here)
 
-source("pilot5-helper-fcns.r")
+#source("pilot5-helper-fcns.r")
 path <- list(
   sdtm = here("pilot5-submission", "pilot5-input", "sdtmdata", "datasetjson"),
   adam = here("pilot5-submission", "pilot5-input", "adamdata"),
