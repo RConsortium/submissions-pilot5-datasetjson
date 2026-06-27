@@ -205,6 +205,7 @@ Automated workflows that run on pushes and pull requests to ensure code quality,
 | `tlf-qc.yaml` | PR to `main` | Renders `tlf-qc.qmd` to compare Pilot 5 TLF outputs against Pilot 3 outputs using text diff and LLM-based visual comparison. Posts a summary comment and fails if mismatches exceed threshold. |
 | `publish-adrg.yaml` | Push to `main` (ADRG changes) | Builds the Nix environment and renders the ADRG as both HTML (published to Quarto Pub) and PDF (uploaded to Linode object storage). |
 | `publish-ectd-bundle.yaml` | Push to `main` (key file changes) | Builds the full eCTD bundle: renders ADRG, README, and cover letter; copies all submission files to the [eCTD repository](https://github.com/RConsortium/submissions-pilot5-datasetjson-to-fda); and pushes the updated bundle. |
+| `test-r-versions.yaml` | Manual (`workflow_dispatch`) | Tests that all ADaM and TLF programs run successfully across a matrix of R versions (4.4.0–4.4.3). Uses `run-programs.R` to execute every program and writes per-version logs and a summary markdown table. |
 
 #### Scripts (`.github/scripts/`)
 
@@ -213,6 +214,7 @@ Automated workflows that run on pushes and pull requests to ensure code quality,
 | `create-ectd-bundle.sh` | Bash script that assembles the eCTD submission folder structure by copying ADaM/SDTM JSON files, R programs, the ADRG PDF, the cover letter, `renv.lock`, the combined report, and the eCTD README into the correct ICH eCTD module directories. |
 | `push-ectd-bundle.sh` | Bash script that commits and pushes the assembled eCTD bundle to the `submissions-pilot5-datasetjson-to-fda` repository. |
 | `create-cmb-report.py` | Python script that converts `.out` (plain text) and `.rtf` TLF files to PDF using `fpdf` and `unoconv`/LibreOffice, then merges them with the KM-plot PDF into a single combined report PDF using `PyPDF2`. |
+| `run-programs.R` | R script used by the `test-r-versions.yaml` CI workflow to sequentially source all ADaM and TLF programs, capture stdout/stderr, and write per-program status logs and a markdown summary table to `run-logs/`. |
 
 ---
 
