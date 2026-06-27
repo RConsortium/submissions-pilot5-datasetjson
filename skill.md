@@ -45,7 +45,7 @@ Apply this skill whenever:
 ## Conventions
 
 - Table column headers are `File` (or `Folder`) and `Purpose`, separated by `|`.
-- File and folder names are wrapped in backticks (e.g., `` `example.r` ``).
+- File and folder names are wrapped in backticks (e.g., `` `example.R` ``).
 - Section separators (`---`) appear between major sections.
 - Descriptions are written in the present tense (e.g., "Generates ADSL…", "Renders the ADRG…").
 - Avoid duplicating information that is already captured in comments within the files themselves; the README entry should give a high-level summary only.
