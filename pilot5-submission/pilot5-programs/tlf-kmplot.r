@@ -119,12 +119,14 @@ if (!dir.exists(file.path(path$output, "pdf"))) {
   dir.create(file.path(path$output, "pdf"))
 }
 
-# Width and height are specified to ensure consistent figure size across workstations
+# Width/height match the checked-in reference PDF page box to keep rendering consistent.
 ggsave(tlf_kmplot,
   filename = file.path(path$output, "pdf/tlf-kmplot-pilot5.pdf"),
-  width = 10,
-  height = 8,
-  scale = 2
+  width = 14.375,
+  height = 7.736,
+  scale = 1,
+  units = "in",
+  device = grDevices::cairo_pdf
 )
 
 while (!is.null(dev.list())) dev.off()
