@@ -62,7 +62,11 @@ print(tlf_demographic)
 # Microsoft Office or Libre Office can do this.
 
 # This brings over the latest copy of km plot
-file.copy(file.path(path$output, "pdf", "tlf-kmplot-pilot5.pdf"), file.path("cmb-report-manual-files"), overwrite = TRUE)
+file.copy(
+  file.path(path$output, "pdf", "tlf-kmplot-pilot5.pdf"),
+  file.path("cmb-report-manual-files"),
+  overwrite = TRUE
+)
 ```
 
 \noindent\begin{minipage}[t]{\textwidth}
