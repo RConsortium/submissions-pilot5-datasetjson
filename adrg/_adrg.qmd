@@ -631,7 +631,7 @@ Restarting R session...
 To reproduce the analysis results from the JSON transport files, set up and run the following programs in the order below:
 
 
-1. Setting up .Rprofile
+**1. Setting up .Rprofile**
 
 Edit the `.Rprofile` file created in the working directory to match the following contents:
 
@@ -652,7 +652,7 @@ path <- list(
 If the file is not present in your working directory, then in the files window click on
 `More > Show Hidden Files` and it should appear in the files window. 
 
-2. Restart R Session 
+**2. Restart R Session**
 
 * Select `Session -> Restart R`
 * This will ensure that the list of paths in your Global Environment is populated.  
@@ -667,14 +667,36 @@ You should receive the following message in your console:
 [1] TRUE
 ```
 
-3. Using the source function, run the `pilot5-helper-fcns.r` program, 
-which will load all helper functions for datasets and displays into your global environment.
+**3. A quick preview of the datasetjson data**
+
+If you would like to inspect some of the available datasetjson files you can use the
+below code to read it into your Global Environment
+
+```r
+library(datasetjson)
+dm <- read_dataset_json(file.path(path$sdtm, "dm.json"))
+dplyr::glimpse(dm)
+```
+
+```r
+Rows: 306
+Columns: 25
+$ STUDYID  <chr> "CDISCPILOT01", "CDISCPILOT01", "CDISCPILOT01", "CDISCPILOT01",
+$ DOMAIN   <chr> "DM", "DM", "DM", "DM", "DM", "DM", "DM", "DM", "DM", "DM", 
+$ USUBJID  <chr> "01-701-1015", "01-701-1023", "01-701-1028", "01-701-1033", 
+$ SUBJID   <chr> "1015", "1023", "1028", "1033", "1034", "1047", "1057", "1097",
+$ RFSTDTC  <chr> "2014-01-02", "2012-08-05", "2013-07-19", "2014-03-18", 
+...
+```
+
+**4. Using the source function, run the `pilot5-helper-fcns.r` program, 
+which will load all helper functions for datasets and displays into your global environment.**
 
 ```r
 source(file.path(path$programs, "pilot5-helper-fcns.r"))
 ```
 
-4. Execute ADaM programs as seen in the order below:
+**5. Execute ADaM programs as seen in the order below:**
 
  - `adsl.r`
  - `adadas.r`
@@ -689,7 +711,7 @@ the name of the dataset in the command. Datasetjson files will be created for ea
 source(file.path(path$programs, "adsl.r"))
 ```
 
-5. Execute Display programs as seen in the order below:
+**6. Execute Display programs as seen in the order below:**
 
  - `tlf-demographic.r`
  - `tlf-efficacy.r`
@@ -708,6 +730,35 @@ called `out`, `pdf` and `rtf`. The programs `tlf-demographic.r` and `tlf-efficac
 produce outputs in the `rtf` folder.  The program `tlf-kmplot.r` will produce the output
 in the `pdf` folder. The `tlf-demographic.r` will produce the output in the `out`
 folder.
+
+**7. Clean Global Environment**
+
+Successfully running all the ADaM and TLF programs can create a lot of objects in
+the Global Environment. Below is a code snippet that you can run to clean up the
+environment for easier viewing of the critical objects. The code emits a warning 
+if any objects are missing from the `keep` list.
+
+```r
+# Keep only these objects in the Global Environment
+keep <- c("path", "adsl", "adae", "adadas", "adlbc", "adtte", "tlf_demographic",
+          "tlf_efficacy", "tlf_kmplot", "tlf_primary")
+
+# Warn if anything in `keep` is missing from the Global Env
+missing <- setdiff(keep, ls(envir = .GlobalEnv))
+if (length(missing) > 0) {
+  warning("Missing objects in .GlobalEnv: ", paste(missing, collapse = ", "), call. = FALSE)
+}
+
+# Remove everything else
+rm(list = setdiff(ls(envir = .GlobalEnv), keep), envir = .GlobalEnv)
+```
+
+These are the critical objects that are used to write out the datasetjson, tables
+and figures:
+
+* `path` - A list that sets up directories
+* `adsl`, `adae`, `adadas`, `adlbc`, `adtte` - Final ADaM datasets pre-datasetjson conversion
+* `tlf_demographic`, `tlf_efficacy`, `tlf_kmplot`, `tlf_primary` - Table and Plot objects pre-rendering
 
 
  
@@ -742,9 +793,19 @@ There are columns in BASE = Pilot 5 and COMPARE = Pilot 3 with different classes
 ```
 
 Pilot 3 data was written out as numeric.  For Pilot 5, the datasetjson R package writes 
-out data use Type from spec for integers and writes out the data as integer.  We do not think this is
-an issue, but is being discussed with the datasetjson R package team.
-  
+out data use Type from spec for integers and writes out the data as integer.  The issue was discussed with `datasetjson` R package team and is paraphrased below:
+
+> Using AGE as an example, the column metadata for AGE was set to 
+> integer, so datasetjson correctly wrote it out and read it back as an 
+> integer in Pilot 5. The Dataset-JSON v1.1 specification allows for 
+> integer, decimal, and float types, not a generic numeric type. Pilot
+> used XPT format, which stores all numeric values as 8-byte floating 
+> point, so there is no distinction between integer and numeric in XPT. 
+> This difference is simply a result of the format change and is not a 
+> meaningful issue. 
+
+The discussion is tracked in this GitHub Issue: https://github.com/RConsortium/submissions-pilot5-datasetjson/issues/143
+
 ### Formats
 
 All datasets have an issue where there are differences in attributes for SAS formats.
@@ -762,8 +823,15 @@ There are columns in BASE = Pilot 5 and COMPARE = Pilot 3 with differing attribu
 ```
 
 Pilot 3 data has the DATE9 format associated with it as an attribute.  For Pilot 5, 
-the datasetjson R package does not associate the format with the variable. 
-We do not think this is an issue, but is being discussed with the datasetjson R package team. 
+the datasetjson R package does not associate the format with the variable. The issue was discussed with `datasetjson` R package team and is paraphrased below:
+
+> The Dataset-JSON column metadata does include DATE9. in the 
+> displayFormat attribute for these date variables. However, when the 
+> datasetjson R package reads the data back into R, it does not assign 
+> this value to a format.sas attribute on the column. In contrast, 
+> haven::read_xpt() preserves the SAS format metadata from the XPT file.
+
+A proposed update to the datasetjson R package has been made. The discussion is tracked in this GitHub Issue: https://github.com/RConsortium/submissions-pilot5-datasetjson/issues/143
 
 ### NAs introduced by coercion.
 
@@ -775,8 +843,17 @@ Warning messages:
 4: In lapply(d[dbl_cols], as.double) : NAs introduced by coercion
 ...
 ```
+
 Using the datasetjson R package, a warning message is produced when the json files
-are read in.  We do not think this is an issue, but is being discussed with the datasetjson R package team. 
+are read in. The issue was discussed with `datasetjson` R package team and is paraphrased below:
+
+> The warning is produced when `datasetjson::read_dataset_json()` applies
+> `as.double()` to numeric columns that contain missing values recorded as
+> character strings such as `"NA"`. R correctly converts those values to
+> missing (`NA`) but also emits the standard "NAs introduced by coercion"
+> warning during the conversion.
+
+The discussion is tracked in this GitHub Issue: https://github.com/atorus-research/datasetjson/issues/76
 
 ### X from the Y table only contains missing values.
 
@@ -791,7 +868,7 @@ Warning messages:
 ...
 ```
 Using the metacore R package, a warning message is produced when the dataset spec files
-are read in.  We do not think this is an issue, but is being discussed with the metacore R package team. 
+are read in.  We do not think this is an issue. An updated version of metacore is available that allows users to "silence" these messages. See GitHub Issue: https://github.com/atorus-research/metacore/pull/138
   
 ## Pilot 3 and CDISC Pilot differences.
 

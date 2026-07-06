@@ -180,7 +180,7 @@ adas5 <- adas_locf2 %>%
   ungroup()
 
 # Export to xpt ---------------
-adas <- adas5 %>%
+adadas <- adas5 %>%
   convert_na_to_blanks() %>%
   drop_unspec_vars(adadas_spec) %>%
   sort_by_key(adadas_spec) %>%
