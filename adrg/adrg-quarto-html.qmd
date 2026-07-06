@@ -7,7 +7,7 @@ format:
   html:
     toc: true
     toc-location: body
-    self-contained: true
+    self-contained: false
     comments:
       hypothesis: true
     execute:
